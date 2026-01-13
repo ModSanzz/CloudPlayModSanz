@@ -129,12 +129,13 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 
 <script>
 // ================= CONFIG =================
-const WORKER_URL="https://adminku.sannafanity.workers.dev/";
+const WORKER_URL="https://adminku.sannafanity.workers.dev/"; // Ganti sesuai Worker URL-mu
 let configData=[], editIndex=null, filter="all";
 
 // ================= HELPER =================
 const $ = id => document.getElementById(id);
 const toastMsg = msg => { $("toast").textContent = msg; $("toast").classList.add("show"); setTimeout(()=>{$("toast").classList.remove("show");},3000); };
+function updateToggleLabel(){ $("maintenanceLabel").textContent = $("maintenanceToggle").checked ? "Maintenance ON" : "Maintenance OFF"; }
 
 // ================= DATE / FILTER =================
 function expired(d){ if(!d) return true; const e=new Date(d); e.setHours(0,0,0,0); const t=new Date(); t.setHours(0,0,0,0); return e < t; }
