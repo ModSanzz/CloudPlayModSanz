@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudplay / DPMods Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --primary: #C77DFF;
+  --card: #282828;
+  --bg: #121212;
+  --text: #fff;
+  --muted: #aaa;
+  --danger: #ff4d4d;
+  --soft-glow: 0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
+}
+body {margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px;}
+header {background:var(--card);padding:15px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.5);}
+h1 {margin:0;font-size:1.5rem;color:var(--primary);}
+.container {max-width:900px;margin:auto;padding:20px;}
+.search-bar {display:flex;gap:8px;margin-bottom:15px;}
+.search-bar input {flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;}
+.search-bar button {padding:10px 14px;border:none;border-radius:6px;background:var(--primary);color:#000;cursor:pointer;box-shadow:var(--soft-glow);}
+.filter-bar {display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
+.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0;}
+.filter-bar button.active {background:var(--primary);color:#000;}
+.user-item {background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
+.user-item.valid {border-left-color:var(--primary);}
+.user-item.expired {border-left-color:var(--danger); background:#331f1f;}
+.user-item-info {display:flex;align-items:center;flex-grow:1;}
+.user-item-text {flex-grow:1;}
+.user-item-text strong {display:block;color:#fff;}
+.user-item.expired .user-item-text strong {color:var(--danger);}
+.user-status-tag {padding:4px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;margin-right:10px;flex-shrink:0;}
+.user-item.valid .user-status-tag {background:var(--primary);color:#000;}
+.user-item.expired .user-status-tag {background:var(--danger);color:#fff;}
+.user-actions {display:flex;gap:5px;flex-shrink:0;align-items:center;}
+.action-btn {background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:6px;border-radius:50%;}
+.action-btn:hover {color:#fff;}
+.delete-btn {color:var(--danger);}
+nav {position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--card);display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 5px rgba(0,0,0,0.3);}
+.nav-item {text-align:center;color:var(--muted);cursor:pointer;}
+.nav-item.active {color:var(--primary);}
+.add-user-btn {width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;justify-content:center;align-items:center;font-size:24px;color:#000;transform:translateY(-15px);box-shadow:var(--soft-glow);cursor:pointer;}
+.modal {position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;}
+.modal-content {background:var(--card);padding:25px;border-radius:12px;width:90%;max-width:420px;}
+input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;box-sizing:border-box;}
+.btn {padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
+.btn-primary {background:var(--primary);color:#000;}
+.btn-secondary {background:#444;color:#fff;margin-right:10px;}
+.toast {position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:4000;}
+.toast.show {opacity:1;}
+</style>
+</head>
+<body>
+
+<header><h1>Cloudplay / DPMods Admin</h1></header>
+
+<div class="container">
+  <div id="usersTab">
+    <div class="search-bar">
+      <input id="searchInput" placeholder="Cari Build ID...">
+      <button onclick="searchIDs()"><i class="fa fa-search"></i></button>
+    </div>
+    <div class="filter-bar">
+      <button class="active" onclick="setFilter('all', this)">ALL <span id="count-all"></span></button>
+      <button onclick="setFilter('valid', this)">VALID <span id="count-valid"></span></button>
+      <button onclick="setFilter('expired', this)">EXPIRED <span id="count-expired"></span></button>
+    </div>
+    <div id="userList"></div>
+  </div>
+
+  <div id="settingsTab" style="display:none;">
+    <h2>Status Global</h2>
+    <div style="background:var(--card);padding:15px;border-radius:8px;margin-top:10px;">
+      <label>
+        <input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()">
+        <span id="maintenanceLabel">Maintenance OFF</span>
+      </label>
+      <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
+      <div style="text-align:right;margin-top:10px;">
+        <button class="btn-primary" onclick="saveMaintenance()">Simpan Status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
+  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
+  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
+</nav>
+
+<div class="modal" id="userModal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Add ID</h3>
+    <input id="buildInput" placeholder="Build ID">
+    <input id="userInput" placeholder="User (optional)" style="margin-top:8px;">
+    <div style="display:flex;gap:5px;margin:5px 0;">
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+30 Hari</button>
+    </div>
+    <input type="date" id="dateInput" oninput="updatePreview()">
+    <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
+    <div style="text-align:right;margin-top:10px;">
+      <button class="btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn-primary" onclick="saveID()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ================= CONFIG =================
+const WORKER_URL="https://adminku.sannafanity.workers.dev/";
+const RAW_CONFIG_URL=`${WORKER_URL}`;
+let configData=[], editIndex=null, filter="all";
+
+// ================= Helper =================
+const $=id=>document.getElementById(id);
+const toastMsg=m=>{$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");},3000)};
+
+// ================= CRUD & UI =================
+function expired(d){if(!d)return true; let e=new Date(d); e.setHours(0,0,0,0); let t=new Date(); t.setHours(0,0,0,0); return e<t;}
+function setFilter(f,el){filter=f;document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderIDs();}
+function searchIDs(){renderIDs();}
+function setExpiryShortcut(days){let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split('T')[0]; updatePreview();}
+function updatePreview(){const d=$("dateInput").value;$("previewStatus").textContent=`Status: ${expired(d)?'EXPIRED':'VALID'}`;}
+function showTab(tab){$("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();} else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateToggleLabel();}}
+
+// ================= CRUD =================
+function renderIDs(){
+  const list=$("userList"); list.innerHTML="";
+  let arr=configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:expired(i.date)}));
+  if(filter==="valid") arr=arr.filter(i=>!i.is_expired);
+  if(filter==="expired") arr=arr.filter(i=>i.is_expired);
+  const term=$("searchInput").value.trim().toLowerCase();
+  if(term) arr=arr.filter(i=>i.build_id.toLowerCase().includes(term));
+  arr.sort((a,b)=>a.build_id.localeCompare(b.build_id));
+  if(arr.length===0){list.innerHTML="<p style='color:#aaa'>Tidak ada ID.</p>"; return;}
+  arr.forEach((i,index)=>{
+    const div=document.createElement('div');
+    div.className=`user-item ${i.is_expired?'expired':'valid'}`;
+    div.innerHTML = `
+      <div class="user-item-info">
+        <span class="user-status-tag">${i.is_expired?'EXPIRED':'VALID'}</span>
+        <div class="user-item-text">
+          <strong>${i.build_id}</strong>
+          ${i.user ? `<span>User: ${i.user}</span>` : ''}
+          <span>Expires: ${i.date||'-'}</span>
+        </div>
+      </div>
+      <div class="user-actions">
+        <button class="action-btn" onclick="editID(${index})"><i class="fa fa-edit"></i></button>
+        <button class="action-btn delete-btn" onclick="deleteID(${index})"><i class="fa fa-trash-alt"></i></button>
+      </div>`;
+    list.appendChild(div);
+  });
+  updateCounts();
+}
+function updateCounts(){const all=configData.filter(i=>i.build_id!=="MAINTENANCE").length; const valid=configData.filter(i=>i.build_id!=="MAINTENANCE" && !expired(i.date)).length; const exp=configData.filter(i=>i.build_id!=="MAINTENANCE" && expired(i.date)).length; $("count-all").textContent=`(${all})`; $("count-valid").textContent=`(${valid})`; $("count-expired").textContent=`(${exp})`;}
+function openAdd(){editIndex=null;$("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("userModal").style.display="flex";}
+function closeModal(){$("userModal").style.display="none";}
+function editID(idx){editIndex=idx;$("modalTitle").textContent="Edit ID";$("buildInput").value=configData[idx].build_id;$("userInput").value=configData[idx].user||'';$("dateInput").value=configData[idx].date||'';updatePreview();$("userModal").style.display="flex";}
+function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus'); promptPasswordSave();}}
+function saveMaintenance(){const enabled=$("maintenanceToggle").checked; const msg=$("maintenanceMessage").value; const index=configData.findIndex(i=>i.build_id==="MAINTENANCE"); const obj={build_id:"MAINTENANCE",status:enabled?'active':'inactive',message:msg}; if(index>-1) configData[index]=obj; else configData.push(obj); toastMsg("Status disimpan"); promptPasswordSave();}
+
+// ================= SAVE ID =================
+function saveID() {
+  const id = $("buildInput").value.trim();
+  const user = $("userInput").value.trim();
+  const date = $("dateInput").value;
+  if (!id || !date) { toastMsg('Build & Date diperlukan'); return; }
+  const newItem = { build_id: id, user: user, date: date };
+  if (editIndex !== null) configData[editIndex] = newItem;
+  else {
+    if (configData.some(i=>i.build_id===id)) { toastMsg('ID sudah ada'); return; }
+    configData.push(newItem);
+  }
+  closeModal(); renderIDs(); promptPasswordSave();
+}
+
+// ================= PASSWORD & SAVE =================
+function promptPasswordSave(){
+  const pass = prompt("Masukkan password admin:");
+  if(!pass) return;
+  saveToWorker(pass);
+}
+
+async function saveToWorker(pass){
+  try{
+    const res = await fetch(WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({admin_password:pass,data:configData})
+    });
+    const data = await res.json();
+    if(data.success) toastMsg('Tersimpan via Worker');
+    else toastMsg('Gagal simpan');
+  }catch(e){console.error(e);toastMsg('Error simpan');}
+}
+
+// ================= INIT =================
+async function loadConfig(){
+  try{
+    const res = await fetch(RAW_CONFIG_URL);
+    configData = await res.json();
+    if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE",status:"inactive",message:""});
+    $("maintenanceToggle").checked=configData.find(i=>i.build_id==="MAINTENANCE").status==='active';
+    $("maintenanceMessage").value=configData.find(i=>i.build_id==="MAINTENANCE").message||'';
+    renderIDs();
+    toastMsg('Config dimuat dari Worker!');
+  }catch(e){console.error(e); toastMsg('Gagal load config');}
+}
+loadConfig();
+</script>
+</body>
+</html>
