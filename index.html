@@ -223,15 +223,24 @@ async function saveToWorker(pass){
       body: JSON.stringify({admin_password:pass,data:configData})
     });
     const data = await res.json();
-    if(data.success) toastMsg('Tersimpan via Worker');
-    else toastMsg('Gagal simpan');
-  }catch(e){console.error(e);toastMsg('Error simpan');}
+
+    if(data.success) {
+      toastMsg('Tersimpan via Worker');
+      // reload config terbaru dari Worker
+      await loadConfig(); // <-- ini bikin data client update otomatis
+    } else {
+      toastMsg('Gagal simpan');
+    }
+  }catch(e){
+    console.error(e);
+    toastMsg('Error simpan');
+  }
 }
 
 // ================= INIT =================
 async function loadConfig(){
   try{
-    const res = await fetch(RAW_CONFIG_URL);
+    const res = await fetch(RAW_CONFIG_URL, { cache:"no-store" }); // no cache
     configData = await res.json();
     if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE",status:"inactive",message:""});
     $("maintenanceToggle").checked=configData.find(i=>i.build_id==="MAINTENANCE").status==='active';
