@@ -24,7 +24,7 @@ h1 {margin:0;font-size:1.5rem;color:var(--primary);}
 .search-bar input {flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;}
 .search-bar button {padding:10px 14px;border:none;border-radius:6px;background:var(--primary);color:#000;cursor:pointer;box-shadow:var(--soft-glow);}
 .filter-bar {display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0;}
+.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:#muted;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active {background:var(--primary);color:#000;}
 .user-item {background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
 .user-item.valid {border-left-color:var(--primary);}
@@ -105,7 +105,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       <button onclick="setExpiryShortcut(30)">+30 Hari</button>
     </div>
     <input type="date" id="dateInput" oninput="updatePreview()">
-    <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
+    <div id="previewStatus" style="margin-top:5px;font-weight:700;padding:5px 10px;border-radius:6px;color:#000;background:#555;">Status: -</div>
     <div style="text-align:right;margin-top:10px;">
       <button class="btn-secondary" onclick="closeModal()">Batal</button>
       <button class="btn-primary" onclick="saveID()">Simpan</button>
@@ -130,7 +130,6 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 <script>
 // ================= CONFIG =================
 const WORKER_URL="https://adminku.sannafanity.workers.dev/";
-const RAW_CONFIG_URL=`${WORKER_URL}`;
 let configData=[], editIndex=null, filter="all";
 
 // ================= Helper =================
@@ -142,7 +141,7 @@ function expired(d){if(!d)return true; let e=new Date(d); e.setHours(0,0,0,0); l
 function setFilter(f,el){filter=f;document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderIDs();}
 function searchIDs(){renderIDs();}
 function setExpiryShortcut(days){let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split('T')[0]; updatePreview();}
-function updatePreview(){const d=$("dateInput").value;$("previewStatus").textContent=`Status: ${expired(d)?'EXPIRED':'VALID'}`;}
+function updatePreview(){const d=$("dateInput").value; const preview=$("previewStatus"); if(!d){ preview.textContent="Status: -"; preview.style.background="#555"; preview.style.color="#000"; return;} if(expired(d)){preview.textContent="Status: EXPIRED"; preview.style.background="#ff4d4d"; preview.style.color="#fff";} else {preview.textContent="Status: VALID"; preview.style.background="#C77DFF"; preview.style.color="#000";}}
 function showTab(tab){$("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();} else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateToggleLabel();}}
 
 // ================= CRUD =================
@@ -198,20 +197,9 @@ function saveID() {
 }
 
 // ================= PASSWORD MODAL =================
-function openPasswordModal(callback) {
-  window.passwordCallback = callback;
-  $("adminPasswordInput").value = "";
-  $("passwordModal").style.display = "flex";
-}
+function openPasswordModal(callback) { window.passwordCallback = callback; $("adminPasswordInput").value = ""; $("passwordModal").style.display = "flex"; }
 function closePasswordModal() { $("passwordModal").style.display = "none"; }
-function submitPasswordModal() {
-  const pass = $("adminPasswordInput").value.trim();
-  if (!pass) return;
-  closePasswordModal();
-  if (typeof window.passwordCallback === "function") {
-    window.passwordCallback(pass);
-  }
-}
+function submitPasswordModal() { const pass = $("adminPasswordInput").value.trim(); if(!pass) return; closePasswordModal(); if(typeof window.passwordCallback === "function"){window.passwordCallback(pass);} }
 function promptPasswordSave(){ openPasswordModal(saveToWorker); }
 
 // ================= SAVE TO WORKER =================
@@ -223,24 +211,15 @@ async function saveToWorker(pass){
       body: JSON.stringify({admin_password:pass,data:configData})
     });
     const data = await res.json();
-
-    if(data.success) {
-      toastMsg('Tersimpan via Worker');
-      // reload config terbaru dari Worker
-      await loadConfig(); // <-- ini bikin data client update otomatis
-    } else {
-      toastMsg('Gagal simpan');
-    }
-  }catch(e){
-    console.error(e);
-    toastMsg('Error simpan');
-  }
+    if(data.success){ toastMsg('Tersimpan via Worker'); await loadConfig(); } 
+    else { toastMsg('Gagal simpan'); }
+  }catch(e){console.error(e);toastMsg('Error simpan');}
 }
 
 // ================= INIT =================
 async function loadConfig(){
   try{
-    const res = await fetch(RAW_CONFIG_URL, { cache:"no-store" }); // no cache
+    const res = await fetch(WORKER_URL, { cache:"no-store" });
     configData = await res.json();
     if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE",status:"inactive",message:""});
     $("maintenanceToggle").checked=configData.find(i=>i.build_id==="MAINTENANCE").status==='active';
