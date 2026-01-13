@@ -24,7 +24,7 @@ h1 {margin:0;font-size:1.5rem;color:var(--primary);}
 .search-bar input {flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;}
 .search-bar button {padding:10px 14px;border:none;border-radius:6px;background:var(--primary);color:#000;cursor:pointer;box-shadow:var(--soft-glow);}
 .filter-bar {display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:#muted;cursor:pointer;flex-shrink:0;}
+.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0;}
 .filter-bar button.active {background:var(--primary);color:#000;}
 .user-item {background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
 .user-item.valid {border-left-color:var(--primary);}
@@ -132,28 +132,28 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 const WORKER_URL="https://adminku.sannafanity.workers.dev/";
 let configData=[], editIndex=null, filter="all";
 
-// ================= Helper =================
-const $=id=>document.getElementById(id);
-const toastMsg=m=>{$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show");},3000)};
+// ================= HELPER =================
+const $ = id => document.getElementById(id);
+const toastMsg = msg => { $("toast").textContent = msg; $("toast").classList.add("show"); setTimeout(()=>{$("toast").classList.remove("show");},3000); };
 
-// ================= CRUD & UI =================
-function expired(d){if(!d)return true; let e=new Date(d); e.setHours(0,0,0,0); let t=new Date(); t.setHours(0,0,0,0); return e<t;}
-function setFilter(f,el){filter=f;document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active"));el.classList.add("active");renderIDs();}
-function searchIDs(){renderIDs();}
-function setExpiryShortcut(days){let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split('T')[0]; updatePreview();}
-function updatePreview(){const d=$("dateInput").value; const preview=$("previewStatus"); if(!d){ preview.textContent="Status: -"; preview.style.background="#555"; preview.style.color="#000"; return;} if(expired(d)){preview.textContent="Status: EXPIRED"; preview.style.background="#ff4d4d"; preview.style.color="#fff";} else {preview.textContent="Status: VALID"; preview.style.background="#C77DFF"; preview.style.color="#000";}}
-function showTab(tab){$("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();} else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateToggleLabel();}}
+// ================= DATE / FILTER =================
+function expired(d){ if(!d) return true; const e=new Date(d); e.setHours(0,0,0,0); const t=new Date(); t.setHours(0,0,0,0); return e < t; }
+function setFilter(f,el){ filter=f; document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active")); el.classList.add("active"); renderIDs(); }
+function searchIDs(){ renderIDs(); }
+function setExpiryShortcut(days){ let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value = d.toISOString().split('T')[0]; updatePreview(); }
+function updatePreview(){ const d = $("dateInput").value; const preview=$("previewStatus"); if(!d){ preview.textContent="Status: -"; preview.style.background="#555"; preview.style.color="#000"; return; } if(expired(d)){ preview.textContent="Status: EXPIRED"; preview.style.background="#ff4d4d"; preview.style.color="#fff"; } else { preview.textContent="Status: VALID"; preview.style.background="#C77DFF"; preview.style.color="#000"; } }
+function showTab(tab){ $("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();} else { $("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateToggleLabel(); }}
 
 // ================= CRUD =================
 function renderIDs(){
   const list=$("userList"); list.innerHTML="";
-  let arr=configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:expired(i.date)}));
+  let arr = configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:expired(i.date)}));
   if(filter==="valid") arr=arr.filter(i=>!i.is_expired);
   if(filter==="expired") arr=arr.filter(i=>i.is_expired);
-  const term=$("searchInput").value.trim().toLowerCase();
-  if(term) arr=arr.filter(i=>i.build_id.toLowerCase().includes(term));
+  const term = $("searchInput").value.trim().toLowerCase();
+  if(term) arr = arr.filter(i=>i.build_id.toLowerCase().includes(term));
   arr.sort((a,b)=>a.build_id.localeCompare(b.build_id));
-  if(arr.length===0){list.innerHTML="<p style='color:#aaa'>Tidak ada ID.</p>"; return;}
+  if(arr.length===0){ list.innerHTML="<p style='color:#aaa'>Tidak ada ID.</p>"; return; }
   arr.forEach((i,index)=>{
     const div=document.createElement('div');
     div.className=`user-item ${i.is_expired?'expired':'valid'}`;
@@ -162,7 +162,7 @@ function renderIDs(){
         <span class="user-status-tag">${i.is_expired?'EXPIRED':'VALID'}</span>
         <div class="user-item-text">
           <strong>${i.build_id}</strong>
-          ${i.user ? `<span>User: ${i.user}</span>` : ''}
+          ${i.user?`<span>User: ${i.user}</span>`:''}
           <span>Expires: ${i.date||'-'}</span>
         </div>
       </div>
@@ -174,59 +174,73 @@ function renderIDs(){
   });
   updateCounts();
 }
-function updateCounts(){const all=configData.filter(i=>i.build_id!=="MAINTENANCE").length; const valid=configData.filter(i=>i.build_id!=="MAINTENANCE" && !expired(i.date)).length; const exp=configData.filter(i=>i.build_id!=="MAINTENANCE" && expired(i.date)).length; $("count-all").textContent=`(${all})`; $("count-valid").textContent=`(${valid})`; $("count-expired").textContent=`(${exp})`;}
-function openAdd(){editIndex=null;$("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("userModal").style.display="flex";}
-function closeModal(){$("userModal").style.display="none";}
-function editID(idx){editIndex=idx;$("modalTitle").textContent="Edit ID";$("buildInput").value=configData[idx].build_id;$("userInput").value=configData[idx].user||'';$("dateInput").value=configData[idx].date||'';updatePreview();$("userModal").style.display="flex";}
-function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus'); promptPasswordSave();}}
-function saveMaintenance(){const enabled=$("maintenanceToggle").checked; const msg=$("maintenanceMessage").value; const index=configData.findIndex(i=>i.build_id==="MAINTENANCE"); const obj={build_id:"MAINTENANCE",status:enabled?'active':'inactive',message:msg}; if(index>-1) configData[index]=obj; else configData.push(obj); toastMsg("Status disimpan"); promptPasswordSave();}
+function updateCounts(){
+  const all=configData.filter(i=>i.build_id!=="MAINTENANCE").length;
+  const valid=configData.filter(i=>i.build_id!=="MAINTENANCE" && !expired(i.date)).length;
+  const exp=configData.filter(i=>i.build_id!=="MAINTENANCE" && expired(i.date)).length;
+  $("count-all").textContent=`(${all})`;
+  $("count-valid").textContent=`(${valid})`;
+  $("count-expired").textContent=`(${exp})`;
+}
+
+// ================= ADD / EDIT =================
+function openAdd(){ editIndex=null; $("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("userModal").style.display="flex"; }
+function closeModal(){ $("userModal").style.display="none"; }
+function editID(idx){ editIndex=idx; $("modalTitle").textContent="Edit ID"; $("buildInput").value=configData[idx].build_id; $("userInput").value=configData[idx].user||''; $("dateInput").value=configData[idx].date||''; updatePreview(); $("userModal").style.display="flex"; }
+function deleteID(idx){ if(confirm(`Hapus ID ${configData[idx].build_id}?`)){ configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus'); promptPasswordSave(); } }
+function saveMaintenance(){
+  const enabled=$("maintenanceToggle").checked; const msg=$("maintenanceMessage").value;
+  const index=configData.findIndex(i=>i.build_id==="MAINTENANCE");
+  const obj={build_id:"MAINTENANCE", status:enabled?'active':'inactive', message:msg};
+  if(index>-1) configData[index]=obj; else configData.push(obj);
+  toastMsg("Status disimpan"); promptPasswordSave();
+}
 
 // ================= SAVE ID =================
-function saveID() {
-  const id = $("buildInput").value.trim();
-  const user = $("userInput").value.trim();
-  const date = $("dateInput").value;
-  if (!id || !date) { toastMsg('Build & Date diperlukan'); return; }
-  const newItem = { build_id: id, user: user, date: date };
-  if (editIndex !== null) configData[editIndex] = newItem;
-  else {
-    if (configData.some(i=>i.build_id===id)) { toastMsg('ID sudah ada'); return; }
-    configData.push(newItem);
-  }
+function saveID(){
+  const id=$("buildInput").value.trim();
+  const user=$("userInput").value.trim();
+  const date=$("dateInput").value;
+  if(!id || !date){ toastMsg('Build & Date diperlukan'); return; }
+  const newItem={build_id:id,user:user,date:date};
+  if(editIndex!==null) configData[editIndex]=newItem;
+  else { if(configData.some(i=>i.build_id===id)){ toastMsg('ID sudah ada'); return; } configData.push(newItem); }
   closeModal(); renderIDs(); promptPasswordSave();
 }
 
 // ================= PASSWORD MODAL =================
-function openPasswordModal(callback) { window.passwordCallback = callback; $("adminPasswordInput").value = ""; $("passwordModal").style.display = "flex"; }
-function closePasswordModal() { $("passwordModal").style.display = "none"; }
-function submitPasswordModal() { const pass = $("adminPasswordInput").value.trim(); if(!pass) return; closePasswordModal(); if(typeof window.passwordCallback === "function"){window.passwordCallback(pass);} }
+function openPasswordModal(callback){ window.passwordCallback=callback; $("adminPasswordInput").value=""; $("passwordModal").style.display="flex"; }
+function closePasswordModal(){ $("passwordModal").style.display="none"; }
+function submitPasswordModal(){ const pass=$("adminPasswordInput").value.trim(); if(!pass) return; closePasswordModal(); if(typeof window.passwordCallback==="function"){ window.passwordCallback(pass); } }
 function promptPasswordSave(){ openPasswordModal(saveToWorker); }
 
 // ================= SAVE TO WORKER =================
 async function saveToWorker(pass){
   try{
-    const res = await fetch(WORKER_URL,{
+    const res=await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({admin_password:pass,data:configData})
+      body: JSON.stringify({ admin_password:pass, data:configData })
     });
-    const data = await res.json();
+    const data=await res.json();
     if(data.success){ toastMsg('Tersimpan via Worker'); await loadConfig(); } 
-    else { toastMsg('Gagal simpan'); }
-  }catch(e){console.error(e);toastMsg('Error simpan');}
+    else{ toastMsg('Gagal simpan'); }
+  }catch(e){ console.error(e); toastMsg('Error simpan'); }
 }
 
 // ================= INIT =================
 async function loadConfig(){
   try{
-    const res = await fetch(WORKER_URL, { cache:"no-store" });
-    configData = await res.json();
-    if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE",status:"inactive",message:""});
-    $("maintenanceToggle").checked=configData.find(i=>i.build_id==="MAINTENANCE").status==='active';
-    $("maintenanceMessage").value=configData.find(i=>i.build_id==="MAINTENANCE").message||'';
+    const res = await fetch(WORKER_URL,{cache:"no-store"});
+    const json = await res.json();
+    configData=json.data || [];
+    if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE", status:"inactive", message:""});
+    const maintenance = configData.find(i=>i.build_id==="MAINTENANCE") || {};
+    $("maintenanceToggle").checked=maintenance.status==='active';
+    $("maintenanceMessage").value=maintenance.message||'';
     renderIDs();
     toastMsg('Config dimuat dari Worker!');
-  }catch(e){console.error(e); toastMsg('Gagal load config');}
+  }catch(e){ console.error(e); toastMsg('Gagal load config'); }
 }
 loadConfig();
 </script>
