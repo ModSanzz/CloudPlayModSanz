@@ -93,6 +93,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
   <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
 </nav>
 
+<!-- Modal Add/Edit User -->
 <div class="modal" id="userModal">
   <div class="modal-content">
     <h3 id="modalTitle">Add ID</h3>
@@ -108,6 +109,18 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
     <div style="text-align:right;margin-top:10px;">
       <button class="btn-secondary" onclick="closeModal()">Batal</button>
       <button class="btn-primary" onclick="saveID()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Password Admin -->
+<div class="modal" id="passwordModal">
+  <div class="modal-content">
+    <h3>Masukkan Password Admin</h3>
+    <input type="password" id="adminPasswordInput" placeholder="Password" style="margin-top:8px;">
+    <div style="text-align:right;margin-top:10px;">
+      <button class="btn-secondary" onclick="closePasswordModal()">Batal</button>
+      <button class="btn-primary" onclick="submitPasswordModal()">Submit</button>
     </div>
   </div>
 </div>
@@ -184,13 +197,24 @@ function saveID() {
   closeModal(); renderIDs(); promptPasswordSave();
 }
 
-// ================= PASSWORD & SAVE =================
-function promptPasswordSave(){
-  const pass = prompt("Masukkan password admin:");
-  if(!pass) return;
-  saveToWorker(pass);
+// ================= PASSWORD MODAL =================
+function openPasswordModal(callback) {
+  window.passwordCallback = callback;
+  $("adminPasswordInput").value = "";
+  $("passwordModal").style.display = "flex";
 }
+function closePasswordModal() { $("passwordModal").style.display = "none"; }
+function submitPasswordModal() {
+  const pass = $("adminPasswordInput").value.trim();
+  if (!pass) return;
+  closePasswordModal();
+  if (typeof window.passwordCallback === "function") {
+    window.passwordCallback(pass);
+  }
+}
+function promptPasswordSave(){ openPasswordModal(saveToWorker); }
 
+// ================= SAVE TO WORKER =================
 async function saveToWorker(pass){
   try{
     const res = await fetch(WORKER_URL,{
