@@ -1,0 +1,24 @@
+name: Update Config
+
+on:
+  workflow_dispatch:
+    inputs:
+      config_content:
+        description: 'JSON content to update'
+        required: true
+
+jobs:
+  update-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Update key.json
+        run: |
+          echo "${{ github.event.inputs.config_content }}" > key.json
+          git config user.name "Admin Panel Bot"
+          git config user.email "admin@cloudplay.com"
+          git add key.json
+          git commit -m "Update config via Admin Panel"
+          git push
