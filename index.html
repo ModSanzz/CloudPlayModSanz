@@ -10,206 +10,161 @@
 
 <style>
 :root{
-  --primary:#C77DFF;
-  --card:#282828;
-  --bg:#121212;
-  --text:#fff;
-  --muted:#aaa;
-  --danger:#ff4d4d;
+--primary:#C77DFF;--bg:#121212;--card:#1f1f1f;--text:#fff;--muted:#aaa;--danger:#ff4d4d;
 }
-body{margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px}
-header{background:var(--card);padding:15px;text-align:center}
-h1{margin:0;color:var(--primary)}
+body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);padding-bottom:70px}
+header{text-align:center;padding:15px;background:var(--card)}
 .container{max-width:900px;margin:auto;padding:20px}
-
 .search-bar{display:flex;gap:8px}
-.search-bar input{flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff}
-.search-bar button{padding:10px 14px;border:none;border-radius:6px;background:var(--primary);cursor:pointer}
-
-.filter-bar{display:flex;gap:10px;margin:15px 0}
-.filter-bar button{background:#333;border:none;padding:6px 14px;border-radius:20px;color:#aaa;cursor:pointer}
+.search-bar input{flex:1;padding:10px;background:#333;color:#fff;border-radius:6px;border:1px solid #444}
+.search-bar button{padding:10px 14px;border:none;border-radius:6px;background:var(--primary)}
+.filter-bar{display:flex;gap:8px;margin:15px 0;overflow-x:auto}
+.filter-bar button{background:#333;color:#aaa;border:none;padding:6px 14px;border-radius:20px}
 .filter-bar button.active{background:var(--primary);color:#000}
-
-.user-item{background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;border-left:5px solid}
+.user-item{background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid}
 .user-item.valid{border-color:var(--primary)}
-.user-item.expired{border-color:var(--danger);background:#331f1f}
-
-.tag{font-size:.7rem;font-weight:700;padding:4px 8px;border-radius:4px}
-.valid .tag{background:var(--primary);color:#000}
-.expired .tag{background:var(--danger)}
-
-.actions button{background:none;border:none;color:#aaa;font-size:18px;cursor:pointer}
-
+.user-item.expired{border-color:var(--danger)}
+.user-status{font-weight:700;margin-right:10px}
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--card);display:flex;justify-content:space-around;align-items:center}
-.add-btn{width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:22px;color:#000;margin-top:-30px}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center}
-.modal-content{background:var(--card);padding:20px;border-radius:12px;width:90%;max-width:400px}
-
-input,textarea{width:100%;padding:10px;margin-top:8px;border-radius:6px;border:1px solid #444;background:#333;color:#fff}
-.btn{padding:10px;border:none;border-radius:6px;font-weight:700;cursor:pointer}
-.primary{background:var(--primary);color:#000}
-.secondary{background:#444;color:#fff}
-
+.add-btn{width:55px;height:55px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:24px;color:#000}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center}
+.modal-content{background:var(--card);padding:20px;border-radius:10px;width:90%;max-width:420px}
+input,textarea{width:100%;padding:10px;background:#333;color:#fff;border-radius:6px;border:1px solid #444;margin-top:8px}
+button{cursor:pointer}
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s}
 .toast.show{opacity:1}
 </style>
 </head>
-
 <body>
 
-<header><h1>Cloudplay / DPMods Admin</h1></header>
+<header><h2>Cloudplay / DPMods Admin</h2></header>
 
 <div class="container">
-  <div class="search-bar">
-    <input id="search" placeholder="Cari Build ID">
-    <button onclick="render()">🔍</button>
-  </div>
+<div class="search-bar">
+<input id="search" placeholder="Cari Build ID">
+<button onclick="render()">🔍</button>
+</div>
 
-  <div class="filter-bar">
-    <button class="active" onclick="setFilter('all',this)">ALL</button>
-    <button onclick="setFilter('valid',this)">VALID</button>
-    <button onclick="setFilter('expired',this)">EXPIRED</button>
-  </div>
+<div class="filter-bar">
+<button class="active" onclick="setFilter('all',this)">ALL</button>
+<button onclick="setFilter('valid',this)">VALID</button>
+<button onclick="setFilter('expired',this)">EXPIRED</button>
+</div>
 
-  <div id="list"></div>
+<div id="list"></div>
 </div>
 
 <nav>
-  <div>ID</div>
-  <div class="add-btn" onclick="openAdd()">+</div>
-  <div>Status</div>
+<div onclick="showSettings()">⚙️</div>
+<div class="add-btn" onclick="openAdd()">+</div>
+<div onclick="showList()">📄</div>
 </nav>
 
-<!-- MODAL ADD -->
+<!-- ADD / EDIT -->
 <div class="modal" id="modal">
-  <div class="modal-content">
-    <h3 id="modalTitle">Add ID</h3>
-    <input id="build">
-    <input id="user" placeholder="User (opsional)">
-    <input type="date" id="date">
-    <br><br>
-    <button class="btn secondary" onclick="closeModal()">Batal</button>
-    <button class="btn primary" onclick="save()">Simpan</button>
-  </div>
+<div class="modal-content">
+<h3 id="modalTitle">Add ID</h3>
+<input id="build">
+<input id="date" type="date">
+<div style="margin-top:10px;text-align:right">
+<button onclick="closeModal()">Batal</button>
+<button onclick="saveID()">Simpan</button>
+</div>
+</div>
 </div>
 
 <!-- PASSWORD -->
 <div class="modal" id="passModal">
-  <div class="modal-content">
-    <h3>Password Admin</h3>
-    <input type="password" id="pass">
-    <br><br>
-    <button class="btn secondary" onclick="closePass()">Batal</button>
-    <button class="btn primary" onclick="submitPass()">OK</button>
-  </div>
+<div class="modal-content">
+<h3>Password Admin</h3>
+<input type="password" id="pass">
+<div style="margin-top:10px;text-align:right">
+<button onclick="closePass()">Batal</button>
+<button onclick="submitPass()">OK</button>
+</div>
+</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ================= CONFIG ================= */
-const WORKER_URL = "https://adminku.sannafanity.workers.dev";
-let data=[],edit=null,filter="all";
+const WORKER_URL="https://adminku.sannafanity.workers.dev/";
+let RAW=[],DATA=[],FILTER="all",EDIT=null;
 
-/* ================= HELPER ================= */
-const $=i=>document.getElementById(i);
-const toast=m=>{$("toast").textContent=m;$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show")},2500)};
-const expired=d=>new Date(d)<new Date().setHours(0,0,0,0);
+const $=e=>document.getElementById(e);
+const toast=t=>{$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>{$("toast").classList.remove("show")},3000)}
 
-/* ================= LOAD ================= */
-async function load(){
-  const r=await fetch(WORKER_URL,{cache:"no-store"});
-  const j=await r.json();
-  data=j.data||[];
-  render();
-}
-load();
+const expired=d=>new Date(d)<new Date().setHours(0,0,0,0)
 
-/* ================= RENDER ================= */
-function setFilter(f,b){
-  filter=f;
-  document.querySelectorAll(".filter-bar button").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  render();
-}
+function setFilter(f,el){FILTER=f;document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active"));el.classList.add("active");render()}
 
 function render(){
-  const l=$("list");l.innerHTML="";
-  let arr=data.filter(i=>i.build_id!=="MAINTENANCE");
-  if(filter==="valid")arr=arr.filter(i=>!expired(i.date));
-  if(filter==="expired")arr=arr.filter(i=>expired(i.date));
+const list=$("list");list.innerHTML=""
+DATA=RAW.filter(i=>i.build_id!=="MAINTENANCE")
+.filter(i=>{
+if(FILTER==="valid")return !expired(i.date)
+if(FILTER==="expired")return expired(i.date)
+return true
+})
+.filter(i=>i.build_id.toLowerCase().includes($("search").value.toLowerCase()))
 
-  const q=$("search").value.toLowerCase();
-  if(q)arr=arr.filter(i=>i.build_id.toLowerCase().includes(q));
-
-  arr.forEach((i,idx)=>{
-    const d=document.createElement("div");
-    d.className="user-item "+(expired(i.date)?"expired":"valid");
-    d.innerHTML=`
-      <div>
-        <span class="tag">${expired(i.date)?"EXPIRED":"VALID"}</span>
-        <b>${i.build_id}</b><br>
-        ${i.user||""}<br>
-        Expires: ${i.date}
-      </div>
-      <div class="actions">
-        <button onclick="editID(${idx})">✏️</button>
-        <button onclick="del(${idx})">🗑️</button>
-      </div>`;
-    l.appendChild(d);
-  });
+DATA.forEach((i,idx)=>{
+const d=document.createElement("div")
+d.className=`user-item ${expired(i.date)?"expired":"valid"}`
+d.innerHTML=`<div><b>${i.build_id}</b><br>${i.date}</div>
+<div>
+<button onclick="edit(${idx})">✏️</button>
+<button onclick="del(${idx})">🗑</button>
+</div>`
+list.appendChild(d)
+})
 }
 
-/* ================= CRUD ================= */
-function openAdd(){
-  edit=null;
-  $("build").value="";
-  $("user").value="";
-  $("date").value="";
-  $("modal").style.display="flex";
-}
-function closeModal(){ $("modal").style.display="none"; }
+function openAdd(){EDIT=null;$("build").value="";$("date").value="";$("modal").style.display="flex"}
+function closeModal(){$("modal").style.display="none"}
 
-function editID(i){
-  edit=i;
-  const d=data[i];
-  $("build").value=d.build_id;
-  $("user").value=d.user||"";
-  $("date").value=d.date;
-  $("modal").style.display="flex";
-}
+function edit(i){EDIT=i;$("build").value=DATA[i].build_id;$("date").value=DATA[i].date;$("modal").style.display="flex"}
 
 function del(i){
-  if(confirm("Hapus?")){
-    data.splice(i,1);
-    savePrompt();
-  }
+if(confirm("Hapus?")){
+RAW=RAW.filter(r=>r.build_id!==DATA[i].build_id)
+save()
+}
+}
+
+function saveID(){
+const b=$("build").value.trim(),d=$("date").value
+if(!b||!d)return toast("Lengkapi data")
+if(EDIT!==null) RAW=RAW.map(r=>r.build_id===DATA[EDIT].build_id?{build_id:b,date:d}:r)
+else RAW.push({build_id:b,date:d})
+closeModal();save()
 }
 
 function save(){
-  const o={build_id:$("build").value,user:$("user").value,date:$("date").value};
-  if(edit!==null)data[edit]=o; else data.push(o);
-  closeModal();savePrompt();
+$("passModal").style.display="flex"
 }
 
-/* ================= SAVE ================= */
-function savePrompt(){
-  $("pass").value="";
-  $("passModal").style.display="flex";
+function closePass(){$("passModal").style.display="none"}
+function submitPass(){
+const p=$("pass").value
+fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({admin_password:p,data:RAW})})
+.then(r=>r.json()).then(j=>{
+if(j.success){toast("Tersimpan");load()}
+else toast("Gagal simpan")
+})
+closePass()
 }
-function closePass(){ $("passModal").style.display="none"; }
-async function submitPass(){
-  $("passModal").style.display="none";
-  const r=await fetch(WORKER_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({admin_password:$("pass").value,data})
-  });
-  const j=await r.json();
-  j.success?(toast("Tersimpan"),load()):toast("Gagal simpan");
+
+function load(){
+fetch(WORKER_URL,{cache:"no-store"}).then(r=>r.json()).then(j=>{
+RAW=j.data||[]
+render()
+toast("Data dimuat")
+})
 }
+
+load()
 </script>
-
 </body>
 </html>
