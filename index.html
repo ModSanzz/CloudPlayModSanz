@@ -24,7 +24,7 @@ h1 {margin:0;font-size:1.5rem;color:var(--primary);}
 .search-bar input {flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;}
 .search-bar button {padding:10px 14px;border:none;border-radius:6px;background:var(--primary);color:#000;cursor:pointer;box-shadow:var(--soft-glow);}
 .filter-bar {display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:#muted;cursor:pointer;flex-shrink:0;}
+.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0;}
 .filter-bar button.active {background:var(--primary);color:#000;}
 .user-item {background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
 .user-item.valid {border-left-color:var(--primary);}
@@ -218,36 +218,38 @@ function closePasswordModal() { $("passwordModal").style.display = "none"; }
 function submitPasswordModal() { const pass = $("adminPasswordInput").value.trim(); if (!pass) return; closePasswordModal(); if (pass !== ADMIN_PASSWORD) { toastMsg('Password salah!'); return; } if (typeof window.passwordCallback === "function") window.passwordCallback(); }
 function promptPasswordSave(){ openPasswordModal(saveToGitHub); }
 
-// ================= GITHUB =================
+// ================= GITHUB ACTION =================
+async function saveToGitHub() {
+  try {
+    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/update-config.yml/dispatches`;
+    const body = { ref: BRANCH, inputs: { config_content: JSON.stringify(configData, null, 2) } };
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) { toastMsg("Tersimpan ke GitHub via Action!"); console.log("Dispatch berhasil"); }
+    else { const errText = await res.text(); console.error("Gagal dispatch:", res.status, res.statusText, errText); toastMsg(`Gagal simpan (${res.status})`); }
+  } catch(e) { console.error(e); toastMsg("Error saat memanggil Action!"); }
+}
+
+// ================= LOAD CONFIG =================
 async function loadConfig() {
-  try{
-    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?ref=${BRANCH}`;
-    const res = await fetch(url, {headers:{Authorization:`token ${GITHUB_TOKEN}`}});
-    const data = await res.json();
-    const jsonString = atob(data.content.replace(/\n/g,""));
-    configData = JSON.parse(jsonString);
+  try {
+    const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${FILE_PATH}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.statusText);
+    configData = await res.json();
     if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE",status:"inactive",message:""});
     $("maintenanceToggle").checked=configData.find(i=>i.build_id==="MAINTENANCE").status==='active';
     $("maintenanceMessage").value=configData.find(i=>i.build_id==="MAINTENANCE").message||'';
     renderIDs();
     toastMsg('Config dimuat dari GitHub!');
-  }catch(e){console.error(e); toastMsg('Gagal load config');}
-}
-
-async function saveToGitHub() {
-  try {
-    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
-    const getRes = await fetch(url + `?ref=${BRANCH}`, {headers:{Authorization:`token ${GITHUB_TOKEN}`}});
-    if(!getRes.ok){ const errText=await getRes.text(); console.error("Gagal fetch SHA:", getRes.status, getRes.statusText, errText); toastMsg(`Gagal fetch SHA (${getRes.status})`); return; }
-    const fileData = await getRes.json();
-    if(!fileData.sha){ console.error("SHA kosong:", fileData); toastMsg("SHA kosong! Cek token & branch."); return; }
-    const sha = fileData.sha;
-    const body = { message:"Update config via Admin Panel", content:btoa(JSON.stringify(configData,null,2)), branch:BRANCH, sha };
-    const putRes = await fetch(url,{method:"PUT",headers:{"Authorization":`token ${GITHUB_TOKEN}`,"Content-Type":"application/json"},body:JSON.stringify(body)});
-    const result = await putRes.json();
-    if(putRes.ok && result.content){ toastMsg('Tersimpan ke GitHub!'); console.log("Update berhasil:", result); }
-    else{ console.error("Gagal simpan:", putRes.status, putRes.statusText, result); toastMsg(`Gagal simpan (${putRes.status})`);}
-  }catch(e){console.error("Error saveToGitHub:", e); toastMsg('Error saat menyimpan ke GitHub! Cek console.');}
+  } catch(e){ console.error(e); toastMsg('Gagal load config'); }
 }
 
 // ================= INIT =================
