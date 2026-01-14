@@ -52,7 +52,6 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 <body>
 
 <header><h1>Cloudplay / DPMods Admin</h1></header>
-
 <div class="container">
 
 <!-- USERS TAB -->
@@ -78,8 +77,9 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       <span id="maintenanceLabel">Maintenance OFF</span>
     </label>
     <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
+    <input id="adminPasswordSettings" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
+    <button class="btn-primary" style="margin-top:10px;" onclick="saveMaintenance()">Simpan Maintenance</button>
   </div>
-</div>
 </div>
 
 <!-- MODAL ADD/EDIT ID -->
@@ -112,21 +112,24 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 </nav>
 
 <script>
-// UTILITY
 const $ = id => document.getElementById(id);
-const toastMsg = m => {
-  $("toast").textContent = m;
-  $("toast").classList.add("show");
-  setTimeout(()=>$("toast").classList.remove("show"),3000);
-};
+const toastMsg = m => { $("toast").textContent = m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
 function expired(d) { if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t; }
 
-// DATA
-let configData = [
-  { build_id:"MAINTENANCE", status:"inactive", message:"Tidak ada maintenance saat ini." }
-];
+let configData = [];
 let editIndex=null;
 let filter="all";
+
+// LOAD DATA DARI WORKER
+async function loadData(){
+  try{
+    const res = await fetch("https://adminku.sannafanity.workers.dev/");
+    const data = await res.json();
+    if(Array.isArray(data)){ configData = data; renderIDs(); updateMaintenanceUI(); }
+    else toastMsg("Data key.json kosong atau error");
+  }catch(e){ console.error(e); toastMsg("Gagal load data dari Worker"); }
+}
+loadData();
 
 // RENDER IDs
 function renderIDs() {
@@ -156,17 +159,6 @@ function renderIDs() {
       </div>`;
     list.appendChild(div);
   });
-  updateCounts();
-}
-
-// UPDATE COUNTS
-function updateCounts() {
-  const all=configData.filter(i=>i.build_id!=="MAINTENANCE").length;
-  const valid=configData.filter(i=>i.build_id!=="MAINTENANCE" && !expired(i.date)).length;
-  const exp=configData.filter(i=>i.build_id!=="MAINTENANCE" && expired(i.date)).length;
-  $("count-all").textContent=`(${all})`;
-  $("count-valid").textContent=`(${valid})`;
-  $("count-expired").textContent=`(${exp})`;
 }
 
 // FILTER & SEARCH
@@ -187,13 +179,10 @@ function updatePreview(){const d=$("dateInput").value; $("previewStatus").textCo
 function updateMaintenanceUI(){const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){$("maintenanceToggle").checked=m.status==="active"; $("maintenanceMessage").value=m.message; updateToggleLabel();}}
 function updateToggleLabel(){$("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF';}
 
-// SAVE ALL
+// SAVE ALL (ID)
 async function saveAll(){
   const pw = $("adminPassword").value.trim();
   if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
-
-  const m=configData.find(i=>i.build_id==="MAINTENANCE"); 
-  if(m){m.status=$("maintenanceToggle").checked?"active":"inactive"; m.message=$("maintenanceMessage").value;}
 
   if($("modalTitle").textContent.includes("Add")||$("modalTitle").textContent.includes("Edit")){
     const build=$("buildInput").value.trim(); if(!build){toastMsg("Build ID kosong!"); return;}
@@ -209,7 +198,7 @@ async function saveAll(){
     const res=await fetch("https://adminku.sannafanity.workers.dev/",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(configData)
+      body:JSON.stringify({password:pw, data:configData})
     });
     const result=await res.json();
     if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate di GitHub!");} 
@@ -217,10 +206,35 @@ async function saveAll(){
   }catch(e){console.error(e); toastMsg("Terjadi error saat update ke GitHub!");}
 }
 
-// TAB NAVIGATION
-function showTab(tab){$("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();} else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}}
-renderIDs();
-</script>
+// SAVE MAINTENANCE
+async function saveMaintenance(){
+  const pw = $("adminPasswordSettings").value.trim();
+  if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
+  let m = configData.find(i=>i.build_id==="MAINTENANCE");
+  if(!m){ m={build_id:"MAINTENANCE",status:"inactive",message:""}; configData.push(m);}
+  m.status = $("maintenanceToggle").checked?"active":"inactive";
+  m.message = $("maintenanceMessage").value;
 
+  try{
+    const res=await fetch("https://adminku.sannafanity.workers.dev/",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password:pw, data:configData})
+    });
+    const result=await res.json();
+    if(res.ok && result.status==="success"){toastMsg("Maintenance berhasil diupdate!");} 
+    else {console.error(result); toastMsg("Gagal update maintenance ke GitHub!");}
+  }catch(e){console.error(e); toastMsg("Terjadi error saat update maintenance!");}
+}
+
+// TAB NAVIGATION
+function showTab(tab){
+  $("usersTab").style.display="none"; $("settingsTab").style.display="none";
+  $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active");
+  if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();}
+  else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}
+}
+
+</script>
 </body>
 </html>
