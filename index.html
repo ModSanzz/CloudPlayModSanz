@@ -24,7 +24,7 @@ h1 {margin:0;font-size:1.5rem;color:var(--primary);}
 .search-bar input {flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;}
 .search-bar button {padding:10px 14px;border:none;border-radius:6px;background:var(--primary);color:#000;cursor:pointer;box-shadow:var(--soft-glow);}
 .filter-bar {display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0;}
+.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:#muted;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active {background:var(--primary);color:#000;}
 .user-item {background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
 .user-item.valid {border-left-color:var(--primary);}
@@ -81,7 +81,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       </label>
       <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
       <div style="text-align:right;margin-top:10px;">
-        <button class="btn-primary" onclick="saveMaintenance()">Simpan Status</button>
+        <button class="btn-primary" onclick="saveToWorker()">Simpan Status</button>
       </div>
     </div>
   </div>
@@ -108,19 +108,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
     <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
     <div style="text-align:right;margin-top:10px;">
       <button class="btn-secondary" onclick="closeModal()">Batal</button>
-      <button class="btn-primary" onclick="saveID()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Password Admin -->
-<div class="modal" id="passwordModal">
-  <div class="modal-content">
-    <h3>Masukkan Password Admin</h3>
-    <input type="password" id="adminPasswordInput" placeholder="Password" style="margin-top:8px;">
-    <div style="text-align:right;margin-top:10px;">
-      <button class="btn-secondary" onclick="closePasswordModal()">Batal</button>
-      <button class="btn-primary" onclick="submitPasswordModal()">Submit</button>
+      <button class="btn-primary" onclick="saveToWorker()">Simpan</button>
     </div>
   </div>
 </div>
@@ -129,12 +117,8 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 
 <script>
 // ================= CONFIG =================
-const REPO_OWNER = "ModSanzz";
-const REPO_NAME = "CloudPlayModSanz";
-const FILE_PATH = "key.json";
-const BRANCH = "main";
-const GITHUB_TOKEN = "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"; // ganti token
 const ADMIN_PASSWORD = "sanzmods";
+const WORKER_URL = "https://adminku.sannafanity.workers.dev/";
 
 let configData = [];
 let editIndex = null;
@@ -184,76 +168,35 @@ function updateCounts(){const all=configData.filter(i=>i.build_id!=="MAINTENANCE
 function openAdd(){editIndex=null;$("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("userModal").style.display="flex";}
 function closeModal(){$("userModal").style.display="none";}
 function editID(idx){editIndex=idx;$("modalTitle").textContent="Edit ID";$("buildInput").value=configData[idx].build_id;$("userInput").value=configData[idx].user||'';$("dateInput").value=configData[idx].date||'';updatePreview();$("userModal").style.display="flex";}
-function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus'); promptPasswordSave();}}
+function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus');} updatePreview();}
 function updateToggleLabel(){ $("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF';}
 
-// ================= SAVE =================
-function saveMaintenance(){
-  const enabled=$("maintenanceToggle").checked;
-  const msg=$("maintenanceMessage").value;
-  const index=configData.findIndex(i=>i.build_id==="MAINTENANCE");
-  const obj={build_id:"MAINTENANCE",status:enabled?'active':'inactive',message:msg};
-  if(index>-1) configData[index]=obj; else configData.push(obj);
-  toastMsg("Status disimpan");
-  promptPasswordSave();
-}
-
-function saveID() {
-  const id = $("buildInput").value.trim();
-  const user = $("userInput").value.trim();
-  const date = $("dateInput").value;
-  if (!id || !date) { toastMsg('Build & Date diperlukan'); return; }
-  const newItem = { build_id: id, user: user, date: date };
-  if (editIndex !== null) configData[editIndex] = newItem;
-  else {
-    if (configData.some(i=>i.build_id===id)) { toastMsg('ID sudah ada'); return; }
-    configData.push(newItem);
-  }
-  closeModal(); renderIDs(); promptPasswordSave();
-}
-
-// ================= PASSWORD MODAL =================
-function openPasswordModal(callback) { window.passwordCallback = callback; $("adminPasswordInput").value = ""; $("passwordModal").style.display = "flex"; }
-function closePasswordModal() { $("passwordModal").style.display = "none"; }
-function submitPasswordModal() { const pass = $("adminPasswordInput").value.trim(); if (!pass) return; closePasswordModal(); if (pass !== ADMIN_PASSWORD) { toastMsg('Password salah!'); return; } if (typeof window.passwordCallback === "function") window.passwordCallback(); }
-function promptPasswordSave(){ openPasswordModal(saveToGitHub); }
-
-// ================= GITHUB ACTION =================
-async function saveToGitHub() {
+// ================= SAVE VIA WORKER =================
+async function saveToWorker() {
   try {
-    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/update-config.yml/dispatches`;
-    const body = { ref: BRANCH, inputs: { config_content: JSON.stringify(configData, null, 2) } };
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `token ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(configData)
     });
-    if (res.ok) { toastMsg("Tersimpan ke GitHub via Action!"); console.log("Dispatch berhasil"); }
-    else { const errText = await res.text(); console.error("Gagal dispatch:", res.status, res.statusText, errText); toastMsg(`Gagal simpan (${res.status})`); }
-  } catch(e) { console.error(e); toastMsg("Error saat memanggil Action!"); }
-}
-
-// ================= LOAD CONFIG =================
-async function loadConfig() {
-  try {
-    const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${FILE_PATH}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(res.statusText);
-    configData = await res.json();
-    if(!configData.some(i=>i.build_id==="MAINTENANCE")) configData.unshift({build_id:"MAINTENANCE",status:"inactive",message:""});
-    $("maintenanceToggle").checked=configData.find(i=>i.build_id==="MAINTENANCE").status==='active';
-    $("maintenanceMessage").value=configData.find(i=>i.build_id==="MAINTENANCE").message||'';
-    renderIDs();
-    toastMsg('Config dimuat dari GitHub!');
-  } catch(e){ console.error(e); toastMsg('Gagal load config'); }
+    const data = await res.json();
+    if(data.status==="success"){ toastMsg("Tersimpan ke GitHub via Worker!"); }
+    else{ toastMsg("Gagal simpan: " + JSON.stringify(data.result)); console.error(data); }
+  } catch(e) {
+    console.error(e);
+    toastMsg("Error koneksi ke Worker!");
+  }
 }
 
 // ================= INIT =================
-loadConfig();
+(async function(){
+  // Bisa load default config dulu, misal kosong atau fetch JSON statis
+  configData = [
+    {build_id:"MAINTENANCE", status:"inactive", message:""}
+  ];
+  renderIDs();
+})();
 </script>
+
 </body>
 </html>
