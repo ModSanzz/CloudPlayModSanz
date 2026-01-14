@@ -8,13 +8,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root {
-  --primary: #C77DFF;
-  --card: #282828;
-  --bg: #121212;
-  --text: #fff;
-  --muted: #aaa;
-  --danger: #ff4d4d;
-  --soft-glow: 0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
+  --primary:#C77DFF; --card:#282828; --bg:#121212; --text:#fff;
+  --muted:#aaa; --danger:#ff4d4d; --soft-glow:0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
 }
 body {margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px;}
 header {background:var(--card);padding:15px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.5);}
@@ -59,40 +54,35 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 <header><h1>Cloudplay / DPMods Admin</h1></header>
 
 <div class="container">
-  <div id="usersTab">
-    <div class="search-bar">
-      <input id="searchInput" placeholder="Cari Build ID...">
-      <button onclick="searchIDs()"><i class="fa fa-search"></i></button>
-    </div>
-    <div class="filter-bar">
-      <button class="active" onclick="setFilter('all', this)">ALL <span id="count-all"></span></button>
-      <button onclick="setFilter('valid', this)">VALID <span id="count-valid"></span></button>
-      <button onclick="setFilter('expired', this)">EXPIRED <span id="count-expired"></span></button>
-    </div>
-    <div id="userList"></div>
-  </div>
 
-  <div id="settingsTab" style="display:none;">
-    <h2>Status Global</h2>
-    <div style="background:var(--card);padding:15px;border-radius:8px;margin-top:10px;">
-      <label>
-        <input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()">
-        <span id="maintenanceLabel">Maintenance OFF</span>
-      </label>
-      <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
-      <div style="text-align:right;margin-top:10px;">
-        <button class="btn-primary" onclick="saveToWorker()">Simpan Status</button>
-      </div>
-    </div>
+<!-- USERS TAB -->
+<div id="usersTab">
+  <div class="search-bar">
+    <input id="searchInput" placeholder="Cari Build ID...">
+    <button onclick="searchIDs()"><i class="fa fa-search"></i></button>
   </div>
+  <div class="filter-bar">
+    <button class="active" onclick="setFilter('all', this)">ALL <span id="count-all"></span></button>
+    <button onclick="setFilter('valid', this)">VALID <span id="count-valid"></span></button>
+    <button onclick="setFilter('expired', this)">EXPIRED <span id="count-expired"></span></button>
+  </div>
+  <div id="userList"></div>
 </div>
 
-<nav>
-  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
-  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
-  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
-</nav>
+<!-- SETTINGS TAB -->
+<div id="settingsTab" style="display:none;">
+  <h2>Status Global</h2>
+  <div style="background:var(--card);padding:15px;border-radius:8px;margin-top:10px;">
+    <label>
+      <input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()">
+      <span id="maintenanceLabel">Maintenance OFF</span>
+    </label>
+    <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
+  </div>
+</div>
+</div>
 
+<!-- MODAL ADD/EDIT ID -->
 <div class="modal" id="userModal">
   <div class="modal-content">
     <h3 id="modalTitle">Add ID</h3>
@@ -104,49 +94,52 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       <button onclick="setExpiryShortcut(30)">+30 Hari</button>
     </div>
     <input type="date" id="dateInput" oninput="updatePreview()">
+    <input id="adminPassword" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
     <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
     <div style="text-align:right;margin-top:10px;">
       <button class="btn-secondary" onclick="closeModal()">Batal</button>
-      <button class="btn-primary" onclick="saveToWorker()">Simpan</button>
+      <button class="btn-primary" onclick="saveAll()">Simpan</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<nav>
+  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
+  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
+  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
+</nav>
+
 <script>
+// UTILITY
 const $ = id => document.getElementById(id);
-const toastMsg = m => { $("toast").textContent = m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
-function expired(d){ if(!d) return true; const e=new Date(d); e.setHours(0,0,0,0); const t=new Date(); t.setHours(0,0,0,0); return e<t; }
+const toastMsg = m => {
+  $("toast").textContent = m;
+  $("toast").classList.add("show");
+  setTimeout(()=>$("toast").classList.remove("show"),3000);
+};
+function expired(d) { if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t; }
 
-let configData = [];
-let editIndex = null;
-let filter = "all";
-const WORKER_URL = "https://adminku.sannafanity.workers.dev"; // ganti URL Worker mu
+// DATA
+let configData = [
+  { build_id:"MAINTENANCE", status:"inactive", message:"Tidak ada maintenance saat ini." }
+];
+let editIndex=null;
+let filter="all";
 
-// ================= FETCH =================
-async function fetchConfig(){
-  try{
-    const res = await fetch(WORKER_URL);
-    if(!res.ok) throw new Error(res.status);
-    configData = await res.json();
-    renderIDs();
-    updateMaintenanceUI();
-  }catch(e){ toastMsg("Gagal load data dari Worker"); console.error(e); }
-}
-
-// ================= RENDER =================
-function renderIDs(){
+// RENDER IDs
+function renderIDs() {
   const list=$("userList"); list.innerHTML="";
-  let arr=configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:expired(i.date)}));
+  let arr=configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i, is_expired:expired(i.date)}));
   if(filter==="valid") arr=arr.filter(i=>!i.is_expired);
   if(filter==="expired") arr=arr.filter(i=>i.is_expired);
   const term=$("searchInput").value.trim().toLowerCase();
   if(term) arr=arr.filter(i=>i.build_id.toLowerCase().includes(term));
   arr.sort((a,b)=>a.build_id.localeCompare(b.build_id));
-  if(arr.length===0){list.innerHTML="<p style='color:#aaa'>Tidak ada ID.</p>"; return;}
+  if(!arr.length){list.innerHTML="<p style='color:#aaa'>Tidak ada ID.</p>"; return;}
   arr.forEach((i,index)=>{
-    const div=document.createElement('div');
+    const div=document.createElement("div");
     div.className=`user-item ${i.is_expired?'expired':'valid'}`;
     div.innerHTML=`
       <div class="user-item-info">
@@ -166,57 +159,67 @@ function renderIDs(){
   updateCounts();
 }
 
-function updateCounts(){
-  $("count-all").textContent=`(${configData.filter(i=>i.build_id!=="MAINTENANCE").length})`;
-  $("count-valid").textContent=`(${configData.filter(i=>i.build_id!=="MAINTENANCE" && !expired(i.date)).length})`;
-  $("count-expired").textContent=`(${configData.filter(i=>i.build_id!=="MAINTENANCE" && expired(i.date)).length})`;
+// UPDATE COUNTS
+function updateCounts() {
+  const all=configData.filter(i=>i.build_id!=="MAINTENANCE").length;
+  const valid=configData.filter(i=>i.build_id!=="MAINTENANCE" && !expired(i.date)).length;
+  const exp=configData.filter(i=>i.build_id!=="MAINTENANCE" && expired(i.date)).length;
+  $("count-all").textContent=`(${all})`;
+  $("count-valid").textContent=`(${valid})`;
+  $("count-expired").textContent=`(${exp})`;
 }
 
-// ================= FILTER / SEARCH =================
-function setFilter(f,el){ filter=f; document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active")); el.classList.add("active"); renderIDs(); }
+// FILTER & SEARCH
+function setFilter(f,el){filter=f; document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active")); el.classList.add("active"); renderIDs();}
 function searchIDs(){renderIDs();}
 
-// ================= ADD / EDIT / DELETE =================
-function openAdd(){editIndex=null;$("modalTitle").textContent="Add ID";$("buildInput").value="";$("userInput").value="";setExpiryShortcut(30);$("userModal").style.display="flex";}
+// MODAL ADD/EDIT
+function openAdd(){editIndex=null; $("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("adminPassword").value=""; $("userModal").style.display="flex";}
 function closeModal(){ $("userModal").style.display="none"; }
-function editID(idx){ editIndex=idx; $("modalTitle").textContent="Edit ID"; $("buildInput").value=configData[idx].build_id; $("userInput").value=configData[idx].user||''; $("dateInput").value=configData[idx].date||''; updatePreview(); $("userModal").style.display="flex"; }
-function deleteID(idx){ if(confirm(`Hapus ID ${configData[idx].build_id}?`)){ configData.splice(idx,1); renderIDs(); saveToWorker(); toastMsg('ID dihapus'); } }
+function editID(idx){editIndex=idx; $("modalTitle").textContent="Edit ID"; $("buildInput").value=configData[idx].build_id; $("userInput").value=configData[idx].user||''; $("dateInput").value=configData[idx].date||''; $("adminPassword").value=""; updatePreview(); $("userModal").style.display="flex"; }
+function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus'); }}
 
-function setExpiryShortcut(days){ let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split('T')[0]; updatePreview(); }
-function updatePreview(){ const d=$("dateInput").value; $("previewStatus").textContent=`Status: ${expired(d)?'EXPIRED':'VALID'}`; }
+// EXPIRY
+function setExpiryShortcut(days){let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split('T')[0]; updatePreview();}
+function updatePreview(){const d=$("dateInput").value; $("previewStatus").textContent=`Status: ${expired(d)?'EXPIRED':'VALID'}`;}
 
-// ================= MAINTENANCE =================
-function updateMaintenanceUI(){ const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){ $("maintenanceToggle").checked=m.status==="active"; $("maintenanceMessage").value=m.message; updateToggleLabel(); } }
-function updateToggleLabel(){ $("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF'; }
+// MAINTENANCE
+function updateMaintenanceUI(){const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){$("maintenanceToggle").checked=m.status==="active"; $("maintenanceMessage").value=m.message; updateToggleLabel();}}
+function updateToggleLabel(){$("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF';}
 
-// ================= SAVE KE WORKER =================
-async function saveToWorker(){
-  // Update Maintenance & Modal Data
-  const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){ m.status=$("maintenanceToggle").checked?"active":"inactive"; m.message=$("maintenanceMessage").value; }
-  if($("modalTitle").textContent.includes("Add") || $("modalTitle").textContent.includes("Edit")){
+// SAVE ALL
+async function saveAll(){
+  const pw = $("adminPassword").value.trim();
+  if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
+
+  const m=configData.find(i=>i.build_id==="MAINTENANCE"); 
+  if(m){m.status=$("maintenanceToggle").checked?"active":"inactive"; m.message=$("maintenanceMessage").value;}
+
+  if($("modalTitle").textContent.includes("Add")||$("modalTitle").textContent.includes("Edit")){
     const build=$("buildInput").value.trim(); if(!build){toastMsg("Build ID kosong!"); return;}
     const user=$("userInput").value.trim(); const date=$("dateInput").value;
     const newData={build_id:build,user,date};
-    if(editIndex!==null){ configData[editIndex]=newData; editIndex=null; } else { configData.push(newData); }
-    closeModal(); renderIDs();
+    if(editIndex!==null){configData[editIndex]=newData; editIndex=null;} else {configData.push(newData);}
+    closeModal();
   }
 
+  renderIDs();
+
   try{
-    const res = await fetch(WORKER_URL, {
+    const res=await fetch("https://adminku.sannafanity.workers.dev/",{
       method:"POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(configData)
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(configData)
     });
-    const data = await res.json();
-    if(res.ok){ toastMsg("Tersimpan ke GitHub via Worker!"); fetchConfig(); }
-    else{ toastMsg(`Gagal simpan: ${data.message||'unknown'}`); console.error(data); }
-  }catch(e){ toastMsg("Error saat menyimpan ke Worker"); console.error(e); }
+    const result=await res.json();
+    if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate di GitHub!");} 
+    else {console.error(result); toastMsg("Gagal update ke GitHub!");}
+  }catch(e){console.error(e); toastMsg("Terjadi error saat update ke GitHub!");}
 }
 
-// ================= TAB NAV =================
-function showTab(tab){ $("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs(); } else { $("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI(); } }
-
-fetchConfig();
+// TAB NAVIGATION
+function showTab(tab){$("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();} else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}}
+renderIDs();
 </script>
 
 </body>
