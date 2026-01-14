@@ -10,7 +10,6 @@
 :root {
   --primary:#C77DFF; --card:#282828; --bg:#121212; --text:#fff;
   --muted:#aaa; --danger:#ff4d4d; --soft-glow:0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
-  --success:#4caf50; --warning:#ff9800; --info:#2196f3;
 }
 body {margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px;}
 header {background:var(--card);padding:15px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.5);}
@@ -46,14 +45,9 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 .btn {padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
 .btn-primary {background:var(--primary);color:#000;}
 .btn-secondary {background:#444;color:#fff;margin-right:10px;}
-.toast-container {position:fixed;bottom:80px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:5000;}
-.toast {padding:10px 18px;border-radius:20px;color:#fff;font-weight:700;opacity:0;transform:translateY(30px);transition:.3s;display:flex;align-items:center;justify-content:space-between;gap:8px;}
-.toast.show {opacity:1;transform:translateY(0);}
-.toast.success {background:var(--success);}
-.toast.error {background:var(--danger);}
-.toast.warning {background:var(--warning);}
-.toast.info {background:var(--info);}
-.toast button.close-toast {background:none;border:none;color:#fff;font-size:16px;cursor:pointer;}
+.toast {position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:4000;}
+.toast.show {opacity:1;}
+.log-entry {padding:6px 10px;border-bottom:1px solid #444;font-size:0.9rem;color:#ccc;}
 </style>
 </head>
 <body>
@@ -68,9 +62,9 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
     <button onclick="searchIDs()"><i class="fa fa-search"></i></button>
   </div>
   <div class="filter-bar">
-    <button class="active" onclick="setFilter('all', this)">ALL <span id="count-all"></span></button>
-    <button onclick="setFilter('valid', this)">VALID <span id="count-valid"></span></button>
-    <button onclick="setFilter('expired', this)">EXPIRED <span id="count-expired"></span></button>
+    <button class="active" onclick="setFilter('all', this)">ALL</button>
+    <button onclick="setFilter('valid', this)">VALID</button>
+    <button onclick="setFilter('expired', this)">EXPIRED</button>
   </div>
   <div id="userList"></div>
 </div>
@@ -87,6 +81,13 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
     <input id="adminPasswordSettings" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
     <button class="btn-primary" style="margin-top:10px;" onclick="saveMaintenance()">Simpan Maintenance</button>
   </div>
+</div>
+
+<!-- LOGS TAB -->
+<div id="logsTab" style="display:none;">
+  <h2>Logs Worker</h2>
+  <button class="btn-secondary" onclick="loadLogs()">Refresh Logs</button>
+  <div id="logList" style="margin-top:10px;max-height:400px;overflow:auto;background:#222;border-radius:6px;padding:5px;"></div>
 </div>
 
 <!-- MODAL ADD/EDIT ID -->
@@ -110,39 +111,19 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
   </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
+<div class="toast" id="toast"></div>
 
 <nav>
   <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
   <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
   <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
+  <div class="nav-item" onclick="showTab('logs')" id="navLogs"><i class="fa fa-file-alt"></i><br>Logs</div>
 </nav>
 
 <script>
 const $ = id => document.getElementById(id);
-
-function showToast(msg, type="info", duration=2500){
-  const icons = { success: "✔️", error: "❌", info: "ℹ️", warning: "⚠️" };
-  const container = $("toastContainer");
-  const toast = document.createElement("div");
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<span>${icons[type] || ""} ${msg}</span><button class="close-toast">&times;</button>`;
-  container.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add("show"));
-  toast.querySelector(".close-toast").addEventListener("click", ()=>{
-    toast.classList.remove("show");
-    setTimeout(()=>container.removeChild(toast),350);
-  });
-  setTimeout(()=>{
-    if(container.contains(toast)){
-      toast.classList.remove("show");
-      setTimeout(()=>container.removeChild(toast),350);
-    }
-  }, duration);
-}
-
-function expired(d){ if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t; }
-
+const toastMsg = m => { $("toast").textContent = m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
+function expired(d){if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t;}
 let configData=[], editIndex=null, filter="all";
 
 // LOAD DATA
@@ -150,14 +131,31 @@ async function loadData(){
   try{
     const res = await fetch("https://adminku.sannafanity.workers.dev/");
     const data = await res.json();
-    if(Array.isArray(data)){ configData = data; renderIDs(); updateMaintenanceUI(); }
-    else showToast("Data key.json kosong atau error","warning");
-  }catch(e){ console.error(e); showToast("Gagal load data dari Worker","error"); }
+    if(Array.isArray(data)){configData=data; renderIDs(); updateMaintenanceUI();}
+    else toastMsg("Data kosong atau error");
+  } catch(e){console.error(e); toastMsg("Gagal load data");}
 }
 loadData();
 
+// LOAD LOGS
+async function loadLogs(){
+  try{
+    const res = await fetch("https://raw.githubusercontent.com/ModSanzz/CloudPlayModSanz/main/worker-errors.log");
+    let logs = []
+    if(res.ok) logs = await res.json().catch(()=>[]);
+    const logDiv = $("logList"); logDiv.innerHTML = '';
+    if(!logs.length){logDiv.innerHTML="<p style='color:#aaa'>Belum ada log.</p>"; return;}
+    logs.reverse().forEach(l=>{
+      const div = document.createElement("div");
+      div.className='log-entry';
+      div.textContent = `[${l.time}] ${l.error}`;
+      logDiv.appendChild(div);
+    });
+  } catch(e){console.error(e); toastMsg("Gagal load logs");}
+}
+
 // RENDER IDs
-function renderIDs(){
+function renderIDs() {
   const list=$("userList"); list.innerHTML="";
   let arr=configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:expired(i.date)}));
   if(filter==="valid") arr=arr.filter(i=>!i.is_expired);
@@ -194,7 +192,7 @@ function searchIDs(){renderIDs();}
 function openAdd(){editIndex=null; $("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("adminPassword").value=""; $("userModal").style.display="flex";}
 function closeModal(){ $("userModal").style.display="none"; }
 function editID(idx){editIndex=idx; $("modalTitle").textContent="Edit ID"; $("buildInput").value=configData[idx].build_id; $("userInput").value=configData[idx].user||''; $("dateInput").value=configData[idx].date||''; $("adminPassword").value=""; updatePreview(); $("userModal").style.display="flex"; }
-function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); showToast('ID dihapus','info'); }}
+function deleteID(idx){if(confirm(`Hapus ID ${configData[idx].build_id}?`)){configData.splice(idx,1); renderIDs(); toastMsg('ID dihapus'); }}
 
 // EXPIRY
 function setExpiryShortcut(days){let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split('T')[0]; updatePreview();}
@@ -204,65 +202,58 @@ function updatePreview(){const d=$("dateInput").value; $("previewStatus").textCo
 function updateMaintenanceUI(){const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){$("maintenanceToggle").checked=m.status==="active"; $("maintenanceMessage").value=m.message; updateToggleLabel();}}
 function updateToggleLabel(){$("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF';}
 
-// SAVE ALL
+// SAVE ALL (ID)
 async function saveAll(){
   const pw = $("adminPassword").value.trim();
-  if(pw!=="sanzmods"){ showToast("Password salah!", "error"); return; }
-
-  if($("modalTitle").textContent.includes("Add") || $("modalTitle").textContent.includes("Edit")){
-    const build = $("buildInput").value.trim();
-    if(!build){ showToast("Build ID kosong!", "warning"); return; }
-    const user = $("userInput").value.trim();
-    const date = $("dateInput").value;
-    const newData = {build_id: build, user, date};
-    if(editIndex!==null){ configData[editIndex] = newData; editIndex = null; }
-    else { configData.push(newData); }
+  if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
+  if($("modalTitle").textContent.includes("Add")||$("modalTitle").textContent.includes("Edit")){
+    const build=$("buildInput").value.trim(); if(!build){toastMsg("Build ID kosong!"); return;}
+    const user=$("userInput").value.trim(); const date=$("dateInput").value;
+    const newData={build_id:build,user,date};
+    if(editIndex!==null){configData[editIndex]=newData; editIndex=null;} else {configData.push(newData);}
     closeModal();
   }
-
   renderIDs();
-
   try{
-    const res = await fetch("https://adminku.sannafanity.workers.dev/", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({password: pw, data: configData})
+    const res=await fetch("https://adminku.sannafanity.workers.dev/",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password:pw, data:configData})
     });
-    const result = await res.json();
-    if(res.ok && result.status==="success"){ showToast("Data berhasil diupdate di GitHub!", "success"); }
-    else { console.error(result); showToast("Gagal update ke GitHub!", "error"); }
-  } catch(e){ console.error(e); showToast("Terjadi error saat update ke GitHub!", "error"); }
+    const result=await res.json();
+    if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate di GitHub!");} 
+    else {console.error(result); toastMsg("Gagal update ke GitHub!");}
+  }catch(e){console.error(e); toastMsg("Terjadi error saat update!");}
 }
 
 // SAVE MAINTENANCE
 async function saveMaintenance(){
   const pw = $("adminPasswordSettings").value.trim();
-  if(pw!=="sanzmods"){ showToast("Password salah!", "error"); return; }
+  if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
   let m = configData.find(i=>i.build_id==="MAINTENANCE");
-  if(!m){ m = {build_id:"MAINTENANCE", status:"inactive", message:""}; configData.push(m); }
-  m.status = $("maintenanceToggle").checked ? "active" : "inactive";
+  if(!m){ m={build_id:"MAINTENANCE",status:"inactive",message:""}; configData.push(m);}
+  m.status = $("maintenanceToggle").checked?"active":"inactive";
   m.message = $("maintenanceMessage").value;
-
   try{
-    const res = await fetch("https://adminku.sannafanity.workers.dev/", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({password: pw, data: configData})
+    const res=await fetch("https://adminku.sannafanity.workers.dev/",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password:pw, data:configData})
     });
-    const result = await res.json();
-    if(res.ok && result.status==="success"){ showToast("Maintenance berhasil diupdate!", "success"); }
-    else { console.error(result); showToast("Gagal update maintenance ke GitHub!", "error"); }
-  } catch(e){ console.error(e); showToast("Terjadi error saat update maintenance!", "error"); }
+    const result=await res.json();
+    if(res.ok && result.status==="success"){toastMsg("Maintenance berhasil diupdate!");} 
+    else {console.error(result); toastMsg("Gagal update maintenance!");}
+  }catch(e){console.error(e); toastMsg("Terjadi error saat update maintenance!");}
 }
 
 // TAB NAVIGATION
 function showTab(tab){
-  $("usersTab").style.display="none"; $("settingsTab").style.display="none";
-  $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active");
+  $("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("logsTab").style.display="none";
+  $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); $("navLogs").classList.remove("active");
   if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();}
-  else {$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}
+  else if(tab==='settings'){$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}
+  else if(tab==='logs'){$("logsTab").style.display="block"; $("navLogs").classList.add("active"); loadLogs();}
 }
 </script>
-
 </body>
 </html>
