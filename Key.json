@@ -1,0 +1,47 @@
+[
+  {
+    "build_id": "MAINTENANCE",
+    "status": "inactive",
+    "message": "We're currently undergoing scheduled maintenance. Please check back later."
+  },
+  {
+    "build_id": "UP1A.231005.007",
+    "date": "2027-10-15"
+  },
+  {
+    "build_id": "DPModsTest",
+    "date": "2025-10-23"
+  },
+  {
+    "build_id": "GH2IJKL9876543210",
+    "date": "2025-11-01"
+  },
+  {
+    "build_id": "XY5ZABC987654321",
+    "date": "2025-10-22"
+  },
+  {
+    "build_id": "ID_A1B2C3D4E5F6G7H8",
+    "date": "2025-12-05"
+  },
+  {
+    "build_id": "ID_H8G7F6E5D4C3B2A1",
+    "date": "2025-11-15"
+  },
+  {
+    "build_id": "ID_QWERTYUIOPASDFGHJ",
+    "date": "2026-03-01"
+  },
+  {
+    "build_id": "ID_LKJHGFDSAMNBVCXZ",
+    "date": "2025-06-10"
+  },
+  {
+    "build_id": "DPMODSCHECKPANEL",
+    "date": "2025-01-21"
+  },
+  {
+    "build_id": "UKQ1.231108.001",
+    "date": "2025-10-23"
+  }
+]
