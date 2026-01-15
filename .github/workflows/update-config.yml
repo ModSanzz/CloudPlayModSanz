@@ -3,7 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - main   # Trigger saat push ke main
+      - main   # trigger saat push ke main
 
 jobs:
   deploy:
@@ -14,19 +14,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2️⃣ Setup Node (kalau perlu build assets, bisa diubah)
+    # 2️⃣ Setup Node (kalau perlu build assets)
     - name: Setup Node
       uses: actions/setup-node@v3
       with:
         node-version: '18'
 
-    # 3️⃣ Buat folder sementara untuk publik
+    # 3️⃣ Buat folder sementara untuk publik dan copy semua file kecuali key.json
     - name: Prepare public folder
       run: |
         rm -rf temp_public
         mkdir temp_public
-        # Copy semua kecuali key.json
-        rsync -av --exclude='key.json' ./ temp_public/
+        shopt -s extglob
+        cp -r !(key.json) temp_public/
 
     # 4️⃣ Deploy ke gh-pages pakai PAT
     - name: Deploy to GitHub Pages
