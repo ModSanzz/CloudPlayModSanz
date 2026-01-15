@@ -2,87 +2,189 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Firebase Panel Array Style</title>
+<title>CloudPlay Admin Panel (Expiry Buttons)</title>
 <style>
-body { background: #111; color: #fff; font-family: Arial; padding: 20px; }
-input, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-button { background: #1db954; border: 0; font-weight: bold; cursor: pointer; }
-pre { background: #000; padding: 10px; max-height: 300px; overflow: auto; }
+body{font-family:Arial;background:#111;color:#fff;padding:20px}
+h2,h3{margin:5px 0}
+button,input,select{padding:8px;margin:5px 0; width:100%; box-sizing:border-box; cursor:pointer}
+button{background:#1db954;border:none;font-weight:bold;color:#000;}
+button.danger{background:#ff4d4d;color:#fff;}
+#list{margin-top:10px;}
+.user{padding:10px;border-radius:6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
+.user.valid{border-left:4px solid #1db954;}
+.user.expired{border-left:4px solid #ff4d4d;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;}
+.modal-box{background:#222;padding:20px;border-radius:10px;width:90%;max-width:400px;}
+.expiry-btns button{width:48%; margin-right:2%; margin-top:5px;}
+.expiry-btns button:last-child{margin-right:0;}
 </style>
 </head>
 <body>
 
-<h2>Firebase Panel - Array Format</h2>
+<h2>CloudPlay Admin Panel</h2>
+<button onclick="openModal()">+ Add New ID</button>
+<select id="filter" onchange="renderList()">
+  <option value="all">All</option>
+  <option value="valid">Valid</option>
+  <option value="expired">Expired</option>
+</select>
 
-<input id="build_id" placeholder="Build / ID">
-<input id="username" placeholder="Username (optional)">
-<input id="date" type="date" placeholder="Expiry Date">
+<div id="list">Loading...</div>
 
-<button onclick="addOrUpdate()">ADD / UPDATE</button>
-<button onclick="loadData()">LOAD DATA</button>
+<h3>Maintenance</h3>
+<label><input type="checkbox" id="mnt"> Enable Maintenance</label>
+<textarea id="mntMsg" placeholder="Maintenance message"></textarea>
+<button onclick="saveMaintenance()">Save Maintenance</button>
 
-<pre id="out">Output</pre>
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h3>Add / Edit ID</h3>
+    <input id="build_id" placeholder="Build/Device ID">
+    <input type="date" id="date">
+    <input id="username" placeholder="Username (optional)">
+    <div class="expiry-btns">
+      <button onclick="addDays(1)">+1 Day</button>
+      <button onclick="addDays(7)">+7 Days</button>
+      <button onclick="addDays(30)">+30 Days</button>
+      <button onclick="addMonths(3)">+3 Months</button>
+    </div>
+    <br>
+    <button onclick="saveID()">Save</button>
+    <button class="danger" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
 
 <script>
 const FIREBASE_ROOT = "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL = FIREBASE_ROOT + "/keys.json";
 
-/* ================= LOAD DATA ================= */
-async function loadData() {
-  try {
-    const res = await fetch(KEYS_URL);
-    let data = await res.json();
+let data = [];
+let editIndex = -1;
 
-    // Pastikan data selalu array
-    if (!Array.isArray(data)) data = [];
-    window.firebaseData = data; // simpan global
-    document.getElementById("out").textContent = JSON.stringify(data, null, 2);
-  } catch (e) {
+/* ===== UTILS ===== */
+function isExpired(d){
+  if(!d) return true;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return new Date(d) < today;
+}
+
+function addDays(n){
+  const d = new Date(date.value || new Date());
+  d.setDate(d.getDate() + n);
+  date.value = d.toISOString().slice(0,10);
+}
+function addMonths(n){
+  const d = new Date(date.value || new Date());
+  d.setMonth(d.getMonth() + n);
+  date.value = d.toISOString().slice(0,10);
+}
+
+/* ===== LOAD DATA ===== */
+async function loadData(){
+  try{
+    const r = await fetch(KEYS_URL);
+    const d = await r.json();
+    if(Array.isArray(d)) data = d; else data=[];
+    renderList();
+    const m = data.find(x=>x.build_id==="MAINTENANCE");
+    if(m){
+      mnt.checked = m.status==="active";
+      mntMsg.value = m.message || "";
+    }
+  }catch(e){
     console.error(e);
-    alert("Gagal load data");
+    document.getElementById("list").innerText="Gagal load data";
   }
 }
 
-/* ================= ADD / UPDATE ================= */
-async function addOrUpdate() {
-  const id = document.getElementById("build_id").value.trim();
-  const user = document.getElementById("username").value.trim();
-  const date = document.getElementById("date").value;
+/* ===== RENDER LIST ===== */
+function renderList(){
+  const list = document.getElementById("list");
+  const filter = document.getElementById("filter").value;
+  list.innerHTML = "";
+  data.forEach((item,idx)=>{
+    if(item.build_id==="MAINTENANCE") return;
+    const exp = isExpired(item.date);
+    if(filter==="valid" && exp) return;
+    if(filter==="expired" && !exp) return;
+    const div = document.createElement("div");
+    div.className = "user "+(exp?"expired":"valid");
+    div.innerHTML = `
+      <div>
+        <b>${item.build_id}</b> ${item.username?`(${item.username})`:''}<br>
+        <small>Expire: ${item.date||"-"}</small>
+      </div>
+      <div>
+        <button onclick="editID(${idx})">Edit</button>
+        <button class="danger" onclick="deleteID(${idx})">Delete</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
 
-  if(!id || !date) return alert("Build ID dan Date harus diisi!");
+/* ===== MODAL ===== */
+function openModal(){
+  editIndex=-1;
+  build_id.value="";
+  date.value="";
+  username.value="";
+  document.getElementById("modal").style.display="flex";
+}
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+}
 
-  // Ambil data lama atau buat array baru
-  let data = window.firebaseData || [];
+/* ===== SAVE ID ===== */
+async function saveID(){
+  const b = build_id.value.trim();
+  const d = date.value;
+  const u = username.value.trim();
+  if(!b||!d){ alert("Build ID & Date harus diisi!"); return; }
 
-  // Cek apakah sudah ada
-  const idx = data.findIndex(item => item.build_id === id);
+  const obj={build_id:b,date:d};
+  if(u) obj.username=u;
 
-  const newObj = { build_id: id, date: date };
-  if(user) newObj.username = user;
+  if(editIndex>-1) data[editIndex] = {...data[editIndex], ...obj};
+  else data.push(obj);
 
-  if(idx > -1){
-    data[idx] = { ...data[idx], ...newObj }; // update object
-  } else {
-    data.push(newObj); // add baru
-  }
-
-  try {
-    const res = await fetch(KEYS_URL, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    if(!res.ok) throw new Error("Gagal simpan ke Firebase");
+  try{
+    await fetch(KEYS_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    closeModal();
     loadData();
-    alert("Sukses tersimpan!");
-  } catch(e) {
-    console.error(e);
-    alert("Gagal simpan data");
+  }catch(e){console.error(e); alert("Gagal simpan");}
+}
+
+/* ===== EDIT / DELETE ===== */
+function editID(idx){
+  editIndex=idx;
+  build_id.value = data[idx].build_id;
+  date.value = data[idx].date;
+  username.value = data[idx].username||"";
+  openModal();
+}
+async function deleteID(idx){
+  if(confirm("Delete "+data[idx].build_id+"?")){
+    data.splice(idx,1);
+    try{
+      await fetch(KEYS_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+      loadData();
+    }catch(e){console.error(e); alert("Gagal hapus");}
   }
 }
 
-/* ================= AUTO LOAD ================= */
+/* ===== MAINTENANCE ===== */
+async function saveMaintenance(){
+  const idx = data.findIndex(x=>x.build_id==="MAINTENANCE");
+  const obj={build_id:"MAINTENANCE",status:mnt.checked?"active":"inactive",message:mntMsg.value};
+  if(idx>-1) data[idx]=obj; else data.push(obj);
+  try{
+    await fetch(KEYS_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    loadData();
+  }catch(e){console.error(e); alert("Gagal update maintenance");}
+}
+
+/* ===== INIT ===== */
 loadData();
 </script>
 
