@@ -1,216 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CloudPlay Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-/* ================== STYLE ================== */
-:root {
-    --primary-color: #1DB954;
-    --secondary-color: #282828;
-    --background-color: #121212;
-    --text-color: #fff;
-    --text-secondary: #B3B3B3;
-    --danger-color: #FF4D4D;
-}
-body { font-family:'Roboto',sans-serif; background: var(--background-color); color: var(--text-color); margin:0; padding:0; }
-header { background: var(--secondary-color); padding:15px 20px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.5); }
-h1 { margin:0; font-size:1.5rem; color: var(--primary-color); }
-.container { padding:20px; max-width:900px; margin:0 auto; }
-.search-bar { display:flex; gap:10px; margin-bottom:15px; }
-.search-bar input { flex-grow:1; padding:10px; border-radius:6px; border:1px solid #444; background:#333; color:#fff; }
-.search-bar button { background:var(--primary-color); color:#000; border:none; border-radius:6px; padding:10px 15px; cursor:pointer; }
-.search-bar button:hover { background:#1ed760; }
-.filter-bar { display:flex; gap:10px; margin-bottom:15px; overflow-x:auto; }
-.filter-bar button { background:#333; color:var(--text-secondary); border:none; padding:8px 15px; border-radius:20px; cursor:pointer; flex-shrink:0; }
-.filter-bar button.active { background:var(--primary-color); color:#000; }
-.user-item { background:var(--secondary-color); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border-left:5px solid transparent; transition:0.2s; }
-.user-item.expired { background:#331f1f; border-left-color:var(--danger-color); }
-.user-item.valid { border-left-color:var(--primary-color); }
-.user-item-info { flex-grow:1; display:flex; align-items:center; }
-.user-item-text { flex-grow:1; }
-.user-item-text strong { display:block; font-size:1.1rem; }
-.user-item-text span { color: var(--text-secondary); font-size:0.9rem; }
-.user-status-tag { background:var(--primary-color); color:#000; padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:700; margin-right:15px; flex-shrink:0; }
-.user-item.expired .user-status-tag { background: var(--danger-color); color:#fff; }
-.user-actions { display:flex; gap:5px; align-items:center; flex-shrink:0; }
-.action-btn { background:none; border:none; color:var(--text-secondary); font-size:1.1rem; cursor:pointer; padding:8px; border-radius:50%; }
-.action-btn:hover { color: var(--text-color); }
-.delete-btn { color: var(--danger-color); }
-nav { position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--secondary-color); display:flex; justify-content:space-around; align-items:center; box-shadow:0 -2px 5px rgba(0,0,0,0.3); z-index:1000; }
-.nav-item { text-decoration:none; color:var(--text-secondary); display:flex; flex-direction:column; align-items:center; font-size:0.7rem; cursor:pointer; }
-.nav-item i { font-size:1.5rem; margin-bottom:2px; }
-.nav-item.active { color: var(--primary-color); }
-.add-user-btn { background:var(--primary-color); color:#000; width:56px; height:56px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:2rem; box-shadow:0 4px 6px rgba(0,0,0,0.3); cursor:pointer; transform:translateY(-15px); }
-.add-user-btn:hover { background:#1ed760; }
-.modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:2000; overflow-y:auto; }
-.modal-content { background:var(--secondary-color); padding:30px; border-radius:12px; width:90%; max-width:450px; }
-.modal h2 { margin-top:0; color:var(--primary-color); }
-.modal button { padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
-.modal .btn-secondary { background:#444; color:#fff; margin-right:10px; }
-#loading { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); color: var(--primary-color); display:none; justify-content:center; align-items:center; font-size:1.5rem; z-index:3000; }
-.toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:#fff; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.3s; z-index:4000; }
-.toast.show { opacity:1; }
-</style>
-</head>
+<html>
 <body>
 
-<header><h1>CloudPlay Admin Panel</h1></header>
-
-<div class="container">
-    <div id="usersTab">
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search ID...">
-            <button onclick="searchIDs()"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="filter-bar">
-            <button class="active" onclick="setFilter('all', this)">All <span id="count-all"></span></button>
-            <button onclick="setFilter('valid', this)">Valid <span id="count-valid"></span></button>
-            <button onclick="setFilter('expired', this)">Expired <span id="count-expired"></span></button>
-        </div>
-        <div id="userList"></div>
-    </div>
-
-    <div id="settingsTab" style="display:none;">
-        <h2>Maintenance Status</h2>
-        <div class="form-group">
-            <label for="maintenanceEnabled">Enable Maintenance</label>
-            <input type="checkbox" id="maintenanceEnabled" onchange="updateToggleLabel()">
-        </div>
-        <div class="form-group">
-            <label for="maintenanceMessage">Message</label>
-            <textarea id="maintenanceMessage" rows="2"></textarea>
-        </div>
-        <button class="btn-primary" onclick="saveSettings()">Save Status</button>
-    </div>
-</div>
-
-<nav>
-    <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fas fa-key"></i><span>IDs</span></div>
-    <div class="add-user-btn" onclick="showUserModal()"><i class="fas fa-plus"></i></div>
-    <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fas fa-bell"></i><span>Status</span></div>
-</nav>
-
-<div id="userModal" class="modal">
-    <div class="modal-content">
-        <h2 id="userModalTitle">Add New ID</h2>
-        <div class="form-group">
-            <label>Build/Device ID</label>
-            <input type="text" id="buildIdInput" required>
-        </div>
-        <div class="form-group">
-            <label>Expiry Date</label>
-            <input type="date" id="expiryDateInput" required>
-        </div>
-        <div style="text-align:right;">
-            <button class="btn-secondary" onclick="closeUserModal()">Cancel</button>
-            <button class="btn-primary" onclick="saveUser()">Save</button>
-        </div>
-    </div>
-</div>
-
-<div id="loading">Loading...</div>
-<div id="toast" class="toast"></div>
+<button onclick="add()">ADD KEY</button>
+<pre id="out"></pre>
 
 <script>
-// ================== CONFIG ==================
-const FIREBASE_URL = "https://cloudplayadmin-default-rtdb.asia-southeast1.firebasedatabase.app/keys.json";
+const DB = "https://NAMA-PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app/keys.json";
 
-let configData = [];
-let currentFilter = 'all';
-let currentSearch = '';
-let editingIndex = -1;
+async function add(){
+  await fetch(DB, {
+    method: "PATCH",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      "TEST123": {
+        "date": "2026-12-31",
+        "status": "active"
+      }
+    })
+  });
 
-// ================== UTIL ==================
-function $(id){ return document.getElementById(id); }
-function showToast(msg,d=3000){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d);}
-function showTab(tab){ $('usersTab').style.display='none'; $('settingsTab').style.display='none'; $('navUsers').classList.remove('active'); $('navSettings').classList.remove('active'); if(tab==='users'){$('usersTab').style.display='block';$('navUsers').classList.add('active');renderIDs();} else {$('settingsTab').style.display='block';$('navSettings').classList.add('active'); loadSettings();}} 
-function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderIDs();}
-function searchIDs(){currentSearch=$('searchInput').value.toLowerCase(); renderIDs();}
-function updateToggleLabel(){}
-
-// ================== MODAL ==================
-function showUserModal(index=-1){
-    editingIndex=index;
-    $('userModalTitle').textContent=(index>=0)?'Edit ID':'Add New ID';
-    if(index>=0){ $('buildIdInput').value=configData[index].build_id; $('expiryDateInput').value=configData[index].date || ''; } 
-    else { $('buildIdInput').value=''; $('expiryDateInput').value=''; }
-    $('userModal').style.display='flex';
-}
-function closeUserModal(){ $('userModal').style.display='none'; }
-
-// ================== LOGIC ==================
-function isExpired(dateStr){ if(!dateStr)return true; let d=new Date(dateStr); d.setHours(0,0,0,0); let today=new Date(); today.setHours(0,0,0,0); return d<today; }
-
-function renderIDs(){
-    const list=$('userList'); list.innerHTML='';
-    let data=configData.filter(i=>i.build_id!=="MAINTENANCE");
-    if(currentFilter==='valid') data=data.filter(i=>!isExpired(i.date));
-    if(currentFilter==='expired') data=data.filter(i=>isExpired(i.date));
-    if(currentSearch) data=data.filter(i=>i.build_id.toLowerCase().includes(currentSearch));
-    data.forEach((item,i)=>{
-        const div=document.createElement('div');
-        div.className='user-item '+(isExpired(item.date)?'expired':'valid');
-        div.innerHTML=`<div class="user-item-info"><span class="user-status-tag">${isExpired(item.date)?'EXPIRED':'VALID'}</span><div class="user-item-text"><strong>${item.build_id}</strong><span>Expires: ${item.date||'NO DATE'}</span></div></div>
-        <div class="user-actions"><button class="action-btn" onclick="editID(${i})"><i class="fas fa-edit"></i></button>
-        <button class="action-btn delete-btn" onclick="deleteID(${i})"><i class="fas fa-trash-alt"></i></button></div>`;
-        list.appendChild(div);
-    });
-    $('count-all').textContent=`(${configData.length})`;
-    $('count-valid').textContent=`(${configData.filter(i=>!isExpired(i.date)).length})`;
-    $('count-expired').textContent=`(${configData.filter(i=>isExpired(i.date)).length})`;
+  load();
 }
 
-function editID(i){ showUserModal(i); }
-function deleteID(i){ if(confirm(`Delete ${configData[i].build_id}?`)){ configData.splice(i,1); saveToFirebase(); renderIDs(); } }
-function saveUser(){
-    const b=$('buildIdInput').value.trim();
-    const d=$('expiryDateInput').value;
-    if(!b||!d){ showToast('Build ID and date required'); return; }
-    if(editingIndex>=0){ configData[editingIndex]={build_id:b,date:d}; }
-    else{ configData.push({build_id:b,date:d}); }
-    closeUserModal(); renderIDs(); saveToFirebase();
+async function load(){
+  const r = await fetch(DB);
+  document.getElementById("out").textContent =
+    JSON.stringify(await r.json(), null, 2);
 }
 
-// ================== SETTINGS ==================
-function loadSettings(){
-    const m=configData.find(i=>i.build_id==='MAINTENANCE');
-    if(m){ $('maintenanceEnabled').checked=m.status==='active'; $('maintenanceMessage').value=m.message||'';}
-}
-function saveSettings(){
-    const m=configData.find(i=>i.build_id==='MAINTENANCE');
-    if(m){ m.status=$('maintenanceEnabled').checked?'active':'inactive'; m.message=$('maintenanceMessage').value;}
-    else{ configData.push({build_id:'MAINTENANCE',status:$('maintenanceEnabled').checked?'active':'inactive',message:$('maintenanceMessage').value});}
-    saveToFirebase(); showToast('Settings saved');
-}
-
-// ================== FIREBASE ==================
-async function loadFromFirebase(){
-    $('loading').style.display='flex';
-    try{
-        const res=await fetch(FIREBASE_URL);
-        const data=await res.json();
-        if(Array.isArray(data)) configData=data; else configData=[];
-        renderIDs();
-    }catch(e){ console.error(e); showToast('Failed to load data');}
-    finally{ $('loading').style.display='none'; }
-}
-async function saveToFirebase(){
-    $('loading').style.display='flex';
-    try{
-        await fetch(FIREBASE_URL,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(configData)});
-        showToast('Saved to Firebase');
-    }catch(e){ console.error(e); showToast('Save failed');}
-    finally{ $('loading').style.display='none'; }
-}
-
-// ================== INIT ==================
-document.addEventListener('DOMContentLoaded',()=>{
-    loadFromFirebase();
-});
+load();
 </script>
+
 </body>
 </html>
