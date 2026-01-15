@@ -2,61 +2,88 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Firebase Simple Test</title>
+<title>Firebase Panel Array Style</title>
+<style>
+body { background: #111; color: #fff; font-family: Arial; padding: 20px; }
+input, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+button { background: #1db954; border: 0; font-weight: bold; cursor: pointer; }
+pre { background: #000; padding: 10px; max-height: 300px; overflow: auto; }
+</style>
 </head>
 <body>
 
-<h3>TES FIREBASE</h3>
+<h2>Firebase Panel - Array Format</h2>
 
-<input id="id" placeholder="ID / BUILD ID">
-<input id="user" placeholder="Username">
-<input id="date" type="date">
+<input id="build_id" placeholder="Build / ID">
+<input id="username" placeholder="Username (optional)">
+<input id="date" type="date" placeholder="Expiry Date">
 
-<button onclick="save()">SAVE</button>
-<button onclick="load()">LOAD</button>
+<button onclick="addOrUpdate()">ADD / UPDATE</button>
+<button onclick="loadData()">LOAD DATA</button>
 
 <pre id="out">Output</pre>
 
 <script>
-/* ========= CONFIG ========= */
-const FIREBASE_ROOT =
-  "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
-
+const FIREBASE_ROOT = "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL = FIREBASE_ROOT + "/keys.json";
 
-/* ========= SAVE ========= */
-async function save(){
-  const id = document.getElementById("id").value.trim();
-  const user = document.getElementById("user").value.trim();
+/* ================= LOAD DATA ================= */
+async function loadData() {
+  try {
+    const res = await fetch(KEYS_URL);
+    let data = await res.json();
+
+    // Pastikan data selalu array
+    if (!Array.isArray(data)) data = [];
+    window.firebaseData = data; // simpan global
+    document.getElementById("out").textContent = JSON.stringify(data, null, 2);
+  } catch (e) {
+    console.error(e);
+    alert("Gagal load data");
+  }
+}
+
+/* ================= ADD / UPDATE ================= */
+async function addOrUpdate() {
+  const id = document.getElementById("build_id").value.trim();
+  const user = document.getElementById("username").value.trim();
   const date = document.getElementById("date").value;
 
-  if(!id || !user || !date){
-    alert("ISI SEMUA");
-    return;
+  if(!id || !date) return alert("Build ID dan Date harus diisi!");
+
+  // Ambil data lama atau buat array baru
+  let data = window.firebaseData || [];
+
+  // Cek apakah sudah ada
+  const idx = data.findIndex(item => item.build_id === id);
+
+  const newObj = { build_id: id, date: date };
+  if(user) newObj.username = user;
+
+  if(idx > -1){
+    data[idx] = { ...data[idx], ...newObj }; // update object
+  } else {
+    data.push(newObj); // add baru
   }
 
-  await fetch(KEYS_URL,{
-    method:"PATCH",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({
-      [id]:{
-        username: user,
-        date: date,
-        status: "active"
-      }
-    })
-  });
+  try {
+    const res = await fetch(KEYS_URL, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-  load();
+    if(!res.ok) throw new Error("Gagal simpan ke Firebase");
+    loadData();
+    alert("Sukses tersimpan!");
+  } catch(e) {
+    console.error(e);
+    alert("Gagal simpan data");
+  }
 }
 
-/* ========= LOAD ========= */
-async function load(){
-  const r = await fetch(KEYS_URL);
-  const d = await r.json();
-  document.getElementById("out").textContent =
-    JSON.stringify(d, null, 2);
-}
+/* ================= AUTO LOAD ================= */
+loadData();
 </script>
 
 </body>
