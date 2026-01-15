@@ -1,4 +1,4 @@
-name: Deploy to GitHub
+name: Deploy GitHub Pages (Single Branch)
 
 on:
   push:
@@ -10,35 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # 1️⃣ Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Create Deployment
-        id: deployment
-        uses: actions/create-deployment@v1
-        with:
-          token: ${{ secrets.GH_PAT }}
-          environment: production
-          description: "Deploy CloudPlay Panel"
-          auto_merge: false
-          required_contexts: []
+      # 2️⃣ Install dependencies (jika perlu, bisa dihapus kalau static HTML/JS)
+      # - name: Install Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '20'
 
-      - name: Prepare public folder
+      # 3️⃣ Build step (opsional, misal kalau ada bundling)
+      # - name: Build
+      #   run: npm run build
+
+      # 4️⃣ Copy semua file ke folder 'docs' (GitHub Pages bisa serve dari /docs)
+      - name: Prepare docs folder
         run: |
-          rm -rf temp_public
-          mkdir temp_public
-          rsync -av --exclude='.git' --exclude='.github' ./ temp_public/
+          mkdir -p docs
+          rsync -av --exclude='.git/' ./ docs/
 
-      - name: Deploy Files
+      # 5️⃣ Commit & push ke main (opsional, kalau ada update otomatis key.json)
+      - name: Commit updated files
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add temp_public
-          git commit -m "Deploy via workflow"
-          git push origin main
-
-      - name: Mark Deployment as Success
-        uses: actions/deployment-status@v1
-        with:
-          token: ${{ secrets.GH_PAT }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
-          state: success
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -m "Update public files for GitHub Pages" || echo "No changes to commit"
+          git push
