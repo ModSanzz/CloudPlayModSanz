@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cloudplay / DPMods Admin</title>
+<title>CloudPlay Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
@@ -19,7 +19,7 @@ h1 {margin:0;font-size:1.5rem;color:var(--primary);}
 .search-bar input {flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;}
 .search-bar button {padding:10px 14px;border:none;border-radius:6px;background:var(--primary);color:#000;cursor:pointer;box-shadow:var(--soft-glow);}
 .filter-bar {display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0;}
+.filter-bar button {background:#333;border:none;padding:6px 14px;border-radius:20px;color:#muted;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active {background:var(--primary);color:#000;}
 .user-item {background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
 .user-item.valid {border-left-color:var(--primary);}
@@ -50,47 +50,37 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 </style>
 </head>
 <body>
-
-<header><h1>Cloudplay / DPMods Admin</h1></header>
+<header><h1>CloudPlay Admin Panel</h1></header>
 <div class="container">
+  <!-- USERS TAB -->
+  <div id="usersTab">
+    <div class="search-bar">
+      <input id="searchInput" placeholder="Cari Build ID...">
+      <button onclick="searchIDs()"><i class="fa fa-search"></i></button>
+    </div>
+    <div class="filter-bar">
+      <button class="active" onclick="setFilter('all', this)">ALL</button>
+      <button onclick="setFilter('valid', this)">VALID</button>
+      <button onclick="setFilter('expired', this)">EXPIRED</button>
+    </div>
+    <div id="userList"></div>
+  </div>
 
-<!-- USERS TAB -->
-<div id="usersTab">
-  <div class="search-bar">
-    <input id="searchInput" placeholder="Cari Build ID...">
-    <button onclick="searchIDs()"><i class="fa fa-search"></i></button>
+  <!-- SETTINGS TAB -->
+  <div id="settingsTab" style="display:none;">
+    <h2>Status Global</h2>
+    <div style="background:var(--card);padding:15px;border-radius:8px;margin-top:10px;">
+      <label>
+        <input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()">
+        <span id="maintenanceLabel">Maintenance OFF</span>
+      </label>
+      <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
+      <input id="adminPasswordSettings" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
+      <button class="btn-primary" style="margin-top:10px;" onclick="saveMaintenance()">Simpan Maintenance</button>
+    </div>
   </div>
-  <div class="filter-bar">
-    <button class="active" onclick="setFilter('all', this)">ALL</button>
-    <button onclick="setFilter('valid', this)">VALID</button>
-    <button onclick="setFilter('expired', this)">EXPIRED</button>
-  </div>
-  <div id="userList"></div>
 </div>
 
-<!-- SETTINGS TAB -->
-<div id="settingsTab" style="display:none;">
-  <h2>Status Global</h2>
-  <div style="background:var(--card);padding:15px;border-radius:8px;margin-top:10px;">
-    <label>
-      <input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()">
-      <span id="maintenanceLabel">Maintenance OFF</span>
-    </label>
-    <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
-    <input id="adminPasswordSettings" type="password" placeholder="Password admin" style="margin-top:8px;">
-    <button class="btn-primary" style="margin-top:10px;" onclick="saveMaintenance()">Simpan Maintenance</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<nav>
-  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
-  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
-  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
-</nav>
-
-<!-- MODAL ADD/EDIT ID -->
 <div class="modal" id="userModal">
   <div class="modal-content">
     <h3 id="modalTitle">Add ID</h3>
@@ -102,7 +92,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       <button onclick="setExpiryShortcut(30)">+30 Hari</button>
     </div>
     <input type="date" id="dateInput" oninput="updatePreview()">
-    <input type="password" id="adminPassword" placeholder="Masukkan password admin" style="margin-top:8px;">
+    <input id="adminPassword" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
     <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
     <div style="text-align:right;margin-top:10px;">
       <button class="btn-secondary" onclick="closeModal()">Batal</button>
@@ -111,13 +101,22 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
+  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
+  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
+</nav>
+
 <script>
 const $ = id => document.getElementById(id);
-const toastMsg = m => { $("toast").textContent = m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
+const toastMsg = m => { $("toast").textContent=m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
+
 function expired(d){if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t;}
 let configData=[], editIndex=null, filter="all";
 
-// LOAD DATA (GET)
+// LOAD DATA GET
 async function loadData(){
   try{
     const res = await fetch("https://adminku.sannafanity.workers.dev/");
@@ -176,7 +175,7 @@ function updatePreview(){const d=$("dateInput").value; $("previewStatus").textCo
 function updateMaintenanceUI(){const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){$("maintenanceToggle").checked=m.status==="active"; $("maintenanceMessage").value=m.message; updateToggleLabel();}}
 function updateToggleLabel(){$("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF';}
 
-// SAVE ALL (POST ke Worker)
+// SAVE ALL (ID)
 async function saveAll(){
   const pw = $("adminPassword").value.trim();
   if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
@@ -192,10 +191,10 @@ async function saveAll(){
     const res=await fetch("https://adminku.sannafanity.workers.dev/",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password:pw, data:configData})
+      body:JSON.stringify({password:pw,data:configData})
     });
     const result=await res.json();
-    if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate!");} 
+    if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate di GitHub!");} 
     else {console.error(result); toastMsg("Gagal update ke GitHub!");}
   }catch(e){console.error(e); toastMsg("Terjadi error saat update!");}
 }
@@ -212,7 +211,7 @@ async function saveMaintenance(){
     const res=await fetch("https://adminku.sannafanity.workers.dev/",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password:pw, data:configData})
+      body:JSON.stringify({password:pw,data:configData})
     });
     const result=await res.json();
     if(res.ok && result.status==="success"){toastMsg("Maintenance berhasil diupdate!");} 
@@ -228,6 +227,5 @@ function showTab(tab){
   else if(tab==='settings'){$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}
 }
 </script>
-
 </body>
 </html>
