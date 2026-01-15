@@ -1,38 +1,38 @@
-name: Deploy GitHub Pages
+name: Deploy CloudPlay Panel
 
+# Trigger saat push ke main branch
 on:
   push:
     branches:
-      - main   # trigger saat push ke main
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout repo
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      # 1️⃣ Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    # 2️⃣ Setup Node (kalau perlu build assets)
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      # 2️⃣ Setup Node (jika butuh build HTML/JS)
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    # 3️⃣ Buat folder sementara untuk publik dan copy semua file kecuali key.json
-    - name: Prepare public folder
-      run: |
-        rm -rf temp_public
-        mkdir temp_public
-        shopt -s extglob
-        cp -r !(key.json) temp_public/
+      # 3️⃣ Buat folder sementara untuk publik dan copy semua kecuali key.json
+      - name: Prepare public folder
+        run: |
+          rm -rf temp_public
+          mkdir temp_public
+          rsync -av --exclude='key.json' ./ temp_public/
 
-    # 4️⃣ Deploy ke gh-pages pakai PAT
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        personal_token: ${{ secrets.GH_PAT }}
-        publish_dir: ./temp_public
-        publish_branch: gh-pages
-        keep_files: false
+      # 4️⃣ Deploy ke gh-pages pakai PAT
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.GH_PAT }}
+          publish_dir: ./temp_public
+          publish_branch: gh-pages
+          keep_files: false
