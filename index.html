@@ -1,220 +1,26 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CloudPlay Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-<style>
-body {margin:0;font-family:Roboto,sans-serif;background:#121212;color:#fff;padding:20px;}
-h1,h2 {text-align:center;color:#C77DFF;}
-button {padding:6px 12px;margin:4px;border:none;border-radius:6px;background:#C77DFF;color:#000;cursor:pointer;}
-input,textarea {width:100%;padding:8px;margin:4px 0;border-radius:6px;border:1px solid #444;background:#222;color:#fff;box-sizing:border-box;}
-#toast {position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:100;}
-#toast.show {opacity:1;}
-.user-item {background:#282828;padding:12px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
-.user-item.valid {border-left:4px solid #C77DFF;}
-.user-item.expired {border-left:4px solid #ff4d4d;background:#331f1f;}
-.user-item strong {display:block;color:#fff;}
-.user-item span {display:block;font-size:0.9rem;color:#aaa;}
-.action-btn {margin-left:5px;padding:2px 6px;border-radius:4px;background:#444;color:#fff;cursor:pointer;}
-.action-btn:hover {background:#C77DFF;color:#000;}
-.modal {position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;}
-.modal-content {background:#282828;padding:20px;border-radius:12px;width:90%;max-width:400px;}
-#logs {max-height:300px;overflow:auto;background:#222;padding:8px;border-radius:6px;margin-top:10px;font-size:0.9rem;}
-</style>
-</head>
-<body>
+name: Deploy GitHub Pages
 
-<h1>CloudPlay Admin Panel</h1>
+on:
+  push:
+    branches:
+      - main
 
-<h2>Maintenance</h2>
-<label>
-<input type="checkbox" id="maintenanceToggle"> Maintenance ON/OFF
-</label>
-<textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
-<input type="password" id="adminPasswordSettings" placeholder="Password admin">
-<button onclick="saveMaintenance()">Simpan Maintenance</button>
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-<h2>Build IDs</h2>
-<div>
-  <input id="searchInput" placeholder="Cari Build ID...">
-  <button onclick="renderIDs()">Search</button>
-</div>
-<div id="userList"></div>
-<button onclick="openModal('add')">Tambah Build ID</button>
+      - name: Prepare public folder
+        run: |
+          rm -rf public
+          mkdir public
+          rsync -av ./ public/
 
-<h2>Worker Logs</h2>
-<button onclick="loadLogs()">Refresh Logs</button>
-<div id="logs"></div>
-
-<div class="modal" id="userModal">
-  <div class="modal-content">
-    <h3 id="modalTitle">Add/Edit Build ID</h3>
-    <input id="buildInput" placeholder="Build ID">
-    <input id="userInput" placeholder="User (optional)">
-    <input type="date" id="dateInput">
-    <input type="password" id="adminPassword" placeholder="Password admin">
-    <div style="text-align:right;margin-top:10px;">
-      <button onclick="closeModal()">Batal</button>
-      <button onclick="saveID()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-const WORKER_URL = "https://adminku.sannafanity.workers.dev/";
-let configData = [];
-let editIndex = null;
-const $ = id => document.getElementById(id);
-const toastMsg = m => { $("toast").textContent = m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
-function expired(d){if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t;}
-
-// ===== LOAD DATA =====
-async function loadData(){
-    try{
-        const res = await fetch(WORKER_URL);
-        if(!res.ok) throw new Error(`GET failed: ${res.status}`);
-        const data = await res.json();
-        if(Array.isArray(data)){
-            configData = data;
-            renderIDs();
-            updateMaintenanceUI();
-        } else toastMsg("Data kosong atau error");
-    } catch(e){console.error(e); toastMsg(e.message);}
-}
-loadData();
-
-// ===== RENDER IDs =====
-function renderIDs(){
-    const list = $("userList");
-    const term = $("searchInput").value.trim().toLowerCase();
-    list.innerHTML = "";
-    configData.forEach((i,index)=>{
-        if(i.build_id==="MAINTENANCE") return;
-        if(term && !i.build_id.toLowerCase().includes(term)) return;
-        const div = document.createElement("div");
-        const isExpired = expired(i.date);
-        div.className = `user-item ${isExpired?'expired':'valid'}`;
-        div.innerHTML = `<strong>${i.build_id}</strong>
-                         ${i.user?`<span>User: ${i.user}</span>`:""}
-                         ${i.date?`<span>Expires: ${i.date}</span>`:""}
-                         <span>Status: ${i.status||'-'}</span>
-                         <div>
-                            <button class="action-btn" onclick="editID(${index})">Edit</button>
-                            <button class="action-btn" onclick="deleteID(${index})">Hapus</button>
-                         </div>`;
-        list.appendChild(div);
-    });
-}
-
-// ===== MAINTENANCE UI =====
-function updateMaintenanceUI(){
-    const m = configData.find(i=>i.build_id==="MAINTENANCE");
-    if(m){
-        $("maintenanceToggle").checked = m.status==="active";
-        $("maintenanceMessage").value = m.message;
-    }
-}
-
-// ===== SAVE MAINTENANCE =====
-async function saveMaintenance(){
-    const pw = $("adminPasswordSettings").value.trim();
-    if(!pw){toastMsg("Isi password!"); return;}
-    let m = configData.find(i=>i.build_id==="MAINTENANCE");
-    if(!m){ m={build_id:"MAINTENANCE",status:"inactive",message:""}; configData.push(m);}
-    m.status = $("maintenanceToggle").checked?"active":"inactive";
-    m.message = $("maintenanceMessage").value;
-
-    await postData(pw, configData, "Maintenance");
-}
-
-// ===== MODAL =====
-function openModal(type){
-    editIndex = null;
-    $("modalTitle").textContent = type==="add"?"Add Build ID":"Edit Build ID";
-    $("buildInput").value = "";
-    $("userInput").value = "";
-    $("dateInput").value = "";
-    $("adminPassword").value = "";
-    $("userModal").style.display = "flex";
-}
-function closeModal(){ $("userModal").style.display = "none"; }
-
-function editID(idx){
-    editIndex = idx;
-    const i = configData[idx];
-    $("modalTitle").textContent = "Edit Build ID";
-    $("buildInput").value = i.build_id;
-    $("userInput").value = i.user||"";
-    $("dateInput").value = i.date||"";
-    $("adminPassword").value = "";
-    $("userModal").style.display = "flex";
-}
-
-function deleteID(idx){
-    if(confirm(`Hapus ID ${configData[idx].build_id}?`)){
-        configData.splice(idx,1);
-        renderIDs();
-    }
-}
-
-// ===== SAVE ID =====
-async function saveID(){
-    const pw = $("adminPassword").value.trim();
-    if(!pw){toastMsg("Isi password!"); return;}
-    const build = $("buildInput").value.trim();
-    if(!build){toastMsg("Build ID kosong!"); return;}
-    const user = $("userInput").value.trim();
-    const date = $("dateInput").value;
-    const newData = {build_id: build, user, date};
-    if(editIndex!==null){configData[editIndex]=newData; editIndex=null;}
-    else configData.push(newData);
-    closeModal();
-    renderIDs();
-    await postData(pw, configData, "Build ID");
-}
-
-// ===== POST HELP =====
-async function postData(password, data, type){
-    try{
-        const res = await fetch(WORKER_URL,{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({password, data})
-        });
-        let msg = "";
-        try{ msg = await res.json(); }catch(e){ msg = await res.text(); }
-        if(res.ok) toastMsg(`${type} berhasil diupdate!`);
-        else toastMsg(`${type} gagal! Code: ${res.status} Msg: ${JSON.stringify(msg)}`);
-        loadLogs(); // auto refresh logs setelah POST
-    }catch(e){
-        console.error(e);
-        toastMsg(`${type} gagal! Error: ${e.message}`);
-    }
-}
-
-// ===== LOAD LOGS =====
-async function loadLogs(){
-    try{
-        const res = await fetch("https://raw.githubusercontent.com/ModSanzz/CloudPlayModSanz/main/worker-errors.log");
-        let logs = [];
-        if(res.ok) logs = await res.json().catch(()=>[]);
-        const logDiv = $("logs");
-        logDiv.innerHTML = '';
-        if(!logs.length){ logDiv.innerHTML="<p style='color:#aaa'>Belum ada log.</p>"; return; }
-        logs.reverse().forEach(l=>{
-            const div = document.createElement("div");
-            div.textContent = `[${l.time}] ${l.error}`;
-            logDiv.appendChild(div);
-        });
-    } catch(e){
-        console.error(e);
-        $("logs").innerHTML = `<p style='color:#f55'>Gagal load logs: ${e.message}</p>`;
-    }
-}
-</script>
-</body>
-</html>
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.GH_PAT }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          keep_files: false
