@@ -107,7 +107,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 </nav>
 
 <script>
-const workerURL = "https://adminku.sannafanity.workers.dev/"; // ✅ langsung ke Worker-mu
+const workerURL = "https://adminku.sannafanity.workers.dev/"; // ganti dengan URL Worker
 const $ = id => document.getElementById(id);
 const toastMsg = m => { $("toast").textContent=m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
 
@@ -198,7 +198,7 @@ async function saveAll(){
 // SAVE MAINTENANCE
 async function saveMaintenance(){
   const pw = $("adminPasswordSettings").value.trim();
-  if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
+  if(pw!=="sanzmods"){toastMsg("Password salah"); return;}
   let m = configData.find(i=>i.build_id==="MAINTENANCE");
   if(!m){ m={build_id:"MAINTENANCE",status:"inactive",message:""}; configData.push(m);}
   m.status = $("maintenanceToggle").checked?"active":"inactive";
