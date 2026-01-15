@@ -10,41 +10,47 @@
 
 <style>
 :root{
-  --primary:#C77DFF;--card:#282828;--bg:#121212;--text:#fff;
-  --muted:#aaa;--danger:#ff4d4d;
+  --primary:#C77DFF; --card:#282828; --bg:#121212; --text:#fff;
+  --muted:#aaa; --danger:#ff4d4d; --soft-glow:0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
 }
-body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);padding-bottom:70px}
-header{background:var(--card);padding:15px;text-align:center}
+body{margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px}
+header{background:var(--card);padding:15px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.5);}
 h1{margin:0;color:var(--primary)}
 .container{max-width:900px;margin:auto;padding:20px}
 .search-bar{display:flex;gap:8px;margin-bottom:15px}
 .search-bar input{flex:1;padding:10px;background:#333;color:#fff;border:1px solid #444;border-radius:6px}
-.search-bar button{background:var(--primary);border:none;border-radius:6px;padding:10px 14px;cursor:pointer}
+.search-bar button{background:var(--primary);border:none;border-radius:6px;padding:10px 14px;cursor:pointer;box-shadow:var(--soft-glow);}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px}
-.filter-bar button{background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer}
+.filter-bar button{background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0}
 .filter-bar button.active{background:var(--primary);color:#000}
 
-.user-item{background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;border-left:5px solid}
-.user-item.valid{border-color:var(--primary)}
-.user-item.expired{border-color:var(--danger);background:#331f1f}
-.user-status{font-size:12px;font-weight:700;margin-right:10px}
-.valid .user-status{color:var(--primary)}
-.expired .user-status{color:var(--danger)}
+.user-item{background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
+.user-item.valid{border-left-color:var(--primary);}
+.user-item.expired{border-left-color:var(--danger); background:#331f1f;}
+.user-item-info{display:flex;align-items:center;flex-grow:1;}
+.user-item-text{flex-grow:1;}
+.user-item-text strong{display:block;color:#fff;}
+.user-item.expired .user-item-text strong{color:var(--danger);}
+.user-status-tag{padding:4px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;margin-right:10px;flex-shrink:0;}
+.user-item.valid .user-status-tag{background:var(--primary);color:#000;}
+.user-item.expired .user-status-tag{background:var(--danger);color:#fff;}
+.user-actions{display:flex;gap:5px;flex-shrink:0;align-items:center;}
+.action-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:6px;border-radius:50%;}
+.action-btn:hover{color:#fff;}
+.delete-btn{color:var(--danger);}
 
-.user-actions button{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
-.user-actions .delete{color:var(--danger)}
-
-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--card);display:flex;justify-content:space-around;align-items:center}
-.nav-item{color:var(--muted);cursor:pointer}
-.nav-item.active{color:var(--primary)}
-.add-btn{width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:24px;color:#000;transform:translateY(-15px)}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center}
-.modal-content{background:var(--card);padding:20px;border-radius:12px;width:90%;max-width:420px}
-input,textarea{width:100%;padding:10px;background:#333;border:1px solid #444;color:#fff;border-radius:6px}
-
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s}
-.toast.show{opacity:1}
+nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--card);display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 5px rgba(0,0,0,0.3);}
+.nav-item{text-align:center;color:var(--muted);cursor:pointer;}
+.nav-item.active{color:var(--primary);}
+.add-user-btn{width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;justify-content:center;align-items:center;font-size:24px;color:#000;transform:translateY(-15px);box-shadow:var(--soft-glow);cursor:pointer;}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;}
+.modal-content{background:var(--card);padding:25px;border-radius:12px;width:90%;max-width:420px;}
+input,textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;box-sizing:border-box;}
+.btn{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
+.btn-primary{background:var(--primary);color:#000;}
+.btn-secondary{background:#444;color:#fff;margin-right:10px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:4000;}
+.toast.show{opacity:1;}
 </style>
 </head>
 
@@ -55,58 +61,58 @@ input,textarea{width:100%;padding:10px;background:#333;border:1px solid #444;col
 <div class="container">
   <div id="usersTab">
     <div class="search-bar">
-      <input id="searchInput" placeholder="Cari Build ID">
-      <button onclick="render()">🔍</button>
+      <input id="searchInput" placeholder="Cari Build ID...">
+      <button onclick="renderIDs()">🔍</button>
     </div>
 
     <div class="filter-bar">
-      <button class="active" onclick="setFilter('all',this)">ALL</button>
-      <button onclick="setFilter('valid',this)">VALID</button>
-      <button onclick="setFilter('expired',this)">EXPIRED</button>
+      <button class="active" onclick="setFilter('all', this)">ALL</button>
+      <button onclick="setFilter('valid', this)">VALID</button>
+      <button onclick="setFilter('expired', this)">EXPIRED</button>
     </div>
 
-    <div id="list"></div>
+    <div id="userList"></div>
   </div>
 
-  <div id="settingsTab" style="display:none">
-    <h3>Maintenance</h3>
-    <label>
-      <input type="checkbox" id="mntToggle"> Maintenance ON
-    </label>
-    <textarea id="mntMsg" placeholder="Pesan maintenance"></textarea>
-    <button onclick="saveMaintenance()">Simpan</button>
+  <div id="settingsTab" style="display:none;">
+    <h2>Status Global</h2>
+    <label><input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()"> <span id="maintenanceLabel">Maintenance OFF</span></label>
+    <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
+    <button class="btn-primary" onclick="saveMaintenance()">Simpan Maintenance</button>
   </div>
 </div>
 
-<div class="modal" id="modal">
+<div class="modal" id="userModal">
   <div class="modal-content">
-    <h3 id="modalTitle">Add ID</h3>
+    <h3 id="modalTitle">Add / Edit ID</h3>
     <input id="buildInput" placeholder="Build ID">
     <input id="userInput" placeholder="User">
-    <div style="display:flex;gap:5px;margin:5px 0">
-      <button onclick="addDays(1)">+1</button>
-      <button onclick="addDays(7)">+7</button>
-      <button onclick="addDays(30)">+30</button>
+    <div style="display:flex;gap:5px;margin:5px 0;">
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+30 Hari</button>
     </div>
     <input type="date" id="dateInput">
-    <button onclick="save()">Simpan</button>
-    <button onclick="closeModal()">Batal</button>
+    <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
+    <div style="text-align:right;margin-top:10px;">
+      <button class="btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn-primary" onclick="saveAll()">Simpan</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <nav>
-  <div class="nav-item active" onclick="tab('users')">IDs</div>
-  <div class="add-btn" onclick="openAdd()">+</div>
-  <div class="nav-item" onclick="tab('settings')">Status</div>
+  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
+  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
+  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
 </nav>
 
-<!-- FIREBASE -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCJ3srzZMnhN4ngShr2b0iI7KEsLespNZg",
@@ -122,91 +128,95 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-let data={}, filter="all", editKey=null;
+const $ = id => document.getElementById(id);
+const toast = msg => { $("toast").textContent=msg; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),2500); };
 
-const expired = d => !d || new Date(d) < new Date().setHours(0,0,0,0);
-const toast = m => {toastEl.textContent=m;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),2500)}
-const toastEl = document.getElementById("toast");
+let configData=[], editIndex=null, filter="all";
 
-onAuthStateChanged(auth,user=>{
-  if(!user){location.href="login.html";return;}
-  onValue(ref(db,"keys"),snap=>{data=snap.val()||{};render();});
-  onValue(ref(db,"maintenance"),snap=>{
-    const m=snap.val()||{};
-    mntToggle.checked=m.status==="active";
-    mntMsg.value=m.message||"";
+const expired = d => !d || new Date(d).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
+
+onAuthStateChanged(auth, user => {
+  if(!user){location.href="login.html"; return;}
+  onValue(ref(db, "keys"), snap => { configData = snap.val() ? Object.entries(snap.val()).map(([k,v])=>({key:k,...v})) : []; renderIDs(); });
+  onValue(ref(db, "maintenance"), snap => {
+    const m = snap.val() || {};
+    $("maintenanceToggle").checked = m.status==="active";
+    $("maintenanceMessage").value = m.message || "";
+    updateToggleLabel();
   });
 });
 
-window.render=()=>{
+function renderIDs(){
+  const list=$("userList");
   list.innerHTML="";
-  Object.entries(data).forEach(([k,v])=>{
-    const isExp=expired(v.date);
+  configData.forEach((item,index)=>{
+    const isExp = expired(item.date);
     if(filter==="valid" && isExp) return;
     if(filter==="expired" && !isExp) return;
-    if(searchInput.value && !k.toLowerCase().includes(searchInput.value.toLowerCase())) return;
+    if($("searchInput").value && !item.key.toLowerCase().includes($("searchInput").value.toLowerCase())) return;
 
-    list.innerHTML+=`
-    <div class="user-item ${isExp?'expired':'valid'}">
-      <div>
-        <div class="user-status">${isExp?'EXPIRED':'VALID'}</div>
-        <b>${k}</b><br>
-        ${v.user||''}<br>
-        ${v.date||'-'}
+    const div=document.createElement("div");
+    div.className = `user-item ${isExp?'expired':'valid'}`;
+    div.innerHTML=`
+      <div class="user-item-info">
+        <span class="user-status-tag">${isExp?'EXPIRED':'VALID'}</span>
+        <div class="user-item-text">
+          <strong>${item.key}</strong>
+          ${item.user?`<span>User: ${item.user}</span>`:""}
+          <span>Expires: ${item.date||'-'}</span>
+        </div>
       </div>
       <div class="user-actions">
-        <button onclick="edit('${k}')"><i class="fa fa-edit"></i></button>
-        <button class="delete" onclick="del('${k}')"><i class="fa fa-trash"></i></button>
-      </div>
-    </div>`;
+        <button class="action-btn" onclick="editID(${index})"><i class="fa fa-edit"></i></button>
+        <button class="action-btn delete-btn" onclick="deleteID(${index})"><i class="fa fa-trash-alt"></i></button>
+      </div>`;
+    list.appendChild(div);
   });
-};
+}
 
-window.openAdd=()=>{editKey=null;modal.style.display="flex";};
-window.closeModal=()=>modal.style.display="none";
-window.addDays=d=>{const t=new Date();t.setDate(t.getDate()+d);dateInput.value=t.toISOString().split("T")[0];};
+function setFilter(f,el){ filter=f; document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active")); el.classList.add("active"); renderIDs(); }
+function showTab(tab){ $("usersTab").style.display=tab==="users"?"block":"none"; $("settingsTab").style.display=tab==="settings"?"block":"none"; document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active")); $(tab==="users"?"navUsers":"navSettings").classList.add("active"); }
 
-window.save=()=>{
-  const k=buildInput.value.trim();
-  if(!k)return;
-  set(ref(db,"keys/"+k),{user:userInput.value,date:dateInput.value});
-  closeModal();toast("Disimpan");
-};
+function openAdd(){ editIndex=null; $("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("userModal").style.display="flex"; $("dateInput").focus(); updatePreview(); }
+function closeModal(){ $("userModal").style.display="none"; }
 
-window.edit=k=>{
-  editKey=k;
-  buildInput.value=k;
-  userInput.value=data[k].user||"";
-  dateInput.value=data[k].date||"";
-  modal.style.display="flex";
-};
+function setExpiryShortcut(days){ let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split("T")[0]; updatePreview(); }
+function updatePreview(){ $("previewStatus").textContent=`Status: ${expired($("dateInput").value)?'EXPIRED':'VALID'}`; }
 
-window.del=k=>{
-  if(confirm("Hapus "+k+" ?")){
-    remove(ref(db,"keys/"+k));
-    toast("Dihapus");
+function saveAll(){
+  const build = $("buildInput").value.trim();
+  if(!build){ toast("Build ID kosong!"); return; }
+  const user = $("userInput").value.trim();
+  const date = $("dateInput").value;
+  const dataObj = {user,date};
+  const refKey = `keys/${build}`;
+
+  set(ref(db, refKey), dataObj);
+  toast(editIndex!==null?"ID diupdate":"ID ditambahkan");
+  closeModal();
+}
+
+function editID(idx){
+  editIndex=idx;
+  const item=configData[idx];
+  $("modalTitle").textContent="Edit ID";
+  $("buildInput").value=item.key;
+  $("userInput").value=item.user||"";
+  $("dateInput").value=item.date||"";
+  $("userModal").style.display="flex";
+  updatePreview();
+}
+
+function deleteID(idx){
+  const key=configData[idx].key;
+  if(confirm(`Hapus ${key} ?`)){
+    remove(ref(db,"keys/"+key));
+    toast("ID dihapus");
   }
-};
+}
 
-window.saveMaintenance=()=>{
-  set(ref(db,"maintenance"),{
-    status:mntToggle.checked?"active":"inactive",
-    message:mntMsg.value
-  });
-  toast("Maintenance updated");
-};
-
-window.setFilter=(f,el)=>{
-  filter=f;
-  document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active"));
-  el.classList.add("active");
-  render();
-};
-
-window.tab=t=>{
-  usersTab.style.display=t==="users"?"block":"none";
-  settingsTab.style.display=t==="settings"?"block":"none";
-};
+function updateToggleLabel(){ $("maintenanceLabel").textContent = $("maintenanceToggle").checked?"Maintenance ON":"Maintenance OFF"; }
+function saveMaintenance(){ set(ref(db,"maintenance"),{status:$("maintenanceToggle").checked?"active":"inactive",message:$("maintenanceMessage").value}); toast("Maintenance updated"); }
 </script>
 
 </body>
