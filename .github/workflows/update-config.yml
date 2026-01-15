@@ -1,0 +1,27 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches:
+      - main  # branch source, jangan pakai root untuk publish
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup public folder
+        run: |
+          mkdir public
+          # Copy semua kecuali Key.json
+          shopt -s extglob
+          cp -r !(key.json) public/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
