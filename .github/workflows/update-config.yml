@@ -1,27 +1,37 @@
-name: Deploy Pages
+name: Deploy CloudPlay Admin Panel
 
 on:
   push:
     branches:
-      - main  # branch source, jangan pakai root untuk publish
+      - main   # ubah kalau source branch bukan main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup public folder
+      # 2️⃣ Install dependencies (opsional, kalau ada build step misal npm)
+      - name: Install dependencies
         run: |
-          mkdir public
-          # Copy semua kecuali Key.json
-          shopt -s extglob
-          cp -r !(key.json) public/
+          if [ -f package.json ]; then
+            npm install
+          fi
 
+      # 3️⃣ Prepare temporary folder untuk GitHub Pages
+      - name: Prepare public folder
+        run: |
+          mkdir temp_public
+          shopt -s extglob
+          # Copy semua kecuali key.json & temp_public sendiri
+          cp -r !(key.json|temp_public) temp_public/
+
+      # 4️⃣ Deploy ke GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./temp_public
