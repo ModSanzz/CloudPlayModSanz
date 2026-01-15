@@ -1,21 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Firebase Simple Test</title>
+</head>
 <body>
 
-<button onclick="add()">ADD KEY</button>
-<pre id="out"></pre>
+<h3>TES FIREBASE</h3>
+
+<input id="id" placeholder="ID / BUILD ID">
+<input id="user" placeholder="Username">
+<input id="date" type="date">
+
+<button onclick="save()">SAVE</button>
+<button onclick="load()">LOAD</button>
+
+<pre id="out">Output</pre>
 
 <script>
-const DB = "https://NAMA-PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app/keys.json";
+/* ========= CONFIG ========= */
+const FIREBASE_ROOT =
+  "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-async function add(){
-  await fetch(DB, {
-    method: "PATCH",
-    headers: {"Content-Type":"application/json"},
+const KEYS_URL = FIREBASE_ROOT + "/keys.json";
+
+/* ========= SAVE ========= */
+async function save(){
+  const id = document.getElementById("id").value.trim();
+  const user = document.getElementById("user").value.trim();
+  const date = document.getElementById("date").value;
+
+  if(!id || !user || !date){
+    alert("ISI SEMUA");
+    return;
+  }
+
+  await fetch(KEYS_URL,{
+    method:"PATCH",
+    headers:{ "Content-Type":"application/json" },
     body: JSON.stringify({
-      "TEST123": {
-        "date": "2026-12-31",
-        "status": "active"
+      [id]:{
+        username: user,
+        date: date,
+        status: "active"
       }
     })
   });
@@ -23,13 +50,13 @@ async function add(){
   load();
 }
 
+/* ========= LOAD ========= */
 async function load(){
-  const r = await fetch(DB);
+  const r = await fetch(KEYS_URL);
+  const d = await r.json();
   document.getElementById("out").textContent =
-    JSON.stringify(await r.json(), null, 2);
+    JSON.stringify(d, null, 2);
 }
-
-load();
 </script>
 
 </body>
