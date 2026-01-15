@@ -4,56 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CloudPlay Admin Panel</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
 <style>
 :root{
-  --primary:#C77DFF; --card:#282828; --bg:#121212; --text:#fff;
-  --muted:#aaa; --danger:#ff4d4d; --soft-glow:0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
+  --primary:#C77DFF;--card:#282828;--bg:#121212;--text:#fff;
+  --muted:#aaa;--danger:#ff4d4d;--soft-glow:0 0 8px rgba(199,125,255,0.7),0 0 15px rgba(199,125,255,0.3);
 }
 body{margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px}
-header{background:var(--card);padding:15px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.5);}
+header{background:var(--card);padding:15px;text-align:center}
 h1{margin:0;color:var(--primary)}
 .container{max-width:900px;margin:auto;padding:20px}
 .search-bar{display:flex;gap:8px;margin-bottom:15px}
 .search-bar input{flex:1;padding:10px;background:#333;color:#fff;border:1px solid #444;border-radius:6px}
-.search-bar button{background:var(--primary);border:none;border-radius:6px;padding:10px 14px;cursor:pointer;box-shadow:var(--soft-glow);}
+.search-bar button{background:var(--primary);border:none;border-radius:6px;padding:10px 14px;cursor:pointer}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px}
 .filter-bar button{background:#333;border:none;padding:6px 14px;border-radius:20px;color:var(--muted);cursor:pointer;flex-shrink:0}
 .filter-bar button.active{background:var(--primary);color:#000}
 
-.user-item{background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
-.user-item.valid{border-left-color:var(--primary);}
-.user-item.expired{border-left-color:var(--danger); background:#331f1f;}
-.user-item-info{display:flex;align-items:center;flex-grow:1;}
-.user-item-text{flex-grow:1;}
-.user-item-text strong{display:block;color:#fff;}
-.user-item.expired .user-item-text strong{color:var(--danger);}
-.user-status-tag{padding:4px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;margin-right:10px;flex-shrink:0;}
-.user-item.valid .user-status-tag{background:var(--primary);color:#000;}
-.user-item.expired .user-status-tag{background:var(--danger);color:#fff;}
-.user-actions{display:flex;gap:5px;flex-shrink:0;align-items:center;}
-.action-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:6px;border-radius:50%;}
-.action-btn:hover{color:#fff;}
-.delete-btn{color:var(--danger);}
+.user-item{background:var(--card);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent}
+.user-item.valid{border-left-color:var(--primary)}
+.user-item.expired{border-left-color:var(--danger);background:#331f1f}
+.user-item-info{flex-grow:1}
+.user-item-info strong{display:block;color:#fff}
+.user-item-info span{display:block;color:#aaa;font-size:0.85rem}
+.user-status-tag{padding:4px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;margin-right:10px;flex-shrink:0}
+.user-item.valid .user-status-tag{background:var(--primary);color:#000}
+.user-item.expired .user-status-tag{background:var(--danger);color:#fff}
+.user-actions{display:flex;gap:5px;flex-shrink:0;align-items:center}
+.action-btn{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:6px;border-radius:50%}
+.action-btn:hover{color:#fff}
+.delete-btn{color:var(--danger)}
 
-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--card);display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 5px rgba(0,0,0,0.3);}
-.nav-item{text-align:center;color:var(--muted);cursor:pointer;}
-.nav-item.active{color:var(--primary);}
-.add-user-btn{width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;justify-content:center;align-items:center;font-size:24px;color:#000;transform:translateY(-15px);box-shadow:var(--soft-glow);cursor:pointer;}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:2000;}
-.modal-content{background:var(--card);padding:25px;border-radius:12px;width:90%;max-width:420px;}
-input,textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;box-sizing:border-box;}
-.btn{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
-.btn-primary{background:var(--primary);color:#000;}
-.btn-secondary{background:#444;color:#fff;margin-right:10px;}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:4000;}
-.toast.show{opacity:1;}
+nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--card);display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 5px rgba(0,0,0,0.3)}
+.nav-item{color:var(--muted);cursor:pointer;text-align:center}
+.nav-item.active{color:var(--primary)}
+.add-user-btn{width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;justify-content:center;align-items:center;font-size:24px;color:#000;transform:translateY(-15px);cursor:pointer;box-shadow:var(--soft-glow)}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:2000}
+.modal-content{background:var(--card);padding:25px;border-radius:12px;width:90%;max-width:420px}
+input,textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:#fff;box-sizing:border-box;margin-bottom:8px}
+.btn{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700}
+.btn-primary{background:var(--primary);color:#000}
+.btn-secondary{background:#444;color:#fff;margin-right:10px}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:4000}
+.toast.show{opacity:1}
 </style>
 </head>
-
 <body>
 
 <header><h1>CloudPlay Admin Panel</h1></header>
@@ -62,42 +60,38 @@ input,textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #444;b
   <div id="usersTab">
     <div class="search-bar">
       <input id="searchInput" placeholder="Cari Build ID...">
-      <button onclick="renderIDs()">🔍</button>
+      <button onclick="renderIDs()"><i class="fa fa-search"></i></button>
     </div>
-
     <div class="filter-bar">
-      <button class="active" onclick="setFilter('all', this)">ALL</button>
-      <button onclick="setFilter('valid', this)">VALID</button>
-      <button onclick="setFilter('expired', this)">EXPIRED</button>
+      <button class="active" onclick="setFilter('all',this)">ALL</button>
+      <button onclick="setFilter('valid',this)">VALID</button>
+      <button onclick="setFilter('expired',this)">EXPIRED</button>
     </div>
-
     <div id="userList"></div>
   </div>
 
   <div id="settingsTab" style="display:none;">
-    <h2>Status Global</h2>
-    <label><input type="checkbox" id="maintenanceToggle" onchange="updateToggleLabel()"> <span id="maintenanceLabel">Maintenance OFF</span></label>
-    <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
+    <h2>Status Maintenance</h2>
+    <label><input type="checkbox" id="maintenanceToggle" onchange="updateMaintenanceLabel()"> <span id="maintenanceLabel">Maintenance OFF</span></label>
+    <textarea id="maintenanceMessage" placeholder="Pesan maintenance..."></textarea>
     <button class="btn-primary" onclick="saveMaintenance()">Simpan Maintenance</button>
   </div>
 </div>
 
 <div class="modal" id="userModal">
   <div class="modal-content">
-    <h3 id="modalTitle">Add / Edit ID</h3>
+    <h3 id="modalTitle">Add ID</h3>
     <input id="buildInput" placeholder="Build ID">
-    <input id="userInput" placeholder="User">
-    <div style="display:flex;gap:5px;margin:5px 0;">
-      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
-      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
-      <button onclick="setExpiryShortcut(30)">+30 Hari</button>
+    <input id="userInput" placeholder="User (optional)">
+    <div style="display:flex;gap:5px;margin-bottom:8px;">
+      <button onclick="setExpiry(1)">+1 Hari</button>
+      <button onclick="setExpiry(7)">+7 Hari</button>
+      <button onclick="setExpiry(30)">+30 Hari</button>
     </div>
-    <input type="date" id="dateInput">
-    <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
-    <div style="text-align:right;margin-top:10px;">
-      <button class="btn-secondary" onclick="closeModal()">Batal</button>
-      <button class="btn-primary" onclick="saveAll()">Simpan</button>
-    </div>
+    <input type="date" id="dateInput" oninput="updatePreview()">
+    <div id="previewStatus" style="margin-bottom:5px;color:#aaa;">Status: -</div>
+    <button class="btn-primary" onclick="saveID()">Simpan</button>
+    <button class="btn-secondary" onclick="closeModal()">Batal</button>
   </div>
 </div>
 
@@ -121,103 +115,81 @@ const firebaseConfig = {
   projectId: "cloudplayadmin",
   storageBucket: "cloudplayadmin.firebasestorage.app",
   messagingSenderId: "747853876510",
-  appId: "1:747853876510:web:d11428bc7c0716a038cd0f"
+  appId: "1:747853876510:web:d11428bc7c0716a038cd0f",
+  measurementId: "G-RMDWS1697C"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-const $ = id => document.getElementById(id);
-const toast = msg => { $("toast").textContent=msg; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),2500); };
+let configData={}, editKey=null, filter="all";
+const toastEl=document.getElementById("toast");
+const expired=d=>!d||new Date(d)<new Date().setHours(0,0,0,0);
+const toast=m=>{toastEl.textContent=m;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),2500)};
 
-let configData=[], editIndex=null, filter="all";
-
-const expired = d => !d || new Date(d).setHours(0,0,0,0) < new Date().setHours(0,0,0,0);
-
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth,user=>{
   if(!user){location.href="login.html"; return;}
-  onValue(ref(db, "keys"), snap => { configData = snap.val() ? Object.entries(snap.val()).map(([k,v])=>({key:k,...v})) : []; renderIDs(); });
-  onValue(ref(db, "maintenance"), snap => {
-    const m = snap.val() || {};
-    $("maintenanceToggle").checked = m.status==="active";
-    $("maintenanceMessage").value = m.message || "";
-    updateToggleLabel();
+  onValue(ref(db,"keys"),snap=>{configData=snap.val()||{}; renderIDs();});
+  onValue(ref(db,"maintenance"),snap=>{
+    const m=snap.val()||{};
+    maintenanceToggle.checked=m.status==="active";
+    maintenanceMessage.value=m.message||"";
+    updateMaintenanceLabel();
   });
 });
 
 function renderIDs(){
-  const list=$("userList");
-  list.innerHTML="";
-  configData.forEach((item,index)=>{
-    const isExp = expired(item.date);
+  userList.innerHTML="";
+  Object.entries(configData).forEach(([k,v])=>{
+    const isExp=expired(v.date);
     if(filter==="valid" && isExp) return;
     if(filter==="expired" && !isExp) return;
-    if($("searchInput").value && !item.key.toLowerCase().includes($("searchInput").value.toLowerCase())) return;
-
+    if(searchInput.value && !k.toLowerCase().includes(searchInput.value.toLowerCase())) return;
     const div=document.createElement("div");
-    div.className = `user-item ${isExp?'expired':'valid'}`;
+    div.className=`user-item ${isExp?'expired':'valid'}`;
     div.innerHTML=`
       <div class="user-item-info">
         <span class="user-status-tag">${isExp?'EXPIRED':'VALID'}</span>
-        <div class="user-item-text">
-          <strong>${item.key}</strong>
-          ${item.user?`<span>User: ${item.user}</span>`:""}
-          <span>Expires: ${item.date||'-'}</span>
-        </div>
+        <strong>${k}</strong>
+        <span>User: ${v.user||'-'}</span>
+        <span>Expires: ${v.date||'-'}</span>
       </div>
       <div class="user-actions">
-        <button class="action-btn" onclick="editID(${index})"><i class="fa fa-edit"></i></button>
-        <button class="action-btn delete-btn" onclick="deleteID(${index})"><i class="fa fa-trash-alt"></i></button>
+        <button class="action-btn" onclick="editID('${k}')"><i class="fa fa-edit"></i></button>
+        <button class="action-btn delete-btn" onclick="deleteID('${k}')"><i class="fa fa-trash-alt"></i></button>
       </div>`;
-    list.appendChild(div);
+    userList.appendChild(div);
   });
 }
 
-function setFilter(f,el){ filter=f; document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active")); el.classList.add("active"); renderIDs(); }
-function showTab(tab){ $("usersTab").style.display=tab==="users"?"block":"none"; $("settingsTab").style.display=tab==="settings"?"block":"none"; document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active")); $(tab==="users"?"navUsers":"navSettings").classList.add("active"); }
-
-function openAdd(){ editIndex=null; $("modalTitle").textContent="Add ID"; $("buildInput").value=""; $("userInput").value=""; setExpiryShortcut(30); $("userModal").style.display="flex"; $("dateInput").focus(); updatePreview(); }
-function closeModal(){ $("userModal").style.display="none"; }
-
-function setExpiryShortcut(days){ let d=new Date(); d.setDate(d.getDate()+days); $("dateInput").value=d.toISOString().split("T")[0]; updatePreview(); }
-function updatePreview(){ $("previewStatus").textContent=`Status: ${expired($("dateInput").value)?'EXPIRED':'VALID'}`; }
-
-function saveAll(){
-  const build = $("buildInput").value.trim();
-  if(!build){ toast("Build ID kosong!"); return; }
-  const user = $("userInput").value.trim();
-  const date = $("dateInput").value;
-  const dataObj = {user,date};
-  const refKey = `keys/${build}`;
-
-  set(ref(db, refKey), dataObj);
-  toast(editIndex!==null?"ID diupdate":"ID ditambahkan");
-  closeModal();
+function showTab(t){
+  usersTab.style.display=t==="users"?"block":"none";
+  settingsTab.style.display=t==="settings"?"block":"none";
+  navUsers.classList.remove("active");
+  navSettings.classList.remove("active");
+  if(t==="users") navUsers.classList.add("active");
+  else navSettings.classList.add("active");
 }
 
-function editID(idx){
-  editIndex=idx;
-  const item=configData[idx];
-  $("modalTitle").textContent="Edit ID";
-  $("buildInput").value=item.key;
-  $("userInput").value=item.user||"";
-  $("dateInput").value=item.date||"";
-  $("userModal").style.display="flex";
-  updatePreview();
-}
+function openAdd(){editKey=null;modal.style.display="flex"; modalTitle.textContent="Add ID";buildInput.value="";userInput.value="";dateInput.value="";updatePreview();}
+function closeModal(){modal.style.display="none";}
 
-function deleteID(idx){
-  const key=configData[idx].key;
-  if(confirm(`Hapus ${key} ?`)){
-    remove(ref(db,"keys/"+key));
-    toast("ID dihapus");
-  }
-}
+function setExpiry(d){const dt=new Date();dt.setDate(dt.getDate()+d);dateInput.value=dt.toISOString().split('T')[0];updatePreview();}
+function updatePreview(){previewStatus.textContent=`Status: ${expired(dateInput.value)?'EXPIRED':'VALID'}`;}
 
-function updateToggleLabel(){ $("maintenanceLabel").textContent = $("maintenanceToggle").checked?"Maintenance ON":"Maintenance OFF"; }
-function saveMaintenance(){ set(ref(db,"maintenance"),{status:$("maintenanceToggle").checked?"active":"inactive",message:$("maintenanceMessage").value}); toast("Maintenance updated"); }
+function saveID(){
+  const k=buildInput.value.trim(); if(!k)return;
+  set(ref(db,"keys/"+k),{user:userInput.value,date:dateInput.value});
+  closeModal(); toast("Disimpan");
+}
+function editID(k){editKey=k;buildInput.value=k;userInput.value=configData[k].user||"";dateInput.value=configData[k].date||"";modalTitle.textContent="Edit ID";modal.style.display="flex";updatePreview();}
+function deleteID(k){if(confirm(`Hapus ${k}?`)){remove(ref(db,"keys/"+k));toast("Dihapus");}}
+
+function updateMaintenanceLabel(){maintenanceLabel.textContent=maintenanceToggle.checked?"Maintenance ON":"Maintenance OFF";}
+function saveMaintenance(){set(ref(db,"maintenance"),{status:maintenanceToggle.checked?"active":"inactive",message:maintenanceMessage.value});toast("Maintenance updated");}
+
+function setFilter(f,el){filter=f; document.querySelectorAll(".filter-bar button").forEach(b=>b.classList.remove("active")); el.classList.add("active");renderIDs();}
 </script>
-
 </body>
 </html>
