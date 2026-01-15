@@ -47,7 +47,6 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 .btn-secondary {background:#444;color:#fff;margin-right:10px;}
 .toast {position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;opacity:0;transition:.3s;z-index:4000;}
 .toast.show {opacity:1;}
-.log-entry {padding:6px 10px;border-bottom:1px solid #444;font-size:0.9rem;color:#ccc;}
 </style>
 </head>
 <body>
@@ -78,17 +77,18 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       <span id="maintenanceLabel">Maintenance OFF</span>
     </label>
     <textarea id="maintenanceMessage" rows="2" placeholder="Pesan maintenance..."></textarea>
-    <input id="adminPasswordSettings" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
+    <input id="adminPasswordSettings" type="password" placeholder="Password admin" style="margin-top:8px;">
     <button class="btn-primary" style="margin-top:10px;" onclick="saveMaintenance()">Simpan Maintenance</button>
   </div>
 </div>
 
-<!-- LOGS TAB -->
-<div id="logsTab" style="display:none;">
-  <h2>Logs Worker</h2>
-  <button class="btn-secondary" onclick="loadLogs()">Refresh Logs</button>
-  <div id="logList" style="margin-top:10px;max-height:400px;overflow:auto;background:#222;border-radius:6px;padding:5px;"></div>
-</div>
+<div class="toast" id="toast"></div>
+
+<nav>
+  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
+  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
+  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
+</nav>
 
 <!-- MODAL ADD/EDIT ID -->
 <div class="modal" id="userModal">
@@ -102,7 +102,7 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
       <button onclick="setExpiryShortcut(30)">+30 Hari</button>
     </div>
     <input type="date" id="dateInput" oninput="updatePreview()">
-    <input id="adminPassword" type="password" placeholder="Masukkan password admin" style="margin-top:8px;">
+    <input type="password" id="adminPassword" placeholder="Masukkan password admin" style="margin-top:8px;">
     <div id="previewStatus" style="margin-top:5px;color:#aaa;">Status: -</div>
     <div style="text-align:right;margin-top:10px;">
       <button class="btn-secondary" onclick="closeModal()">Batal</button>
@@ -111,22 +111,13 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
-<nav>
-  <div class="nav-item active" onclick="showTab('users')" id="navUsers"><i class="fa fa-key"></i><br>IDs</div>
-  <div class="add-user-btn" onclick="openAdd()"><i class="fa fa-plus"></i></div>
-  <div class="nav-item" onclick="showTab('settings')" id="navSettings"><i class="fa fa-gear"></i><br>Status</div>
-  <div class="nav-item" onclick="showTab('logs')" id="navLogs"><i class="fa fa-file-alt"></i><br>Logs</div>
-</nav>
-
 <script>
 const $ = id => document.getElementById(id);
 const toastMsg = m => { $("toast").textContent = m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
 function expired(d){if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t;}
 let configData=[], editIndex=null, filter="all";
 
-// LOAD DATA
+// LOAD DATA (GET)
 async function loadData(){
   try{
     const res = await fetch("https://adminku.sannafanity.workers.dev/");
@@ -136,23 +127,6 @@ async function loadData(){
   } catch(e){console.error(e); toastMsg("Gagal load data");}
 }
 loadData();
-
-// LOAD LOGS
-async function loadLogs(){
-  try{
-    const res = await fetch("https://raw.githubusercontent.com/ModSanzz/CloudPlayModSanz/main/worker-errors.log");
-    let logs = []
-    if(res.ok) logs = await res.json().catch(()=>[]);
-    const logDiv = $("logList"); logDiv.innerHTML = '';
-    if(!logs.length){logDiv.innerHTML="<p style='color:#aaa'>Belum ada log.</p>"; return;}
-    logs.reverse().forEach(l=>{
-      const div = document.createElement("div");
-      div.className='log-entry';
-      div.textContent = `[${l.time}] ${l.error}`;
-      logDiv.appendChild(div);
-    });
-  } catch(e){console.error(e); toastMsg("Gagal load logs");}
-}
 
 // RENDER IDs
 function renderIDs() {
@@ -202,7 +176,7 @@ function updatePreview(){const d=$("dateInput").value; $("previewStatus").textCo
 function updateMaintenanceUI(){const m=configData.find(i=>i.build_id==="MAINTENANCE"); if(m){$("maintenanceToggle").checked=m.status==="active"; $("maintenanceMessage").value=m.message; updateToggleLabel();}}
 function updateToggleLabel(){$("maintenanceLabel").textContent=$("maintenanceToggle").checked?'Maintenance ON':'Maintenance OFF';}
 
-// SAVE ALL (ID)
+// SAVE ALL (POST ke Worker)
 async function saveAll(){
   const pw = $("adminPassword").value.trim();
   if(pw!=="sanzmods"){toastMsg("Password salah!"); return;}
@@ -221,7 +195,7 @@ async function saveAll(){
       body:JSON.stringify({password:pw, data:configData})
     });
     const result=await res.json();
-    if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate di GitHub!");} 
+    if(res.ok && result.status==="success"){toastMsg("Data berhasil diupdate!");} 
     else {console.error(result); toastMsg("Gagal update ke GitHub!");}
   }catch(e){console.error(e); toastMsg("Terjadi error saat update!");}
 }
@@ -248,12 +222,12 @@ async function saveMaintenance(){
 
 // TAB NAVIGATION
 function showTab(tab){
-  $("usersTab").style.display="none"; $("settingsTab").style.display="none"; $("logsTab").style.display="none";
-  $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active"); $("navLogs").classList.remove("active");
+  $("usersTab").style.display="none"; $("settingsTab").style.display="none";
+  $("navUsers").classList.remove("active"); $("navSettings").classList.remove("active");
   if(tab==='users'){$("usersTab").style.display="block"; $("navUsers").classList.add("active"); renderIDs();}
   else if(tab==='settings'){$("settingsTab").style.display="block"; $("navSettings").classList.add("active"); updateMaintenanceUI();}
-  else if(tab==='logs'){$("logsTab").style.display="block"; $("navLogs").classList.add("active"); loadLogs();}
 }
 </script>
+
 </body>
 </html>
