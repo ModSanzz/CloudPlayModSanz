@@ -1,38 +1,44 @@
-name: Deploy GitHub Pages
+name: Deploy to GitHub
 
 on:
   push:
     branches:
-      - main  # Trigger saat push ke main
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repo
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # 2️⃣ Setup Node (kalau perlu build assets)
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Create Deployment
+        id: deployment
+        uses: actions/create-deployment@v1
         with:
-          node-version: '18'
+          token: ${{ secrets.GH_PAT }}
+          environment: production
+          description: "Deploy CloudPlay Panel"
+          auto_merge: false
+          required_contexts: []
 
-      # 3️⃣ Buat folder sementara untuk publik (termasuk key.json)
       - name: Prepare public folder
         run: |
           rm -rf temp_public
           mkdir temp_public
-          # Copy semua file kecuali folder .git & workflow
           rsync -av --exclude='.git' --exclude='.github' ./ temp_public/
 
-      # 4️⃣ Deploy ke gh-pages pakai PAT
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy Files
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add temp_public
+          git commit -m "Deploy via workflow"
+          git push origin main
+
+      - name: Mark Deployment as Success
+        uses: actions/deployment-status@v1
         with:
-          personal_token: ${{ secrets.GH_PAT }}
-          publish_dir: ./temp_public
-          publish_branch: gh-pages
-          keep_files: false
+          token: ${{ secrets.GH_PAT }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          state: success
