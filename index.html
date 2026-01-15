@@ -110,24 +110,23 @@ input,textarea {width:100%;padding:10px;border-radius:6px;border:1px solid #444;
 </nav>
 
 <script>
+const workerURL = "https://adminku.sannafanity.workers.dev/";
 const $ = id => document.getElementById(id);
 const toastMsg = m => { $("toast").textContent=m; $("toast").classList.add("show"); setTimeout(()=>$("toast").classList.remove("show"),3000); };
 
-function expired(d){if(!d) return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t;}
+function expired(d){if(!d)return true; const e=new Date(d), t=new Date(); e.setHours(0,0,0,0); t.setHours(0,0,0,0); return e<t;}
 let configData=[], editIndex=null, filter="all";
 
-// LOAD DATA GET
 async function loadData(){
   try{
-    const res = await fetch("https://adminku.sannafanity.workers.dev/");
+    const res = await fetch(workerURL);
     const data = await res.json();
     if(Array.isArray(data)){configData=data; renderIDs(); updateMaintenanceUI();}
     else toastMsg("Data kosong atau error");
-  } catch(e){console.error(e); toastMsg("Gagal load data");}
+  } catch(e){ toastMsg("Gagal load data"); }
 }
 loadData();
 
-// RENDER IDs
 function renderIDs() {
   const list=$("userList"); list.innerHTML="";
   let arr=configData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:expired(i.date)}));
@@ -188,7 +187,7 @@ async function saveAll(){
   }
   renderIDs();
   try{
-    const res=await fetch("https://adminku.sannafanity.workers.dev/",{
+    const res=await fetch(workerURL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({password:pw,data:configData})
@@ -208,7 +207,7 @@ async function saveMaintenance(){
   m.status = $("maintenanceToggle").checked?"active":"inactive";
   m.message = $("maintenanceMessage").value;
   try{
-    const res=await fetch("https://adminku.sannafanity.workers.dev/",{
+    const res=await fetch(workerURL,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({password:pw,data:configData})
