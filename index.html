@@ -9,7 +9,6 @@
 <style>
 :root{
 --primary:#C77DFF;
---secondary:#282828;
 --bg:#121212;
 --text:#fff;
 --muted:#aaa;
@@ -17,168 +16,129 @@
 --valid:#4caf50;
 --glow:0 0 8px rgba(199,125,255,.7);
 }
-body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text)}
-header{padding:15px;text-align:center;font-size:1.6rem;font-weight:700;color:var(--primary)}
-.search-bar{display:flex;justify-content:center;margin:10px}
-.search-bar input{flex:1;padding:8px;border-radius:5px 0 0 5px;border:none;background:#222;color:#fff}
-.search-bar button{padding:8px;background:var(--primary);border:none;color:#fff;border-radius:0 5px 5px 0;cursor:pointer}
-.filters{display:flex;justify-content:center;margin:10px;gap:5px}
-.filters button{padding:5px 10px;border:none;border-radius:20px;background:#333;color:#fff;cursor:pointer}
-.filters button.active{background:var(--primary)}
-.user-card{display:flex;justify-content:space-between;align-items:center;padding:10px;margin:5px;border-radius:10px;background:#222;border:2px solid transparent;box-shadow:var(--glow)}
-.user-card.valid{border-color:var(--primary)}
-.user-info{display:flex;flex-direction:column;gap:3px}
-.status-actions{display:flex;align-items:center;gap:5px}
-.status-tag{padding:2px 8px;border-radius:5px;background:var(--valid);color:#fff;font-weight:700;font-size:0.8rem}
-.status-actions button{border:none;padding:5px 8px;border-radius:5px;cursor:pointer;background:#333}
-.status-actions button.edit{color:#aaa}
-.status-actions button.delete{color:var(--danger)}
-.date-shortcuts{display:flex;gap:5px;flex-wrap:wrap;margin:5px 0}
-.date-shortcuts button{padding:5px 10px;border:none;border-radius:5px;background:var(--primary);color:#fff;cursor:pointer}
-#addBtn{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:var(--primary);border:none;color:#fff;font-size:1.8rem;cursor:pointer;box-shadow:var(--glow)}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center}
-.modal-content{background:#222;padding:20px;border-radius:10px;width:90%;max-width:400px;display:flex;flex-direction:column;gap:10px}
-.modal-content input[type=text], .modal-content input[type=date]{padding:8px;border-radius:5px;border:none;background:#333;color:#fff}
-.modal-content label{font-size:0.9rem;color:#fff}
-.modal-content .btns{display:flex;justify-content:flex-end;gap:10px}
-.modal-content .btns button{padding:5px 10px;border:none;border-radius:5px;cursor:pointer}
+body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);}
+header{padding:20px;text-align:center;font-size:1.5rem;font-weight:bold;color:var(--primary);}
+.search-bar{display:flex;justify-content:center;margin-bottom:10px;}
+.search-bar input{padding:10px;border:none;border-radius:5px 0 0 5px;outline:none;width:70%;background:#222;color:#fff;}
+.search-bar button{padding:10px;background:var(--primary);border:none;border-radius:0 5px 5px 0;color:#000;}
+.filter-btns{display:flex;justify-content:center;margin-bottom:10px;gap:10px;}
+.filter-btns button{padding:8px 16px;border:none;border-radius:20px;background:#333;color:#fff;cursor:pointer;}
+.filter-btns button.active{background:var(--primary);box-shadow:var(--glow);}
+.user-list{padding:0 10px;display:flex;flex-direction:column;gap:10px;}
+.user-card{background:#222;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border:2px solid transparent;}
+.user-card.valid{border-color:var(--primary);}
+.user-info{display:flex;flex-direction:column;gap:3px;}
+.status-actions{display:flex;gap:5px;align-items:center;}
+.status-tag{padding:3px 8px;background:var(--valid);border-radius:5px;color:#000;font-weight:bold;}
+.status-actions button{border:none;padding:5px 8px;border-radius:5px;cursor:pointer;}
+.status-actions button.edit{color:#aaa;background:#333;}
+.status-actions button.delete{color:var(--danger);background:#333;}
+.status-actions button:hover{background:#222;}
+.bottom-add{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);}
+.bottom-add button{background:var(--primary);border:none;color:#000;font-size:1.5rem;padding:15px;border-radius:50%;box-shadow:var(--glow);cursor:pointer;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;}
+.modal-content{background:#222;padding:20px;border-radius:12px;width:90%;max-width:400px;}
+.modal-content h2{margin-top:0;color:var(--primary);}
+.modal-content input, .modal-content textarea{width:100%;padding:8px;margin:5px 0;border-radius:5px;border:none;background:#333;color:#fff;}
+.date-shortcuts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px;}
+.date-shortcuts button{flex:1;padding:5px;border:none;border-radius:5px;background:#555;color:#fff;cursor:pointer;}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;margin:10px 0;}
+.toggle-switch{position:relative;display:inline-block;width:50px;height:24px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:.4s;}
+.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;transition:.4s;border-radius:50%;}
+input:checked + .slider{background:var(--primary);}
+input:checked + .slider:before{transform:translateX(26px);}
+.btn-primary{background:var(--primary);color:#000;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;margin-left:5px;}
+.btn-secondary{background:#555;color:#fff;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;margin-left:5px;}
 </style>
 </head>
 <body>
 <header>CloudPlay Admin Panel</header>
-
 <div class="search-bar">
-<input type="text" id="search" placeholder="Search Build/Device ID...">
-<button onclick="renderList()">🔍</button>
+<input type="text" id="search" placeholder="Cari Build/Device ID..." oninput="renderList()">
+<button onclick="renderList()"><i class="fa fa-search"></i></button>
 </div>
-
-<div class="filters">
-<button onclick="setFilter('all')" id="fAll" class="active">All (<span id="countAll">0</span>)</button>
-<button onclick="setFilter('valid')" id="fValid">Valid (<span id="countValid">0</span>)</button>
-<button onclick="setFilter('expired')" id="fExpired">Expired (<span id="countExpired">0</span>)</button>
+<div class="filter-btns">
+<button id="allBtn" class="active" onclick="setFilter('all')">Semua</button>
+<button id="validBtn" onclick="setFilter('valid')">Valid</button>
+<button id="expiredBtn" onclick="setFilter('expired')">Expired</button>
 </div>
+<div class="user-list" id="userList"></div>
+<div class="bottom-add"><button onclick="showModal()"><i class="fa fa-plus"></i></button></div>
 
-<div id="userList"></div>
-
-<button id="addBtn" onclick="openModal()">+</button>
-
-<div class="modal" id="modal">
+<div class="modal" id="userModal">
 <div class="modal-content">
-<label>ID / Build</label>
-<input type="text" id="idInput">
-<label>Username</label>
-<input type="text" id="userInput">
-<label>Expire</label>
-<input type="date" id="dateInput">
+<h2 id="modalTitle">Tambah / Edit ID</h2>
+<input type="text" id="buildIdInput" placeholder="Build/Device ID">
 <div class="date-shortcuts">
 <button onclick="setExpiryShortcut(1)">+1 Hari</button>
 <button onclick="setExpiryShortcut(7)">+7 Hari</button>
 <button onclick="setExpiryShortcut(30)">+30 Hari</button>
 <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
 <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-<button onclick="setExpiryPermanent()">Permanent</button>
+<button onclick="setExpiryShortcut('permanent')">Permanent</button>
 </div>
-<label><input type="checkbox" id="maintenanceToggle"> Maintenance</label>
-<div class="btns">
-<button onclick="closeModal()">Batal</button>
-<button onclick="saveID()">Simpan</button>
+<input type="date" id="expiryDateInput">
+<div style="display:flex;justify-content:flex-end;margin-top:10px;">
+<button class="btn-secondary" onclick="closeModal()">Batal</button>
+<button class="btn-primary" onclick="saveUser()">Simpan</button>
 </div>
+</div>
+</div>
+
+<div style="padding:10px;margin-top:10px;">
+<div class="toggle-row">
+<label id="maintenanceLabel">Sistem Aktif :)</label>
+<label class="toggle-switch">
+<input type="checkbox" id="maintenanceToggle" onchange="updateMaintenanceLabel()">
+<span class="slider"></span>
+</label>
 </div>
 </div>
 
 <script>
-let data={
-"Qtrtq5261e1r":{username:"@Snanbavz",date:"2026-01-31",maintenance:false},
-"Wt62562":{username:"@Sanz",date:"2027-04-30",maintenance:false}
-};
+let users={"Qtrtq5261e1r":{username:"@Snanbavz",date:"2026-01-31"},"Wt62562":{username:"@Sanz",date:"2027-04-30"}};
 let filter="all";
-
 function renderList(){
-const ul=document.getElementById("userList");
-ul.innerHTML="";
-const search=document.getElementById("search").value.toLowerCase();
-let cAll=0,cValid=0,cExp=0;
-for(let k in data){
-let d=data[k];
+let list=document.getElementById("userList");
+let search=document.getElementById("search").value.toLowerCase();
+list.innerHTML="";
+for(let k in users){
+let d=users[k];
 let exp=new Date(d.date)<new Date();
-let status=d.maintenance?"MAINT":"";
-if(!k.toLowerCase().includes(search)&&!d.username.toLowerCase().includes(search)) continue;
-cAll++;
-if(exp)cExp++;else cValid++;
-if(filter==="valid"&&exp) continue;
-if(filter==="expired"&&!exp) continue;
+if(filter==="valid"&&exp)continue;
+if(filter==="expired"&&!exp)continue;
+if(search&&!k.toLowerCase().includes(search)&&!d.username.toLowerCase().includes(search))continue;
 let card=document.createElement("div");
-card.className="user-card "+(exp?"":"valid");
+card.className="user-card "+(exp?"expired":"valid");
 card.innerHTML=`
 <div class="user-info">
 <strong>${k}</strong>
-<span>User: ${d.username}<br>Expire: ${d.date}${status?" | Maintenance":""}</span>
+<span>User: ${d.username}<br>Expire: ${d.date}</span>
 </div>
 <div class="status-actions">
 <span class="status-tag">${exp?"EXPIRED":"VALID"}</span>
-<button class="edit" onclick="edit('${k}')"><i class="fa fa-edit"></i></button>
-<button class="delete" onclick="del('${k}')"><i class="fa fa-trash"></i></button>
+<button class="edit" onclick="editUser('${k}')"><i class="fa fa-edit"></i></button>
+<button class="delete" onclick="deleteUser('${k}')"><i class="fa fa-trash"></i></button>
 </div>`;
-ul.appendChild(card);
-}
-document.getElementById("countAll").textContent=cAll;
-document.getElementById("countValid").textContent=cValid;
-document.getElementById("countExpired").textContent=cExp;
-}
-
-function setFilter(f){
-filter=f;
-document.getElementById("fAll").classList.remove("active");
-document.getElementById("fValid").classList.remove("active");
-document.getElementById("fExpired").classList.remove("active");
-document.getElementById("f"+f.charAt(0).toUpperCase()+f.slice(1)).classList.add("active");
-renderList();
-}
-
-function openModal(id=""){
-document.getElementById("modal").style.display="flex";
-if(id){
-document.getElementById("idInput").value=id;
-document.getElementById("userInput").value=data[id].username;
-document.getElementById("dateInput").value=data[id].date;
-document.getElementById("maintenanceToggle").checked=data[id].maintenance;
-}else{
-document.getElementById("idInput").value="";
-document.getElementById("userInput").value="";
-document.getElementById("dateInput").value="";
-document.getElementById("maintenanceToggle").checked=false;
+list.appendChild(card);
 }
 }
-
-function closeModal(){document.getElementById("modal").style.display="none"}
-
-function saveID(){
-let id=document.getElementById("idInput").value;
-let user=document.getElementById("userInput").value;
-let date=document.getElementById("dateInput").value;
-let maint=document.getElementById("maintenanceToggle").checked;
-if(!id||!user||!date){alert("Lengkapi semua field");return;}
-data[id]={username:user,date:date,maintenance:maint};
-closeModal();
-renderList();
-}
-
-function del(id){if(confirm("Hapus ID ini?")){delete data[id];renderList()}}
-
-function edit(id){openModal(id)}
-
+function setFilter(f){filter=f;document.getElementById("allBtn").classList.remove("active");document.getElementById("validBtn").classList.remove("active");document.getElementById("expiredBtn").classList.remove("active");if(f==="all")document.getElementById("allBtn").classList.add("active");if(f==="valid")document.getElementById("validBtn").classList.add("active");if(f==="expired")document.getElementById("expiredBtn").classList.add("active");renderList();}
+function showModal(){document.getElementById("userModal").style.display="flex";}
+function closeModal(){document.getElementById("userModal").style.display="none";}
 function setExpiryShortcut(days){
-let d=new Date();
-d.setDate(d.getDate()+days);
-document.getElementById("dateInput").value=d.toISOString().split("T")[0];
+let input=document.getElementById("expiryDateInput");
+let date=new Date();
+if(days==="permanent"){input.value="9999-12-31";return;}
+date.setDate(date.getDate()+days);
+input.value=date.toISOString().split("T")[0];
 }
-
-function setExpiryPermanent(){
-document.getElementById("dateInput").value="9999-12-31";
-}
-
-setInterval(renderList,1000); // auto update status
-
+function saveUser(){alert("Simpan ID (Admin)");closeModal();renderList();}
+function editUser(id){alert("Edit "+id);}
+function deleteUser(id){alert("Delete "+id);}
+function updateMaintenanceLabel(){document.getElementById("maintenanceLabel").innerText=document.getElementById("maintenanceToggle").checked?"Sistem Aktif :)":"Sistem Mati :(";}
 renderList();
 </script>
 </body>
