@@ -3,175 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DPMods Build ID Admin Panel (Firebase)</title>
+<title>CloudPlay Admin Panel - Neon</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-:root {
-    --primary-color: #1DB954; /* hijau neon valid */
-    --secondary-color: #282828; /* card dark */
-    --background-color: #121212; /* background */
-    --text-color: #FFFFFF;
-    --text-secondary: #B3B3B3;
-    --danger-color: #FF4D4D; /* merah expired */
-    --maintenance-color: #9B59B6; /* ungu maintenance */
+:root{
+--primary:#1DB954;
+--primary-glow:rgba(29,185,84,.7);
+--secondary:#1E1E1E;
+--background:#0D0D0D;
+--text:#fff;
+--muted:#aaa;
+--danger:#FF4D4D;
+--danger-glow:rgba(255,77,77,.7);
+--maintenance:#9B59B6;
+--maintenance-glow:rgba(155,89,182,.7);
+--soft-glow:0 0 8px var(--primary-glow),0 0 15px rgba(29,185,84,.3);
 }
-
-body { font-family:'Roboto',sans-serif; background:var(--background-color); color:var(--text-color); margin:0; padding-bottom:70px;}
-header { background:var(--secondary-color); padding:15px 20px; text-align:center;}
-header h1 { margin:0; color:yellowgreen;}
-.container { padding:20px; max-width:800px; margin:0 auto;}
-.search-bar { display:flex; gap:10px; margin-bottom:15px;}
-.search-bar input { flex-grow:1; padding:10px; border-radius:6px; border:1px solid #444; background:#333; color:var(--text-color);}
-.search-bar button { background:var(--primary-color); border:none; border-radius:6px; padding:10px 15px; cursor:pointer; color:var(--background-color);}
-.filter-bar { display:flex; gap:10px; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;}
-.filter-bar button { background:#333; color:var(--text-secondary); border:none; padding:8px 15px; border-radius:20px; cursor:pointer; display:flex; align-items:center; flex-shrink:0;}
-.filter-bar button span { color:var(--text-secondary); margin-left:5px; opacity:0.7; font-size:0.8rem;}
-.filter-bar button.active { background:var(--primary-color); color:var(--background-color);}
-.user-item { background:var(--secondary-color); padding:15px; margin-bottom:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; border-left:5px solid transparent;}
-.user-item.valid { border-left-color:var(--primary-color);}
-.user-item.expired { background:#331f1f; border-left-color:var(--danger-color);}
-.user-item.maintenance { border-left-color:var(--maintenance-color);}
-.user-item-info { flex-grow:1; display:flex; align-items:center;}
-.user-item-text { flex-grow:1;}
-.user-item-text strong { display:block; font-size:1.1rem;}
-.user-item-text span { color:var(--text-secondary); font-size:0.9rem; display:block;}
-.user-status-tag { background:var(--primary-color); color:var(--background-color); padding:4px 8px; border-radius:4px; font-size:0.75rem; font-weight:700; margin-right:15px;}
-.user-item.expired .user-status-tag { background:var(--danger-color); color:var(--text-color);}
-.user-item.maintenance .user-status-tag { background:var(--maintenance-color); color:#fff;}
-.user-actions { display:flex; gap:5px; align-items:center; flex-shrink:0;}
-.action-btn { background:none; border:none; color:var(--text-secondary); font-size:1.1rem; cursor:pointer; padding:8px; border-radius:50%;}
-.action-btn:hover { color:var(--text-color);}
-.delete-btn { color:var(--danger-color);}
-nav { position:fixed; bottom:0; left:0; right:0; height:60px; background:var(--secondary-color); display:flex; justify-content:space-around; align-items:center; box-shadow:0 -2px 5px rgba(0,0,0,0.3);}
-.nav-item { text-decoration:none; color:var(--text-secondary); display:flex; flex-direction:column; align-items:center; font-size:0.7rem; cursor:pointer; padding:5px 10px;}
-.nav-item i { font-size:1.5rem; margin-bottom:2px;}
-.nav-item.active { color:var(--primary-color); text-shadow:0 0 5px rgba(29,185,84,0.8);}
-.add-user-btn { background:var(--primary-color); color:var(--background-color); width:56px; height:56px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:2rem; box-shadow:0 4px 6px rgba(0,0,0,0.3); cursor:pointer; transform:translateY(-15px);}
-.add-user-btn:hover { background:#1ed760;}
-.modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:2000; overflow-y:auto;}
-.modal-content { background:var(--secondary-color); padding:30px; border-radius:12px; width:90%; max-width:450px; box-shadow:0 4px 20px rgba(0,0,0,0.5);}
-.modal h2 { margin-top:0; color:var(--primary-color);}
-.modal button { padding:10px 15px; border:none; border-radius:6px; cursor:pointer; font-weight:700; transition:opacity 0.2s;}
-.modal .btn-secondary { background:#444; color:#fff; margin-right:10px;}
-.modal .btn-primary { background:var(--primary-color); color:#000; box-shadow:0 0 8px rgba(29,185,84,0.6);}
-#toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:#fff; padding:10px 20px; border-radius:20px; opacity:0; transition:opacity 0.3s; z-index:4000;}
-.toast.show { opacity:1;}
-.date-shortcuts { display:flex; gap:5px; margin-bottom:10px; overflow-x:auto; padding-bottom:5px;}
-.date-shortcuts button { background:#333; color:var(--text-secondary); border:none; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:0.9rem; flex-shrink:0;}
-.date-shortcuts button:hover { background:#444;}
+body{margin:0;font-family:Roboto;background:var(--background);color:var(--text);padding-bottom:70px;}
+header{padding:15px;text-align:center;background:var(--secondary);box-shadow:0 2px 8px rgba(0,0,0,.7);}
+h1{margin:0;color:var(--primary);}
+.container{padding:15px;max-width:900px;margin:auto;}
+input,textarea{width:100%;padding:10px;margin:5px 0;border-radius:8px;background:#222;border:1px solid #555;color:#fff;}
+button{cursor:pointer;border:none;border-radius:8px;padding:8px 12px;font-weight:700;transition:0.2s;}
+button:hover{opacity:.9;}
+.user{background:var(--secondary);padding:15px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-left:5px solid transparent;box-shadow:0 0 5px rgba(0,0,0,.5);}
+.user.valid{border-left-color:var(--primary);box-shadow:0 0 10px var(--primary-glow);}
+.user.expired{border-left-color:var(--danger);box-shadow:0 0 10px var(--danger-glow);}
+.user.maintenance{border-left-color:var(--maintenance);box-shadow:0 0 10px var(--maintenance-glow);}
+.user-info{flex-grow:1;}
+.user-info strong{display:block;color:#fff;}
+.user-info span{color:var(--muted);font-size:0.9rem;}
+.user-actions{display:flex;gap:5px;}
+.user-actions button{background:none;color:var(--muted);font-size:1.2rem;transition:0.2s;}
+.user-actions button:hover{color:#fff;}
+nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary);display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 8px rgba(0,0,0,.7);}
+nav div{text-align:center;color:var(--muted);cursor:pointer;font-size:0.75rem;}
+nav .active{color:var(--primary);text-shadow:0 0 6px var(--primary-glow);}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:1000;}
+.modal-box{background:var(--secondary);padding:25px;border-radius:12px;width:90%;max-width:420px;box-shadow:0 0 15px var(--primary-glow);}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111;padding:12px 22px;border-radius:25px;display:none;z-index:2000;box-shadow:0 0 8px var(--primary-glow);}
+.date-shortcuts{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;}
+.date-shortcuts button{background:#222;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;flex-shrink:0;}
+.date-shortcuts button:hover{background:#333;}
+.search-bar{display:flex;gap:10px;margin-bottom:10px;}
+.search-bar input{flex-grow:1;border-radius:6px;background:#222;padding:8px;}
+.search-bar button{background:var(--primary);color:#000;box-shadow:var(--soft-glow);}
+.search-bar button:hover{background:#1ed760;}
 </style>
 </head>
 <body>
-
-<header>
-<h1>DPMods Build ID Admin Panel</h1>
-</header>
-
-<div class="container">
+<header><h1>CloudPlay Admin Panel</h1></header>
+<div class="container" id="usersTab">
+<h3>Build / Device IDs</h3>
 <div class="search-bar">
-<input type="text" id="searchInput" placeholder="Cari Build/Device ID...">
-<button onclick="searchIDs()"><i class="fas fa-search"></i></button>
+<input id="searchInput" placeholder="Cari Build ID..." oninput="render()">
+<button onclick="openModal()"><i class="fas fa-plus"></i> Tambah</button>
+</div>
+<div>
+<button onclick="setFilter('all')">All</button>
+<button onclick="setFilter('valid')">Valid</button>
+<button onclick="setFilter('expired')">Expired</button>
+</div>
+<div id="list"></div>
 </div>
 
-<div class="filter-bar" id="filterBar">
-<button class="active" data-filter="all" onclick="setFilter('all', this)">Semua <span id="count-all"></span></button>
-<button data-filter="valid" onclick="setFilter('valid', this)">Valid <span id="count-valid"></span></button>
-<button data-filter="expired" onclick="setFilter('expired', this)">Expired <span id="count-expired"></span></button>
+<div class="container" id="settingsTab" style="display:none">
+<h3>Maintenance</h3>
+<label><input type="checkbox" id="mnt"> Aktifkan Maintenance</label>
+<textarea id="mntMsg" placeholder="Pesan maintenance"></textarea>
+<button onclick="saveMaintenance()">Simpan Maintenance</button>
 </div>
 
-<div id="userList"></div>
-</div>
+<nav>
+<div id="navUsers" class="active" onclick="showTab('users')"><i class="fa fa-key"></i><br>ID</div>
+<div id="navSettings" onclick="showTab('settings')"><i class="fa fa-bell"></i><br>Status</div>
+</nav>
 
-<div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
-
-<div id="userModal" class="modal">
-<div class="modal-content">
-<h2 id="userModalTitle">Add New ID</h2>
-<div class="form-group">
-<label>Build/Device ID</label>
-<input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007">
-</div>
-<label>Expiry Date (UTC)</label>
+<div class="modal" id="modal">
+<div class="modal-box">
+<h3>Tambah / Edit ID</h3>
+<input id="idInput" placeholder="Build ID">
+<input id="userInput" placeholder="Username">
+<label>Tanggal Kadaluarsa</label>
 <div class="date-shortcuts">
-<button onclick="setExpiryShortcut(1)">+1 Hari</button>
-<button onclick="setExpiryShortcut(7)">+7 Hari</button>
-<button onclick="setExpiryShortcut(30)">+30 Hari</button>
-<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+<button onclick="setExpiry(1)">+1 Hari</button>
+<button onclick="setExpiry(7)">+7 Hari</button>
+<button onclick="setExpiry(30)">+30 Hari</button>
+<button onclick="setExpiry(90)">+3 Bulan</button>
+<button onclick="setExpiry(365)">+1 Tahun</button>
 </div>
-<div class="form-group">
-<input type="date" id="expiryDateInput">
-</div>
-<div style="display:flex; justify-content:flex-end; margin-top:20px;">
-<button class="btn-secondary" onclick="closeUserModal()">Batal</button>
-<button class="btn-primary" id="saveUserBtn">Simpan ID</button>
-</div>
+<input type="date" id="dateInput">
+<br><br>
+<button onclick="saveID()">Simpan</button>
+<button onclick="closeModal()">Batal</button>
 </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const FIREBASE_ROOT = "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
-const KEYS_URL = FIREBASE_ROOT + "/keys.json";
-
-let configData = [];
-let currentFilter = 'all';
-let currentSearchTerm = '';
-
-const $ = id => document.getElementById(id);
-
-function showToast(msg, duration=3000){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),duration);}
-function setFilter(filter, btn){ currentFilter=filter; document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); renderIDs();}
-function searchIDs(){ currentSearchTerm=$('searchInput').value.toLowerCase().trim(); renderIDs(); }
-
-function isExpired(date){ if(!date) return true; const d=new Date(date); d.setHours(0,0,0,0); const now=new Date(); now.setHours(0,0,0,0); return d<now;}
-
-function updateFilterCounts(allData){
-const ids = allData.filter(i=>i.build_id!=="MAINTENANCE").map(i=>({...i,is_expired:isExpired(i.date)}));
-$('count-all').textContent=`(${ids.length})`;
-$('count-valid').textContent=`(${ids.filter(i=>!i.is_expired).length})`;
-$('count-expired').textContent=`(${ids.filter(i=>i.is_expired).length})`;
-}
-
-function renderIDs(){
-const list=$('userList'); list.innerHTML='';
-let filtered=configData.map(i=>({...i,is_expired:isExpired(i.date)}));
-
-if(currentFilter==='valid') filtered=filtered.filter(i=>!i.is_expired);
-if(currentFilter==='expired') filtered=filtered.filter(i=>i.is_expired);
-if(currentSearchTerm) filtered=filtered.filter(i=>i.build_id.toLowerCase().includes(currentSearchTerm));
-filtered.forEach(item=>{
-const div=document.createElement('div');
-div.className='user-item'+(item.build_id==="MAINTENANCE"?' maintenance':item.is_expired?' expired':' valid');
-const statusLabel=item.build_id==="MAINTENANCE"?'MAINTENANCE':item.is_expired?'EXPIRED':'VALID';
-div.innerHTML=`<div class="user-item-info"><span class="user-status-tag">${statusLabel}</span><div class="user-item-text"><strong>${item.build_id}</strong><span>${item.date||'NO DATE'}</span></div></div><div class="user-actions"><button class="action-btn edit-btn" onclick="editID('${item.build_id}')"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="deleteID('${item.build_id}')"><i class="fas fa-trash-alt"></i></button></div>`;
-list.appendChild(div);
-});
-updateFilterCounts(configData);
-}
-
-function loadData(){ fetch(KEYS_URL).then(r=>r.json()).then(d=>{ configData=[]; for(const k in d){ configData.push(d[k]); } renderIDs(); }).catch(e=>showToast('Gagal load data Firebase'));}
-function saveData(){ const obj={}; configData.forEach(i=>{ obj[i.build_id]=i; }); fetch(KEYS_URL,{method:'PATCH',headers:{"Content-Type":"application/json"},body:JSON.stringify(obj)}).then(()=>{ showToast('Data tersimpan!'); renderIDs(); }).catch(e=>showToast('Gagal simpan'));}
-
-function setExpiryShortcut(days){ const d=new Date(); d.setDate(d.getDate()+days); $('expiryDateInput').value=d.toISOString().split('T')[0];}
-function showUserModal(){ $('userModal').style.display='flex'; setExpiryShortcut(30);}
-function closeUserModal(){ $('userModal').style.display='none';}
-
-function handleSaveUser(){
-const id=$('buildIdInput').value.trim(); const date=$('expiryDateInput').value;
-if(!id||!date){ showToast('Isi semua field!'); return;}
-let exists=configData.findIndex(i=>i.build_id===id);
-if(exists>-1){ configData[exists].date=date; }else{ configData.push({build_id:id,date:date});}
-closeUserModal(); saveData();
-}
-
-function editID(id){ const item=configData.find(i=>i.build_id===id); if(!item) return; showUserModal(); $('buildIdInput').value=item.build_id; $('expiryDateInput').value=item.date; }
-function deleteID(id){ if(confirm(`Hapus ID ${id}?`)){ configData=configData.filter(i=>i.build_id!==id); saveData(); }}
-
-document.addEventListener('DOMContentLoaded',()=>{ $('addUserBtn').addEventListener('click',showUserModal); $('saveUserBtn').addEventListener('click',handleSaveUser); loadData(); });
+const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
+const KEYS_URL=FIREBASE_ROOT+"/keys.json";
+let data={},editId=null;
+const $=id=>document.getElementById(id);
+function toast(msg){const t=$('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500);}
+async function load(){const r=await fetch(KEYS_URL);data=await r.json()||{};render();if(data.MAINTENANCE){mnt.checked=data.MAINTENANCE.status==="active";mntMsg.value=data.MAINTENANCE.message||"";}}
+let filter='all';
+function render(){const list=$('list');list.innerHTML='';const q=$('searchInput').value.toLowerCase();Object.keys(data).forEach(id=>{if(id==="MAINTENANCE") return;const d=data[id];const expired=isExpired(d.date);if(filter==='valid'&&!expired){}else if(filter==='expired'&&expired){}else if(filter==='all'){}else return;if(q&&!id.toLowerCase().includes(q)) return;list.innerHTML+=`<div class="user ${expired?'expired':'valid'}"><div class="user-info"><strong>${id}</strong><span>${d.username||'-'} | Expire: ${d.date||'-'}</span></div><div class="user-actions"><button onclick="edit('${id}')"><i class="fas fa-pen"></i></button><button onclick="del('${id}')"><i class="fas fa-trash delete-btn"></i></button></div></div>`;});}
+function isExpired(date){if(!date) return true;const today=new Date();today.setHours(0,0,0,0);return new Date(date)<today;}
+function showTab(t){$('usersTab').style.display=t==='users'?'block':'none';$('settingsTab').style.display=t==='settings'?'block':'none';navUsers.classList.toggle('active',t==='users');navSettings.classList.toggle('active',t==='settings');}
+function openModal(){editId=null;$('idInput').value='';$('userInput').value='';const today=new Date();$('dateInput').value=today.toISOString().split('T')[0];$('modal').style.display='flex';}
+function closeModal(){$('modal').style.display='none';}
+function setExpiry(days){const d=new Date();d.setDate(d.getDate()+days);$('dateInput').value=d.toISOString().split('T')[0];}
+function edit(id){editId=id;$('idInput').value=id;$('userInput').value=data[id].username||'';$('dateInput').value=data[id].date||'';$('modal').style.display='flex';}
+async function saveID(){const id=$('idInput').value.trim();const user=$('userInput').value.trim();const date=$('dateInput').value;if(!id||!user||!date){toast("ISI SEMUA");return;}data[id]={username:user,date:date,status:"active"};await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({[id]:data[id]})});load();closeModal();toast("Tersimpan");}
+async function del(id){if(confirm("Hapus "+id+" ?")){await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({[id]:null})});load();toast("Dihapus");}}
+async function saveMaintenance(){await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({MAINTENANCE:{status:mnt.checked?"active":"inactive",message:mntMsg.value}})});load();toast("Maintenance disimpan");}
+function setFilter(f){filter=f;render();}
+load();
 </script>
-
 </body>
 </html>
