@@ -6,7 +6,6 @@
 <title>CloudPlay Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
 <style>
 :root {
   --primary-color: #C77DFF;
@@ -29,9 +28,24 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .search-bar{display:flex;gap:10px;margin-bottom:15px;}
 .search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:var(--text-color);}
 .search-bar button{background-color:var(--primary-color);color:var(--background-color);border:none;border-radius:6px;padding:10px 15px;cursor:pointer;transition:0.3s;}
+.search-bar button:hover{box-shadow:var(--soft-glow);}
+
+.bulk-buttons{display:flex;gap:10px;margin-bottom:15px;}
+.bulk-btn{
+  background:black;
+  color:#C77DFF;
+  border:1px solid #C77DFF;
+  padding:10px 15px;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+  text-shadow:0 0 8px #C77DFF;
+  box-shadow:0 0 10px rgba(199,125,255,.8);
+}
+.bulk-btn:hover{box-shadow:0 0 15px #C77DFF;}
 
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
-.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;}
+.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;transition:0.3s;}
 .filter-bar button.active{background-color:var(--primary-color);color:var(--background-color);box-shadow:var(--soft-glow);}
 
 .user-item{
@@ -43,13 +57,25 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
   align-items:center;
   justify-content:space-between;
   border-left:6px solid var(--primary-color);
+  transition:0.2s;
+  gap:10px;
 }
 
 .user-item.valid:hover{box-shadow:0 0 10px var(--valid-color);}
 .user-item.expired{background-color:#331f1f;}
+
 .user-item.permanent{border-left:6px solid gold;}
+.user-item.permanent .user-status-tag{
+  background:white;
+  color:black;
+}
+
+.user-item-text{flex-grow:1;line-height:1.3;}
+.user-item-text strong{display:block;font-size:1.1rem;color:var(--text-color);}
+.user-item-text span{color:var(--text-secondary);font-size:0.95rem;}
 
 .user-status-tag{
+  display:inline-block;
   padding:4px 10px;
   font-size:0.8rem;
   font-weight:700;
@@ -59,305 +85,400 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.valid .user-status-tag{background-color:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background-color:var(--danger-color);color:#fff;}
 
-nav{
-  position:fixed;bottom:0;left:0;right:0;height:60px;
-  background-color:var(--secondary-color);
-  display:flex;justify-content:center;align-items:center;
+.user-actions{display:flex;align-items:center;gap:6px;}
+
+.action-btn{
+  background:none;
+  border:none;
+  color:#9e9e9e;
+  font-size:1.2rem;
+  cursor:pointer;
+  padding:6px;
+  border-radius:50%;
+  transition:0.2s;
 }
 
-.add-user-btn{
-  background-color:var(--primary-color);
-  width:60px;height:60px;border-radius:50%;
-  display:flex;justify-content:center;align-items:center;
-  font-size:2rem;cursor:pointer;
-  transform:translateY(-15px);
-  box-shadow:var(--soft-glow);
-}
+.action-btn:hover{color:#ffffff;}
+.delete-btn{color:#ff4d4d !important;}
+.delete-btn:hover{color:#ff0000 !important;}
 
-.modal{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,.8);
-  display:none;align-items:center;justify-content:center;
-  z-index:2000;
-}
+nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 5px rgba(0,0,0,0.3);}
 
-.modal-content{
-  background:var(--secondary-color);
-  padding:25px;border-radius:12px;
-  width:90%;max-width:500px;
-}
+.nav-item{text-decoration:none;color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:0.7rem;cursor:pointer;padding:5px 10px;transition:0.2s;}
+.nav-item i{font-size:1.5rem;margin-bottom:2px;}
+.nav-item.active{color:var(--primary-color);text-shadow:var(--soft-glow);}
 
-.status-btn{
-  flex:1;padding:10px;border-radius:8px;border:none;
-  background:var(--primary-color);color:black;
-  font-weight:700;cursor:pointer;box-shadow:var(--soft-glow);
-}
+.add-user-btn{background-color:var(--primary-color);color:var(--background-color);width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;box-shadow:0 4px 6px rgba(0,0,0,0.3),var(--soft-glow);cursor:pointer;transform:translateY(-15px);transition:0.3s;}
+.add-user-btn:hover{background-color:#d18aff;}
 
-.bulk-header{
-  display:flex;justify-content:space-between;margin-bottom:10px;
-}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:2000;overflow-y:auto;}
+.modal-content{background-color:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;box-shadow:0 4px 20px rgba(0,0,0,0.5);margin:50px 0;}
 
-.bulk-list label{
-  display:block;margin:6px 0;
-}
+.modal h2{margin-top:0;color:var(--primary-color);}
+.modal button{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;transition:0.2s;}
+.modal button:hover{opacity:0.9;}
 
-.toast{
-  position:fixed;bottom:80px;left:50%;
-  transform:translateX(-50%);
-  background:black;color:white;
-  padding:10px 20px;border-radius:20px;
-  opacity:0;transition:.3s;
-}
+.modal .btn-secondary{background-color:#444;color:var(--text-color);margin-right:10px;}
+
+.btn-primary{background-color:var(--primary-color);color:var(--background-color);padding:12px 20px;font-weight:700;border-radius:6px;box-shadow:var(--soft-glow);}
+
+#loading{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);color:var(--primary-color);display:none;justify-content:center;align-items:center;font-size:1.5rem;z-index:3000;}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:var(--text-color);padding:10px 20px;border-radius:20px;opacity:0;transition:0.3s;z-index:4000;}
 .toast.show{opacity:1;}
+
+.date-shortcuts{display:flex;gap:5px;margin:10px 0;flex-wrap:wrap;}
+.date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
+.date-shortcuts button:hover{background:#444;}
+
+.bulk-list{max-height:300px;overflow-y:auto;margin:10px 0;}
+.bulk-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #444;}
+.bulk-actions{display:flex;justify-content:center;gap:15px;margin-top:15px;}
 </style>
 </head>
-
 <body>
 
 <header><h1>CloudPlay Admin Panel</h1></header>
 
 <div class="container">
+<div id="usersTab">
+<h2>Build/Device IDs</h2>
 
-<div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+<div class="bulk-buttons">
+<button class="bulk-btn" onclick="openBulk('expired')">EXPIRED</button>
+<button class="bulk-btn" onclick="openBulk('permanent')">PERMANENT</button>
 </div>
 
-<div class="filter-bar">
-<button class="active" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
-<button onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
-<button onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
-<button onclick="setFilter('permanent',this)">Permanent <span id="countPermanent"></span></button>
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="searchIDs()">
+<button onclick="searchIDs()"><i class="fas fa-search"></i></button>
+</div>
+
+<div class="filter-bar" id="filterBar">
+<button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
+<button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
+<button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
+<button data-filter="permanent" onclick="setFilter('permanent',this)">Permanent <span id="countPermanent"></span></button>
 </div>
 
 <div id="userList"></div>
 </div>
 
+<div id="settingsTab" style="display:none;">
+<h2>Global Status</h2>
+<div style="background-color: var(--secondary-color); padding:20px; border-radius:8px;">
+<h3 style="margin-top:0; color: var(--primary-color);">Maintenance Configuration</h3>
+<label>Maintenance Active</label>
+<input type="checkbox" id="maintenanceEnabled">
+<textarea id="maintenanceMessage" rows="2" placeholder="Maintenance message"></textarea>
+<button class="btn-primary" onclick="saveMaintenance()">Save Maintenance</button>
+</div>
+</div>
+</div>
+
 <nav>
+<div class="nav-item active" id="navUsers" onclick="showTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
 <div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
+<div class="nav-item" id="navSettings" onclick="showTab('settings')"><i class="fas fa-bell"></i><span>Status</span></div>
 </nav>
 
 <div id="userModal" class="modal">
 <div class="modal-content">
-
-<h2 style="text-align:center;color:var(--primary-color);">ADD NEW ID</h2>
+<h2>Add New ID</h2>
 
 <label>Build/Device ID</label>
-<input type="text" id="buildIdInput" placeholder="UP1A.231005.007" style="width:100%;padding:8px;margin-bottom:10px;">
+<input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007">
 
 <label>Username</label>
-<input type="text" id="usernameInput" placeholder="usernama" style="width:100%;padding:8px;margin-bottom:10px;">
+<input type="text" id="usernameInput" placeholder="e.g., JohnDoe">
 
-<label>Expired Date (UTC)</label>
-<div style="display:flex;gap:5px;margin:10px 0;flex-wrap:wrap;">
-<button onclick="setExpiryShortcut(1)">1 Hari</button>
-<button onclick="setExpiryShortcut(7)">7 Hari</button>
-<button onclick="setExpiryShortcut(30)">1 Bulan</button>
-<button onclick="setExpiryShortcut(90)">3 Bulan</button>
-<button onclick="setExpiryShortcut(365)">1 Tahun</button>
+<label>
+  <input type="checkbox" id="permanentInput">
+  Jadikan Permanent (Khusus Admin)
+</label>
+
+<label>Expiry Date (UTC)</label>
+<div class="date-shortcuts">
+<button onclick="setExpiryShortcut(1)">+1 Hari</button>
+<button onclick="setExpiryShortcut(7)">+7 Hari</button>
+<button onclick="setExpiryShortcut(30)">+30 Hari</button>
+<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
 </div>
 
-<div style="display:flex;gap:10px;margin:10px 0;">
-<button class="status-btn" onclick="openBulk()">EXPIRED</button>
-<button class="status-btn" onclick="setPermanent()">PERMANENT</button>
+<input type="date" id="expiryDateInput">
+
+<div style="display:flex;justify-content:flex-end;margin-top:10px;">
+<button class="btn-secondary" onclick="closeModal()">Cancel</button>
+<button class="btn-primary" onclick="saveID()">Save ID</button>
 </div>
-
-<label>Tanggal Expired</label>
-<input type="text" id="expiryDateInput" readonly style="width:100%;padding:8px;margin-bottom:10px;">
-
-<div style="display:flex;justify-content:flex-end;gap:10px;">
-<button onclick="closeModal()">BATAL</button>
-<button onclick="saveID()">SIMPAN</button>
-</div>
-
 </div>
 </div>
 
-<div id="bulkPopup" class="modal">
+<div id="bulkModal" class="modal">
 <div class="modal-content">
-<div class="bulk-header">
-<h3>Pilih ID yang mau diubah</h3>
-<button onclick="toggleAll()">PILIH SEMUA</button>
+<h2 id="bulkTitle"></h2>
+
+<div class="bulk-list" id="bulkList"></div>
+
+<div class="bulk-actions" id="bulkActions"></div>
+
+<div style="text-align:right;margin-top:15px;">
+<button class="btn-secondary" onclick="closeBulk()">Close</button>
 </div>
-
-<div id="bulkList"></div>
-
-<div style="display:flex;gap:10px;margin-top:10px;">
-<button onclick="applyBulk(true)">ON</button>
-<button onclick="applyBulk(false)">OFF</button>
-</div>
-
-<button onclick="closeBulk()" style="margin-top:10px;">TUTUP</button>
 </div>
 </div>
 
+<div id="loading">Updating...</div>
 <div id="toast" class="toast"></div>
 
 <script>
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL=FIREBASE_ROOT+"/keys.json";
-let data={}, currentFilter="all";
+let data={}, bulkMode="";
 
 const $=id=>document.getElementById(id);
 
 function toast(msg){
-const t=$('toast');
-t.textContent=msg;
-t.classList.add('show');
-setTimeout(()=>t.classList.remove('show'),2500);
+  const t=$('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
 async function load(){
-const r=await fetch(KEYS_URL);
-data=await r.json()||{};
-render();
+  const r=await fetch(KEYS_URL);
+  data=await r.json()||{};
+  render();
 }
 
 function isExpired(id){
-if(data[id]?.permanent) return false;
-const d=new Date(data[id]?.date||"2000-01-01");
-const t=new Date();
-t.setHours(0,0,0,0);
-return d < t;
+  if(data[id] && data[id].permanent) return false;
+  const date=data[id]?.date;
+  if(!date) return true;
+  const d=new Date(date); d.setHours(0,0,0,0);
+  const t=new Date(); t.setHours(0,0,0,0);
+  return d<t;
 }
 
 function updateCounts(){
-let total=0, valid=0, expired=0, permanent=0;
+  let total=0, valid=0, expired=0, permanent=0;
 
-Object.keys(data).forEach(id=>{
-if(id==="MAINTENANCE") return;
-total++;
-if(data[id]?.permanent) permanent++;
-else if(isExpired(id)) expired++;
-else valid++;
-});
+  Object.keys(data).forEach(id=>{
+    if(id==="MAINTENANCE") return;
+    total++;
+    if(data[id]?.permanent){
+      permanent++;
+    } else if(isExpired(id)){
+      expired++;
+    } else {
+      valid++;
+    }
+  });
 
-$('countAll').textContent=`(${total})`;
-$('countValid').textContent=`(${valid})`;
-$('countExpired').textContent=`(${expired})`;
-$('countPermanent').textContent=`(${permanent})`;
-}
-
-function setFilter(f,btn){
-currentFilter=f;
-document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-render();
+  $('countAll').textContent=`(${total})`;
+  $('countValid').textContent=`(${valid})`;
+  $('countExpired').textContent=`(${expired})`;
+  $('countPermanent').textContent=`(${permanent})`;
 }
 
 function render(){
-const list=$('userList');
-list.innerHTML='';
-const q=$('searchInput').value.toLowerCase();
+  const list=$('userList');
+  list.innerHTML='';
+  const q=$('searchInput').value.toLowerCase();
+  const f=document.querySelector('.filter-bar button.active').dataset.filter;
 
-Object.keys(data).sort().forEach(id=>{
-if(id==="MAINTENANCE") return;
-const d=data[id];
-const expired=isExpired(id);
+  Object.keys(data).sort().forEach(id=>{
+    if(id==="MAINTENANCE") return;
+    const d=data[id];
+    const expired=isExpired(id);
 
-if(currentFilter==="valid" && expired) return;
-if(currentFilter==="expired" && !expired) return;
-if(currentFilter==="permanent" && !d.permanent) return;
-if(q && !id.toLowerCase().includes(q)) return;
+    if(f==="valid" && expired) return;
+    if(f==="expired" && !expired) return;
+    if(f==="permanent" && !d.permanent) return;
+    if(q && !id.toLowerCase().includes(q) && !(d.username||'').toLowerCase().includes(q)) return;
 
-const div=document.createElement('div');
-div.className='user-item '+(d.permanent?'permanent':(expired?'expired':'valid'));
+    const item=document.createElement('div');
+    item.className='user-item '+(d.permanent?'permanent':(expired?'expired':'valid'));
 
-div.innerHTML=`
-<div>
-<strong>${id}</strong><br>
-User : @${d.username||'-'}<br>
-Expired : ${d.date||'-'}
-</div>
-<div class="user-status-tag">
-${d.permanent?'PERMANENT':(expired?'EXPIRED':'VALID')}
-</div>
-`;
+    item.innerHTML=`
+    <div class="user-item-text">
+      <strong>${id}</strong>
+      <span>User : @${d.username||'-'}</span><br>
+      <span>Expired : ${d.date||'-'}</span>
+    </div>
 
-list.appendChild(div);
-});
+    <div class="user-actions">
+      <div class="user-status-tag">
+        ${d.permanent ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
+      </div>
+      <button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button>
+      <button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button>
+    </div>
+    `;
+    list.appendChild(item);
+  });
 
-updateCounts();
+  updateCounts();
+}
+
+function setFilter(f,btn){
+  document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function searchIDs(){render();}
+function showTab(tab){
+  $('usersTab').style.display=tab==='users'?'block':'none';
+  $('settingsTab').style.display=tab==='settings'?'block':'none';
 }
 
 function openModal(){
-$('buildIdInput').value='';
-$('usernameInput').value='';
-$('expiryDateInput').value='';
-$('userModal').style.display='flex';
+  editId=null;
+  $('buildIdInput').value='';
+  $('usernameInput').value='';
+  $('expiryDateInput').value='';
+  $('permanentInput').checked=false;
+  $('userModal').style.display='flex';
 }
 
 function closeModal(){
-$('userModal').style.display='none';
+  $('userModal').style.display='none';
 }
 
 function setExpiryShortcut(days){
-const d=new Date();
-d.setDate(d.getDate()+days);
-$('expiryDateInput').value=d.toISOString().split('T')[0];
+  const d=new Date();
+  d.setDate(d.getDate()+days);
+  $('expiryDateInput').value=d.toISOString().split('T')[0];
 }
 
-function setPermanent(){
-$('expiryDateInput').value="9999-01-12";
-}
-
-function openBulk(){
-const box=$('bulkList');
-box.innerHTML='';
-Object.keys(data).forEach(id=>{
-if(id==="MAINTENANCE") return;
-box.innerHTML+=`<label><input type="checkbox" class="bulk-check" value="${id}"> ${id}</label>`;
-});
-$('bulkPopup').style.display='flex';
-}
-
-function closeBulk(){
-$('bulkPopup').style.display='none';
-}
-
-function toggleAll(){
-const all=document.querySelectorAll('.bulk-check');
-const anyUnchecked=[...all].some(c=>!c.checked);
-all.forEach(c=>c.checked=anyUnchecked);
-}
-
-async function applyBulk(on){
-const checks=document.querySelectorAll('.bulk-check:checked');
-for(let c of checks){
-data[c.value].permanent=on;
-}
-
-await fetch(KEYS_URL,{
-method:"PATCH",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(data)
-});
-
-closeBulk();
-load();
-toast(on?"ID jadi VALID":"ID jadi EXPIRED");
+function edit(id){
+  editId=id;
+  $('buildIdInput').value=id;
+  $('usernameInput').value=data[id].username||'';
+  $('expiryDateInput').value=data[id].date||'';
+  $('permanentInput').checked=data[id].permanent||false;
+  $('userModal').style.display='flex';
 }
 
 async function saveID(){
-const id=$('buildIdInput').value.trim();
-const username=$('usernameInput').value.trim();
-const date=$('expiryDateInput').value;
+  const id=$('buildIdInput').value.trim();
+  const username=$('usernameInput').value.trim();
+  const date=$('expiryDateInput').value;
+  const permanent=$('permanentInput').checked;
 
-if(!id||!username||!date){
-toast("Isi semua!");
-return;
+  if(!id||!username||(!date && !permanent)){
+    toast("Isi semua!");
+    return;
+  }
+
+  data[id]={username,date,permanent};
+
+  await fetch(KEYS_URL,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({[id]:data[id]})
+  });
+
+  load();
+  closeModal();
+  toast("Tersimpan");
 }
 
-data[id]={username,date,permanent:(date==="9999-01-12")};
+async function del(id){
+  if(confirm("Hapus "+id+" ?")){
+    await fetch(KEYS_URL,{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({[id]:null})
+    });
+    load();
+    toast("Dihapus");
+  }
+}
 
-await fetch(KEYS_URL,{
-method:"PATCH",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({[id]:data[id]})
-});
+async function saveMaintenance(){
+  const status=$('maintenanceEnabled').checked?'active':'inactive';
+  const msg=$('maintenanceMessage').value;
 
-closeModal();
-load();
-toast("Tersimpan");
+  await fetch(KEYS_URL,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({MAINTENANCE:{status,msg}})
+  });
+
+  toast("Maintenance disimpan");
+}
+
+function openBulk(mode){
+  bulkMode=mode;
+  $('bulkTitle').textContent = mode==="expired" ? "Pilih ID yang mau diubah" : "Pilih ID untuk PERMANENT";
+  const list=$('bulkList');
+  list.innerHTML="";
+
+  Object.keys(data).sort().forEach(id=>{
+    if(id==="MAINTENANCE") return;
+    const div=document.createElement('div');
+    div.className='bulk-item';
+    div.innerHTML=`<input type="checkbox" class="bulkCheck" value="${id}"> ${id}`;
+    list.appendChild(div);
+  });
+
+  const actions=$('bulkActions');
+  actions.innerHTML="";
+
+  if(mode==="expired"){
+    actions.innerHTML=`
+      <button class="btn-primary" onclick="applyBulk('on')">ON</button>
+      <button class="btn-secondary" onclick="applyBulk('off')">OFF</button>
+    `;
+  } else {
+    actions.innerHTML=`
+      <button class="btn-primary" onclick="applyBulk('permanent')">Jadikan PERMANENT</button>
+    `;
+  }
+
+  $('bulkModal').style.display='flex';
+}
+
+function closeBulk(){
+  $('bulkModal').style.display='none';
+}
+
+async function applyBulk(action){
+  const checked=[...document.querySelectorAll('.bulkCheck:checked')].map(c=>c.value);
+  if(checked.length===0){
+    toast("Pilih minimal 1 ID");
+    return;
+  }
+
+  let updates={};
+
+  const today=new Date().toISOString().split('T')[0];
+  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+
+  checked.forEach(id=>{
+    if(action==="on"){
+      updates[id]={...data[id],permanent:false,date:today};
+    }
+    if(action==="off"){
+      updates[id]={...data[id],permanent:false,date:yesterday};
+    }
+    if(action==="permanent"){
+      updates[id]={...data[id],permanent:true,date:"9999-01-12"};
+    }
+  });
+
+  await fetch(KEYS_URL,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(updates)
+  });
+
+  closeBulk();
+  load();
+  toast("Berhasil diperbarui");
 }
 
 $('addUserBtn').onclick=openModal;
