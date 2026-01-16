@@ -36,14 +36,14 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item-text span{color:var(--text-secondary);font-size:1rem;display:block;}
 .user-status-tag{
   display:inline-block;
-  padding:4px 10px;
-  font-size:0.85rem;
+  padding:3px 8px;
+  font-size:0.8rem;
   font-weight:700;
   border-radius:6px;
   margin-top:5px;
 }
+.user-item.valid .user-status-tag{background-color:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background-color:var(--danger-color);color:#fff;}
-.user-item.valid .user-status-tag{background-color:var(--primary-color);color:#000;}
 .user-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:5px;}
 .action-btn{background:none;border:none;color:var(--text-secondary);font-size:1.2rem;cursor:pointer;padding:8px;border-radius:50%;transition:0.2s;}
 .action-btn:hover{color:var(--text-color);}
@@ -141,7 +141,7 @@ function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show')
 async function load(){ 
   const r=await fetch(KEYS_URL);
   data=await r.json()||{};
-  render(); 
+  render();
 }
 
 function updateCounts(){
