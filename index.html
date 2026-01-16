@@ -8,61 +8,79 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{
-  --primary:#C77DFF; /* Ungu neon */
-  --bg:#121212;
+  --primary:#C77DFF;
+  --bg:#0a0a0a;
   --card:#1e1e1e;
   --text:#fff;
   --muted:#aaa;
-  --valid:#4caf50;
-  --expired:#ff4d4d;
+  --danger:#ff4d4d;
+  --success:#00ff7f;
+  --glow-primary:0 0 10px #C77DFF,0 0 20px rgba(199,125,255,.3);
+  --glow-success:0 0 10px #00ff7f,0 0 20px rgba(0,255,127,.3);
+  --glow-danger:0 0 10px #ff4d4d,0 0 20px rgba(255,77,77,.3);
 }
 body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);padding-bottom:80px;}
-header{padding:15px;text-align:center;background:#1a1a1a;box-shadow:0 2px 5px rgba(0,0,0,.5);}
-h1{margin:0;color:var(--primary);}
+header{padding:15px;text-align:center;background:#111;box-shadow:0 2px 5px rgba(0,0,0,.5);}
+h1{margin:0;color:var(--primary);text-shadow:var(--glow-primary);}
 .container{padding:15px;max-width:900px;margin:auto;}
-.search{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
-.search input{flex:1;padding:8px;border-radius:6px;border:none;background:#333;color:#fff;}
-.search button{background:var(--primary);color:#000;border:none;padding:8px 12px;border-radius:6px;font-weight:700;cursor:pointer;}
-.filters{display:flex;gap:10px;margin-bottom:10px;}
-.filters button{padding:5px 12px;border-radius:6px;border:none;cursor:pointer;background:#333;color:#fff;}
-.filters button.active{background:var(--primary);color:#000;}
-.card{background:var(--card);border-radius:8px;padding:12px 15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;position:relative;}
-.card .status{position:absolute;top:10px;left:10px;padding:2px 6px;border-radius:4px;font-size:12px;font-weight:700;color:#fff;}
-.card.valid .status{background:var(--valid);}
-.card.expired .status{background:var(--expired);}
-.card .info{margin-left:0;}
-.card .actions button{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;margin-left:5px;}
-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#1a1a1a;display:flex;justify-content:space-around;align-items:center;}
-nav div{text-align:center;color:#aaa;cursor:pointer;}
-nav .active{color:var(--primary);}
-#addBtn{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);width:60px;height:60px;border-radius:50%;background:#4caf50;color:#fff;font-size:30px;display:flex;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 0 10px rgba(0,255,0,.5);}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;}
-.modal-box{background:var(--card);padding:20px;border-radius:10px;width:90%;max-width:400px;}
-.modal-box h3{margin-top:0;}
-.modal-box input, .modal-box textarea{width:100%;padding:8px;margin-top:5px;border-radius:6px;background:#333;border:1px solid #555;color:#fff;}
-.date-shortcuts{display:flex;gap:5px;margin-top:5px;margin-bottom:10px;}
+input,textarea,select{width:100%;padding:8px;margin-top:5px;border-radius:6px;background:#222;border:1px solid #555;color:#fff;}
+button{cursor:pointer;border:none;border-radius:6px;padding:8px 12px;font-weight:700;transition:0.2s;}
+button:hover{opacity:0.9;}
+.btn-primary{background:var(--primary);color:#000;text-shadow:var(--glow-primary);}
+.btn-danger{background:var(--danger);color:#fff;text-shadow:var(--glow-danger);}
+.user{background:var(--card);padding:15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.user.valid{border-left:4px solid var(--success);box-shadow:var(--glow-success);}
+.user.expired{border-left:4px solid var(--danger);box-shadow:var(--glow-danger);}
+.user.maintenance{border-left:4px solid var(--primary);box-shadow:var(--glow-primary);}
+small{color:var(--muted);}
+.search{display:flex;gap:10px;margin-bottom:10px;}
+nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#111;display:flex;justify-content:space-around;align-items:center;box-shadow:0 -2px 10px rgba(0,0,0,.5);}
+nav div{text-align:center;color:var(--muted);cursor:pointer;}
+nav .active{color:var(--primary);text-shadow:var(--glow-primary);}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;}
+.modal-box{background:var(--card);padding:20px;border-radius:12px;width:90%;max-width:420px;box-shadow:0 0 15px rgba(199,125,255,.5);}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;display:none;}
+.date-shortcuts{display:flex;gap:5px;margin-bottom:10px;}
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;flex-shrink:0;}
 .date-shortcuts button:hover{background:#444;}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;display:none;}
+.filter-btns{display:flex;gap:5px;margin-bottom:10px;}
+.filter-btns button{padding:5px 12px;border-radius:6px;border:none;cursor:pointer;}
+.filter-btns .active{background:var(--primary);color:#000;text-shadow:var(--glow-primary);}
 </style>
 </head>
 <body>
 
 <header><h1>CloudPlay / DPMods Admin</h1></header>
 
-<div class="container">
+<div class="container" id="usersTab">
   <div class="search">
     <input id="searchInput" placeholder="Cari Build ID..." oninput="render()">
   </div>
-  <div class="filters">
-    <button id="filterAll" class="active" onclick="setFilter('all')">ALL (0)</button>
-    <button id="filterValid" onclick="setFilter('valid')">VALID (0)</button>
-    <button id="filterExpired" onclick="setFilter('expired')">EXPIRED (0)</button>
+  <div class="filter-btns">
+    <button id="btnAll" class="active" onclick="setFilter('all')">ALL (0)</button>
+    <button id="btnValid" onclick="setFilter('valid')">VALID (0)</button>
+    <button id="btnExpired" onclick="setFilter('expired')">EXPIRED (0)</button>
   </div>
   <div id="list"></div>
+
+  <div style="margin-top:10px; display:flex; gap:10px;">
+    <button class="btn-primary" onclick="openModal()">Tambah ID</button>
+    <button class="btn-primary" onclick="exportJSON()">Export JSON</button>
+    <button class="btn-primary" onclick="exportCSV()">Export CSV</button>
+  </div>
 </div>
 
-<div id="addBtn" onclick="openModal()">+</div>
+<div class="container" id="settingsTab" style="display:none">
+  <h3>Maintenance</h3>
+  <label><input type="checkbox" id="mnt"> Aktifkan Maintenance</label>
+  <textarea id="mntMsg" placeholder="Pesan maintenance"></textarea>
+  <button class="btn-primary" onclick="saveMaintenance()">Simpan Maintenance</button>
+</div>
+
+<nav>
+  <div id="navUsers" class="active" onclick="showTab('users')"><i class="fa fa-key"></i><br>ID</div>
+  <div id="navSettings" onclick="showTab('settings')"><i class="fa fa-bell"></i><br>Status</div>
+</nav>
 
 <div class="modal" id="modal">
   <div class="modal-box">
@@ -78,78 +96,158 @@ nav .active{color:var(--primary);}
     </div>
     <input type="date" id="dateInput">
     <br><br>
-    <button style="background:var(--primary);color:#000;padding:8px 12px;border:none;border-radius:6px;" onclick="saveID()">Simpan</button>
-    <button style="background:var(--expired);color:#fff;padding:8px 12px;border:none;border-radius:6px;" onclick="closeModal()">Batal</button>
+    <button class="btn-primary" onclick="saveID()">Simpan</button>
+    <button class="btn-danger" onclick="closeModal()">Batal</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
-const KEYS_URL=FIREBASE_ROOT+"/keys.json";
+const FIREBASE_ROOT = "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
+const KEYS_URL = FIREBASE_ROOT + "/keys.json";
 
-let data={}, editId=null, filter="all";
+let data = {};
+let editId = null;
+let filter = 'all';
 
-const $=id=>document.getElementById(id);
-function toast(msg){const t=$('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500);}
+const $ = id=>document.getElementById(id);
+
+function toast(msg){
+  const t=$('toast'); t.innerText=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',2500);
+}
 
 async function load(){
-  const r=await fetch(KEYS_URL);
-  data=await r.json()||{};
+  const r = await fetch(KEYS_URL);
+  data = await r.json() || {};
   render();
+  if(data.MAINTENANCE){
+    $('mnt').checked = data.MAINTENANCE.status==="active";
+    $('mntMsg').value = data.MAINTENANCE.message||"";
+  }
 }
-function isExpired(date){if(!date) return true; const today=new Date(); today.setHours(0,0,0,0); return new Date(date)<today;}
-function setFilter(f){filter=f; render();}
+
 function render(){
   const list=$('list');
   list.innerHTML='';
-  let all=0,valid=0,expired=0;
+  let countAll=0, countValid=0, countExpired=0;
+
+  const q=$('searchInput').value.toLowerCase();
   Object.keys(data).forEach(id=>{
-    const d=data[id];
-    const exp=isExpired(d.date);
     if(id==="MAINTENANCE") return;
-    if(filter==='valid' && exp) return;
-    if(filter==='expired' && !exp) return;
-    all++; if(exp) expired++; else valid++;
-    list.innerHTML+=`<div class="card ${exp?'expired':'valid'}">
-      <span class="status">${exp?'EXPIRED':'VALID'}</span>
-      <div class="info"><strong>${id}</strong><br>Expires: ${d.date||'-'}<br>Username: ${d.username||'-'}</div>
-      <div class="actions">
+    const d=data[id];
+    const expired = isExpired(d.date);
+    countAll++;
+    if(!expired) countValid++; else countExpired++;
+    if(filter==="valid" && expired) return;
+    if(filter==="expired" && !expired) return;
+    if(q && !id.toLowerCase().includes(q)) return;
+    let cls = expired ? 'expired':'valid';
+    list.innerHTML+=`<div class="user ${cls}">
+      <div><strong>${id}</strong> <br><small>${d.username||'-'} | Expire: ${d.date||'-'}</small></div>
+      <div>
         <button onclick="edit('${id}')"><i class="fa fa-pen"></i></button>
         <button onclick="del('${id}')"><i class="fa fa-trash"></i></button>
       </div>
     </div>`;
   });
-  $('filterAll').innerText=`ALL (${all})`;
-  $('filterValid').innerText=`VALID (${valid})`;
-  $('filterExpired').innerText=`EXPIRED (${expired})`;
-  document.querySelectorAll('.filters button').forEach(b=>b.classList.remove('active'));
-  if(filter==='all') $('filterAll').classList.add('active');
-  if(filter==='valid') $('filterValid').classList.add('active');
-  if(filter==='expired') $('filterExpired').classList.add('active');
+
+  $('btnAll').innerText=`ALL (${countAll})`;
+  $('btnValid').innerText=`VALID (${countValid})`;
+  $('btnExpired').innerText=`EXPIRED (${countExpired})`;
+}
+
+function isExpired(date){
+  if(!date) return true;
+  const today=new Date(); today.setHours(0,0,0,0);
+  return new Date(date)<today;
+}
+
+function showTab(t){
+  $('usersTab').style.display=t==='users'?'block':'none';
+  $('settingsTab').style.display=t==='settings'?'block':'none';
+  $('navUsers').classList.toggle('active',t==='users');
+  $('navSettings').classList.toggle('active',t==='settings');
+}
+
+function setFilter(f){
+  filter=f;
+  document.querySelectorAll('.filter-btns button').forEach(b=>b.classList.remove('active'));
+  if(f==='all') $('btnAll').classList.add('active');
+  if(f==='valid') $('btnValid').classList.add('active');
+  if(f==='expired') $('btnExpired').classList.add('active');
+  render();
 }
 
 function openModal(){
-  editId=null; $('idInput').value=''; $('userInput').value=''; $('dateInput').value=''; $('modal').style.display='flex';
+  editId = null;
+  $('idInput').value = '';
+  $('userInput').value = '';
+  
+  const today = new Date();
+  $('dateInput').value = today.toISOString().split('T')[0];
+
+  $('modal').style.display='flex';
 }
+
 function closeModal(){ $('modal').style.display='none'; }
-function setExpiry(days){const d=new Date(); d.setDate(d.getDate()+days); $('dateInput').value=d.toISOString().split('T')[0];}
-function edit(id){editId=id; $('idInput').value=id; $('userInput').value=data[id].username||''; $('dateInput').value=data[id].date||''; $('modal').style.display='flex';}
+
+function setExpiry(days){
+  const d=new Date();
+  d.setDate(d.getDate()+days);
+  $('dateInput').value=d.toISOString().split('T')[0];
+}
+
+function edit(id){
+  editId=id;
+  $('idInput').value=id;
+  $('userInput').value=data[id].username||'';
+  $('dateInput').value=data[id].date||'';
+  $('modal').style.display='flex';
+}
 
 async function saveID(){
-  const id=$('idInput').value.trim(); const user=$('userInput').value.trim(); const date=$('dateInput').value;
-  if(!id||!user||!date){toast("ISI SEMUA!");return;}
-  data[id]={username:user,date:date};
+  const id=$('idInput').value.trim();
+  const user=$('userInput').value.trim();
+  const date=$('dateInput').value;
+  if(!id||!date||!user){toast("ISI SEMUA!");return;}
+  data[id]={username:user,date:date,status:"active"};
   await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({[id]:data[id]})});
-  load(); closeModal(); toast("Tersimpan");
+  load();
+  closeModal();
+  toast("Tersimpan");
 }
 
 async function del(id){
   if(confirm("Hapus "+id+" ?")){
     await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({[id]:null})});
-    load(); toast("Dihapus");
+    load();
+    toast("Dihapus");
   }
+}
+
+async function saveMaintenance(){
+  const status=$('mnt').checked?'active':'inactive';
+  const msg=$('mntMsg').value;
+  await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({MAINTENANCE:{status,msg}})});
+  toast("Maintenance disimpan");
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='backup_keys.json'; a.click(); URL.revokeObjectURL(url);
+  toast('Data diekspor JSON');
+}
+
+function exportCSV(){
+  const arr=Object.keys(data).filter(k=>k!=='MAINTENANCE').map(k=>[k,data[k].username||'',data[k].date||'',data[k].status||''].join(','));
+  const csv=['build_id,username,date,status',...arr].join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='backup_keys.csv'; a.click(); URL.revokeObjectURL(url);
+  toast('Data diekspor CSV');
 }
 
 load();
