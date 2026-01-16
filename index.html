@@ -63,12 +63,8 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .user-item.valid:hover{box-shadow:0 0 10px var(--valid-color);}
 .user-item.expired{background-color:#331f1f;}
-
 .user-item.permanent{border-left:6px solid gold;}
-.user-item.permanent .user-status-tag{
-  background:white;
-  color:black;
-}
+.user-item.permanent .user-status-tag{background:white;color:black;}
 
 .user-item-text{flex-grow:1;line-height:1.3;}
 .user-item-text strong{display:block;font-size:1.1rem;color:var(--text-color);}
@@ -108,32 +104,52 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 .nav-item i{font-size:1.5rem;margin-bottom:2px;}
 .nav-item.active{color:var(--primary-color);text-shadow:var(--soft-glow);}
 
-.add-user-btn{background-color:var(--primary-color);color:var(--background-color);width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;box-shadow:0 4px 6px rgba(0,0,0,0.3),var(--soft-glow);cursor:pointer;transform:translateY(-15px);transition:0.3s;}
-.add-user-btn:hover{background-color:#d18aff;}
+.add-user-btn{
+  background-color:var(--primary-color);
+  color:var(--background-color);
+  width:60px;height:60px;border-radius:50%;
+  display:flex;justify-content:center;align-items:center;
+  font-size:2rem;
+  box-shadow:0 4px 6px rgba(0,0,0,0.3),var(--soft-glow);
+  cursor:pointer;transform:translateY(-15px);transition:0.3s;
+}
 
 .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:2000;overflow-y:auto;}
 .modal-content{background-color:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;box-shadow:0 4px 20px rgba(0,0,0,0.5);margin:50px 0;}
 
 .modal h2{margin-top:0;color:var(--primary-color);}
-.modal button{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;transition:0.2s;}
-.modal button:hover{opacity:0.9;}
 
-.modal .btn-secondary{background-color:#444;color:var(--text-color);margin-right:10px;}
-
-.btn-primary{background-color:var(--primary-color);color:var(--background-color);padding:12px 20px;font-weight:700;border-radius:6px;box-shadow:var(--soft-glow);}
-
-#loading{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);color:var(--primary-color);display:none;justify-content:center;align-items:center;font-size:1.5rem;z-index:3000;}
-
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:var(--text-color);padding:10px 20px;border-radius:20px;opacity:0;transition:0.3s;z-index:4000;}
-.toast.show{opacity:1;}
+.btn-primary{background-color:var(--primary-color);color:var(--background-color);padding:12px 20px;font-weight:700;border-radius:6px;}
+.btn-secondary{background-color:#444;color:white;padding:12px 20px;font-weight:700;border-radius:6px;}
 
 .date-shortcuts{display:flex;gap:5px;margin:10px 0;flex-wrap:wrap;}
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
-.date-shortcuts button:hover{background:#444;}
 
 .bulk-list{max-height:300px;overflow-y:auto;margin:10px 0;}
 .bulk-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #444;}
 .bulk-actions{display:flex;justify-content:center;gap:15px;margin-top:15px;}
+
+/* ======== PERBAIKAN ADD NEW ID ======== */
+.admin-buttons{display:flex;gap:10px;margin:10px 0;}
+.admin-btn{
+  background:black;
+  color:#C77DFF;
+  border:1px solid #C77DFF;
+  padding:10px;
+  border-radius:8px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-save, .btn-cancel{
+  background:#C77DFF;
+  color:black;
+  border:none;
+  padding:10px 15px;
+  border-radius:6px;
+  font-weight:700;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -187,30 +203,32 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <h2>Add New ID</h2>
 
 <label>Build/Device ID</label>
-<input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007">
+<input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
 
 <label>Username</label>
-<input type="text" id="usernameInput" placeholder="e.g., JohnDoe">
+<input type="text" id="usernameInput" placeholder="username">
 
-<label>
-  <input type="checkbox" id="permanentInput">
-  Jadikan Permanent (Khusus Admin)
-</label>
+<p style="color:#C77DFF;">Fitur Khusus Admin</p>
+<div class="admin-buttons">
+<button class="admin-btn" onclick="setExpired()">EXPIRED</button>
+<button class="admin-btn" onclick="setPermanent()">PERMANENT</button>
+</div>
 
 <label>Expiry Date (UTC)</label>
+
 <div class="date-shortcuts">
 <button onclick="setExpiryShortcut(1)">+1 Hari</button>
 <button onclick="setExpiryShortcut(7)">+7 Hari</button>
-<button onclick="setExpiryShortcut(30)">+30 Hari</button>
+<button onclick="setExpiryShortcut(30)">+1 Bulan</button>
 <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
 <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
 </div>
 
 <input type="date" id="expiryDateInput">
 
-<div style="display:flex;justify-content:flex-end;margin-top:10px;">
-<button class="btn-secondary" onclick="closeModal()">Cancel</button>
-<button class="btn-primary" onclick="saveID()">Save ID</button>
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+<button class="btn-cancel" onclick="closeModal()">BATAL</button>
+<button class="btn-save" onclick="saveID()">SIMPAN</button>
 </div>
 </div>
 </div>
@@ -218,11 +236,8 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <div id="bulkModal" class="modal">
 <div class="modal-content">
 <h2 id="bulkTitle"></h2>
-
 <div class="bulk-list" id="bulkList"></div>
-
 <div class="bulk-actions" id="bulkActions"></div>
-
 <div style="text-align:right;margin-top:15px;">
 <button class="btn-secondary" onclick="closeBulk()">Close</button>
 </div>
@@ -238,13 +253,6 @@ const KEYS_URL=FIREBASE_ROOT+"/keys.json";
 let data={}, bulkMode="";
 
 const $=id=>document.getElementById(id);
-
-function toast(msg){
-  const t=$('toast');
-  t.textContent=msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
 
 async function load(){
   const r=await fetch(KEYS_URL);
@@ -263,19 +271,13 @@ function isExpired(id){
 
 function updateCounts(){
   let total=0, valid=0, expired=0, permanent=0;
-
   Object.keys(data).forEach(id=>{
     if(id==="MAINTENANCE") return;
     total++;
-    if(data[id]?.permanent){
-      permanent++;
-    } else if(isExpired(id)){
-      expired++;
-    } else {
-      valid++;
-    }
+    if(data[id]?.permanent){ permanent++; }
+    else if(isExpired(id)){ expired++; }
+    else { valid++; }
   });
-
   $('countAll').textContent=`(${total})`;
   $('countValid').textContent=`(${valid})`;
   $('countExpired').textContent=`(${expired})`;
@@ -338,8 +340,8 @@ function openModal(){
   editId=null;
   $('buildIdInput').value='';
   $('usernameInput').value='';
-  $('expiryDateInput').value='';
-  $('permanentInput').checked=false;
+  const today=new Date().toISOString().split('T')[0];
+  $('expiryDateInput').value=today;
   $('userModal').style.display='flex';
 }
 
@@ -353,12 +355,20 @@ function setExpiryShortcut(days){
   $('expiryDateInput').value=d.toISOString().split('T')[0];
 }
 
+function setExpired(){
+  const today=new Date().toISOString().split('T')[0];
+  $('expiryDateInput').value=today;
+}
+
+function setPermanent(){
+  $('expiryDateInput').value="9999-01-12";
+}
+
 function edit(id){
   editId=id;
   $('buildIdInput').value=id;
   $('usernameInput').value=data[id].username||'';
   $('expiryDateInput').value=data[id].date||'';
-  $('permanentInput').checked=data[id].permanent||false;
   $('userModal').style.display='flex';
 }
 
@@ -366,24 +376,18 @@ async function saveID(){
   const id=$('buildIdInput').value.trim();
   const username=$('usernameInput').value.trim();
   const date=$('expiryDateInput').value;
-  const permanent=$('permanentInput').checked;
+  if(!id||!username||!date){ alert("Isi semua!"); return; }
 
-  if(!id||!username||(!date && !permanent)){
-    toast("Isi semua!");
-    return;
-  }
-
-  data[id]={username,date,permanent};
+  const permanent = (date==="9999-01-12");
 
   await fetch(KEYS_URL,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({[id]:data[id]})
+    body:JSON.stringify({[id]:{username,date,permanent}})
   });
 
-  load();
   closeModal();
-  toast("Tersimpan");
+  load();
 }
 
 async function del(id){
@@ -394,7 +398,6 @@ async function del(id){
       body:JSON.stringify({[id]:null})
     });
     load();
-    toast("Dihapus");
   }
 }
 
@@ -407,8 +410,6 @@ async function saveMaintenance(){
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({MAINTENANCE:{status,msg}})
   });
-
-  toast("Maintenance disimpan");
 }
 
 function openBulk(mode){
@@ -448,10 +449,7 @@ function closeBulk(){
 
 async function applyBulk(action){
   const checked=[...document.querySelectorAll('.bulkCheck:checked')].map(c=>c.value);
-  if(checked.length===0){
-    toast("Pilih minimal 1 ID");
-    return;
-  }
+  if(checked.length===0){ alert("Pilih minimal 1 ID"); return; }
 
   let updates={};
 
@@ -478,7 +476,6 @@ async function applyBulk(action){
 
   closeBulk();
   load();
-  toast("Berhasil diperbarui");
 }
 
 $('addUserBtn').onclick=openModal;
