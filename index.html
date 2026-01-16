@@ -2,191 +2,227 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>CloudPlay Admin Panel (Expiry Buttons)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DPMods Full Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-body{font-family:Arial;background:#111;color:#fff;padding:20px}
-h2,h3{margin:5px 0}
-button,input,select{padding:8px;margin:5px 0; width:100%; box-sizing:border-box; cursor:pointer}
-button{background:#1db954;border:none;font-weight:bold;color:#000;}
-button.danger{background:#ff4d4d;color:#fff;}
-#list{margin-top:10px;}
-.user{padding:10px;border-radius:6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;}
-.user.valid{border-left:4px solid #1db954;}
-.user.expired{border-left:4px solid #ff4d4d;}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;}
-.modal-box{background:#222;padding:20px;border-radius:10px;width:90%;max-width:400px;}
-.expiry-btns button{width:48%; margin-right:2%; margin-top:5px;}
-.expiry-btns button:last-child{margin-right:0;}
+:root{
+  --primary:#C77DFF;
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#fff;
+  --muted:#aaa;
+  --danger:#ff4d4d;
+  --glow:0 0 8px rgba(199,125,255,.7),0 0 15px rgba(199,125,255,.3);
+}
+body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);padding-bottom:80px;}
+header{padding:15px;text-align:center;background:#1a1a1a;box-shadow:0 2px 5px rgba(0,0,0,.5);}
+h1{margin:0;color:var(--primary);}
+.container{padding:15px;max-width:900px;margin:auto;}
+input,textarea,select{width:100%;padding:8px;margin-top:5px;border-radius:6px;background:#333;border:1px solid #555;color:#fff;}
+button{cursor:pointer;border:none;border-radius:6px;padding:8px 12px;font-weight:700;}
+.btn-primary{background:var(--primary);color:#000;}
+.btn-danger{background:var(--danger);color:#fff;}
+.user{background:var(--card);padding:15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.user.valid{border-left:4px solid var(--primary);}
+.user.expired{border-left:4px solid var(--danger);}
+small{color:var(--muted);}
+.search{display:flex;gap:10px;margin-bottom:10px;}
+nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#1a1a1a;display:flex;justify-content:space-around;align-items:center;}
+nav div{text-align:center;color:var(--muted);cursor:pointer;}
+nav .active{color:var(--primary);}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;}
+.modal-box{background:var(--card);padding:20px;border-radius:10px;width:90%;max-width:420px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#000;padding:10px 20px;border-radius:20px;display:none;}
+.date-shortcuts{display:flex;gap:5px;margin-bottom:10px;}
+.date-shortcuts button{background:#333;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;flex-shrink:0;}
+.date-shortcuts button:hover{background:#444;}
 </style>
 </head>
 <body>
 
-<h2>CloudPlay Admin Panel</h2>
-<button onclick="openModal()">+ Add New ID</button>
-<select id="filter" onchange="renderList()">
-  <option value="all">All</option>
-  <option value="valid">Valid</option>
-  <option value="expired">Expired</option>
-</select>
+<header><h1>DPMods Admin Panel</h1></header>
 
-<div id="list">Loading...</div>
+<div class="container" id="usersTab">
+  <div class="search">
+    <input id="searchInput" placeholder="Cari Build ID..." oninput="render()">
+    <select id="filter" onchange="render()">
+      <option value="all">Semua</option>
+      <option value="valid">Aktif</option>
+      <option value="expired">Kadaluarsa</option>
+    </select>
+    <button class="btn-primary" onclick="openModal()">Tambah ID</button>
+  </div>
+  <div id="list"></div>
 
-<h3>Maintenance</h3>
-<label><input type="checkbox" id="mnt"> Enable Maintenance</label>
-<textarea id="mntMsg" placeholder="Maintenance message"></textarea>
-<button onclick="saveMaintenance()">Save Maintenance</button>
+  <div style="margin-top:10px;">
+    <button class="btn-primary" onclick="exportJSON()">Export JSON</button>
+    <button class="btn-primary" onclick="exportCSV()">Export CSV</button>
+  </div>
+</div>
+
+<div class="container" id="settingsTab" style="display:none">
+  <h3>Maintenance</h3>
+  <label><input type="checkbox" id="mnt"> Aktifkan Maintenance</label>
+  <textarea id="mntMsg" placeholder="Pesan maintenance"></textarea>
+  <button class="btn-primary" onclick="saveMaintenance()">Simpan Maintenance</button>
+</div>
+
+<nav>
+  <div id="navUsers" class="active" onclick="showTab('users')"><i class="fa fa-key"></i><br>ID</div>
+  <div id="navSettings" onclick="showTab('settings')"><i class="fa fa-bell"></i><br>Status</div>
+</nav>
 
 <div class="modal" id="modal">
   <div class="modal-box">
-    <h3>Add / Edit ID</h3>
-    <input id="build_id" placeholder="Build/Device ID">
-    <input type="date" id="date">
-    <input id="username" placeholder="Username (optional)">
-    <div class="expiry-btns">
-      <button onclick="addDays(1)">+1 Day</button>
-      <button onclick="addDays(7)">+7 Days</button>
-      <button onclick="addDays(30)">+30 Days</button>
-      <button onclick="addMonths(3)">+3 Months</button>
+    <h3>Tambah / Edit ID</h3>
+    <input id="idInput" placeholder="Build ID">
+    <input id="userInput" placeholder="Username">
+    <label>Tanggal Kadaluarsa</label>
+    <div class="date-shortcuts">
+      <button onclick="setExpiry(1)">+1 Hari</button>
+      <button onclick="setExpiry(7)">+7 Hari</button>
+      <button onclick="setExpiry(30)">+30 Hari</button>
+      <button onclick="setExpiry(90)">+3 Bulan</button>
+      <button onclick="setExpiry(365)">+1 Tahun</button>
     </div>
-    <br>
-    <button onclick="saveID()">Save</button>
-    <button class="danger" onclick="closeModal()">Cancel</button>
+    <input type="date" id="dateInput">
+    <br><br>
+    <button class="btn-primary" onclick="saveID()">Simpan</button>
+    <button class="btn-danger" onclick="closeModal()">Batal</button>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const FIREBASE_ROOT = "https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL = FIREBASE_ROOT + "/keys.json";
 
-let data = [];
-let editIndex = -1;
+let data = {};
+let editId = null;
 
-/* ===== UTILS ===== */
-function isExpired(d){
-  if(!d) return true;
-  const today = new Date(); today.setHours(0,0,0,0);
-  return new Date(d) < today;
+const $ = id=>document.getElementById(id);
+
+function toast(msg){
+  const t=$('toast'); t.innerText=msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none',2500);
 }
 
-function addDays(n){
-  const d = new Date(date.value || new Date());
-  d.setDate(d.getDate() + n);
-  date.value = d.toISOString().slice(0,10);
-}
-function addMonths(n){
-  const d = new Date(date.value || new Date());
-  d.setMonth(d.getMonth() + n);
-  date.value = d.toISOString().slice(0,10);
-}
-
-/* ===== LOAD DATA ===== */
-async function loadData(){
-  try{
-    const r = await fetch(KEYS_URL);
-    const d = await r.json();
-    if(Array.isArray(d)) data = d; else data=[];
-    renderList();
-    const m = data.find(x=>x.build_id==="MAINTENANCE");
-    if(m){
-      mnt.checked = m.status==="active";
-      mntMsg.value = m.message || "";
-    }
-  }catch(e){
-    console.error(e);
-    document.getElementById("list").innerText="Gagal load data";
+async function load(){
+  const r = await fetch(KEYS_URL);
+  data = await r.json() || {};
+  render();
+  if(data.MAINTENANCE){
+    $('mnt').checked = data.MAINTENANCE.status==="active";
+    $('mntMsg').value = data.MAINTENANCE.message||"";
   }
 }
 
-/* ===== RENDER LIST ===== */
-function renderList(){
-  const list = document.getElementById("list");
-  const filter = document.getElementById("filter").value;
-  list.innerHTML = "";
-  data.forEach((item,idx)=>{
-    if(item.build_id==="MAINTENANCE") return;
-    const exp = isExpired(item.date);
-    if(filter==="valid" && exp) return;
-    if(filter==="expired" && !exp) return;
-    const div = document.createElement("div");
-    div.className = "user "+(exp?"expired":"valid");
-    div.innerHTML = `
+function render(){
+  const list=$('list');
+  list.innerHTML='';
+  const q=$('searchInput').value.toLowerCase();
+  const f=$('filter').value;
+  Object.keys(data).forEach(id=>{
+    if(id==="MAINTENANCE") return;
+    const d=data[id];
+    const expired = isExpired(d.date);
+    if(f==="valid" && expired) return;
+    if(f==="expired" && !expired) return;
+    if(q && !id.toLowerCase().includes(q)) return;
+    list.innerHTML+=`<div class="user ${expired?'expired':'valid'}">
+      <div><strong>${id}</strong> <br><small>${d.username||'-'} | Expire: ${d.date||'-'}</small></div>
       <div>
-        <b>${item.build_id}</b> ${item.username?`(${item.username})`:''}<br>
-        <small>Expire: ${item.date||"-"}</small>
+        <button onclick="edit('${id}')">✏️</button>
+        <button onclick="del('${id}')">🗑️</button>
       </div>
-      <div>
-        <button onclick="editID(${idx})">Edit</button>
-        <button class="danger" onclick="deleteID(${idx})">Delete</button>
-      </div>
-    `;
-    list.appendChild(div);
+    </div>`;
   });
 }
 
-/* ===== MODAL ===== */
+function isExpired(date){
+  if(!date) return true;
+  const today=new Date(); today.setHours(0,0,0,0);
+  return new Date(date)<today;
+}
+
+function showTab(t){
+  $('usersTab').style.display=t==='users'?'block':'none';
+  $('settingsTab').style.display=t==='settings'?'block':'none';
+  $('navUsers').classList.toggle('active',t==='users');
+  $('navSettings').classList.toggle('active',t==='settings');
+}
+
 function openModal(){
-  editIndex=-1;
-  build_id.value="";
-  date.value="";
-  username.value="";
-  document.getElementById("modal").style.display="flex";
-}
-function closeModal(){
-  document.getElementById("modal").style.display="none";
+  editId=null;
+  $('idInput').value='';
+  $('userInput').value='';
+  $('dateInput').value='';
+  $('modal').style.display='flex';
 }
 
-/* ===== SAVE ID ===== */
+function closeModal(){ $('modal').style.display='none'; }
+
+function setExpiry(days){
+  const d=new Date();
+  d.setDate(d.getDate()+days);
+  $('dateInput').value=d.toISOString().split('T')[0];
+}
+
+function edit(id){
+  editId=id;
+  $('idInput').value=id;
+  $('userInput').value=data[id].username||'';
+  $('dateInput').value=data[id].date||'';
+  $('modal').style.display='flex';
+}
+
 async function saveID(){
-  const b = build_id.value.trim();
-  const d = date.value;
-  const u = username.value.trim();
-  if(!b||!d){ alert("Build ID & Date harus diisi!"); return; }
-
-  const obj={build_id:b,date:d};
-  if(u) obj.username=u;
-
-  if(editIndex>-1) data[editIndex] = {...data[editIndex], ...obj};
-  else data.push(obj);
-
-  try{
-    await fetch(KEYS_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-    closeModal();
-    loadData();
-  }catch(e){console.error(e); alert("Gagal simpan");}
+  const id=$('idInput').value.trim();
+  const user=$('userInput').value.trim();
+  const date=$('dateInput').value;
+  if(!id||!date||!user){toast("ISI SEMUA!");return;}
+  data[id]={username:user,date:date,status:"active"};
+  await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({[id]:data[id]})});
+  load();
+  closeModal();
+  toast("Tersimpan");
 }
 
-/* ===== EDIT / DELETE ===== */
-function editID(idx){
-  editIndex=idx;
-  build_id.value = data[idx].build_id;
-  date.value = data[idx].date;
-  username.value = data[idx].username||"";
-  openModal();
-}
-async function deleteID(idx){
-  if(confirm("Delete "+data[idx].build_id+"?")){
-    data.splice(idx,1);
-    try{
-      await fetch(KEYS_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-      loadData();
-    }catch(e){console.error(e); alert("Gagal hapus");}
+async function del(id){
+  if(confirm("Hapus "+id+" ?")){
+    await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({[id]:null})});
+    load();
+    toast("Dihapus");
   }
 }
 
-/* ===== MAINTENANCE ===== */
 async function saveMaintenance(){
-  const idx = data.findIndex(x=>x.build_id==="MAINTENANCE");
-  const obj={build_id:"MAINTENANCE",status:mnt.checked?"active":"inactive",message:mntMsg.value};
-  if(idx>-1) data[idx]=obj; else data.push(obj);
-  try{
-    await fetch(KEYS_URL,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-    loadData();
-  }catch(e){console.error(e); alert("Gagal update maintenance");}
+  const status=$('mnt').checked?'active':'inactive';
+  const msg=$('mntMsg').value;
+  await fetch(KEYS_URL,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({MAINTENANCE:{status,msg}})});
+  toast("Maintenance disimpan");
 }
 
-/* ===== INIT ===== */
-loadData();
-</script>
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='backup_keys.json'; a.click(); URL.revokeObjectURL(url);
+  toast('Data diekspor JSON');
+}
 
+function exportCSV(){
+  const arr=Object.keys(data).filter(k=>k!=='MAINTENANCE').map(k=>[k,data[k].username||'',data[k].date||'',data[k].status||''].join(','));
+  const csv=['build_id,username,date,status',...arr].join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='backup_keys.csv'; a.click(); URL.revokeObjectURL(url);
+  toast('Data diekspor CSV');
+}
+
+load();
+</script>
 </body>
 </html>
