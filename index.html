@@ -119,6 +119,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 </style>
 </head>
 <body>
+
 <header><h1>CloudPlay Admin Panel</h1></header>
 
 <div class="container">
@@ -134,6 +135,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
 <button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
 <button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
+<button data-filter="permanent" onclick="setFilter('permanent',this)">Permanent <span id="countPermanent"></span></button>
 </div>
 
 <div id="userList"></div>
@@ -222,15 +224,25 @@ function isExpired(id){
 }
 
 function updateCounts(){
-  let total=0, valid=0, expired=0;
+  let total=0, valid=0, expired=0, permanent=0;
+
   Object.keys(data).forEach(id=>{
     if(id==="MAINTENANCE") return;
     total++;
-    if(isExpired(id)) expired++; else valid++;
+
+    if(data[id]?.permanent){
+      permanent++;
+    } else if(isExpired(id)){
+      expired++;
+    } else {
+      valid++;
+    }
   });
+
   $('countAll').textContent=`(${total})`;
   $('countValid').textContent=`(${valid})`;
   $('countExpired').textContent=`(${expired})`;
+  $('countPermanent').textContent=`(${permanent})`;
 }
 
 function render(){
@@ -246,6 +258,7 @@ function render(){
 
     if(f==="valid" && expired) return;
     if(f==="expired" && !expired) return;
+    if(f==="permanent" && !d.permanent) return;
     if(q && !id.toLowerCase().includes(q) && !(d.username||'').toLowerCase().includes(q)) return;
 
     const item=document.createElement('div');
@@ -254,17 +267,16 @@ function render(){
     item.innerHTML=`
     <div class="user-item-text">
       <strong>${id}</strong>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span>@${d.username||'-'}</span>
-        <div class="user-actions">
-          <div class="user-status-tag">
-            ${d.permanent ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
-          </div>
-          <button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button>
-          <button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button>
-        </div>
+      <span>User : @${d.username||'-'}</span><br>
+      <span>Expired : ${d.date||'-'}</span>
+    </div>
+
+    <div class="user-actions">
+      <div class="user-status-tag">
+        ${d.permanent ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
       </div>
-      <span style="display:block;margin-top:4px;">Expiry : ${d.date||'-'}</span>
+      <button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button>
+      <button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button>
     </div>
     `;
 
@@ -272,11 +284,6 @@ function render(){
   });
 
   updateCounts();
-
-  if(data.MAINTENANCE){
-    $('maintenanceEnabled').checked=data.MAINTENANCE.status==="active";
-    $('maintenanceMessage').value=data.MAINTENANCE.message||"";
-  }
 }
 
 function setFilter(f,btn){
