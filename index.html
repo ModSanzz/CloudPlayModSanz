@@ -52,7 +52,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .user-item.permanent{border-left:6px solid gold;}
 .user-item.permanent .user-status-tag{
-  background:gold;
+  background:white;
   color:black;
 }
 
@@ -62,7 +62,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .user-status-tag{
   display:inline-block;
-  padding:3px 8px;
+  padding:4px 10px;
   font-size:0.8rem;
   font-weight:700;
   border-radius:6px;
@@ -253,16 +253,18 @@ function render(){
 
     item.innerHTML=`
     <div class="user-item-text">
-      <strong>ID : ${id}</strong>
-      <span>User : @${d.username||'-'}</span>
-    </div>
-
-    <div class="user-actions">
-      <div class="user-status-tag">
-        ${d.permanent ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
+      <strong>${id}</strong>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span>@${d.username||'-'}</span>
+        <div class="user-actions">
+          <div class="user-status-tag">
+            ${d.permanent ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
+          </div>
+          <button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button>
+          <button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button>
+        </div>
       </div>
-      <button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button>
-      <button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button>
+      <span style="display:block;margin-top:4px;">Expiry : ${d.date||'-'}</span>
     </div>
     `;
 
