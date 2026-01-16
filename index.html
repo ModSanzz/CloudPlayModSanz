@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,58 +8,58 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
---primary:#C77DFF;
---secondary:#282828;
---bg:#121212;
---text:#fff;
---muted:#aaa;
---danger:#ff4d4d;
---valid:#4caf50;
---glow:0 0 8px rgba(199,125,255,.7);
+  --primary:#C77DFF;
+  --secondary:#282828;
+  --bg:#121212;
+  --text:#fff;
+  --text-secondary:#B3B3B3;
+  --danger:#FF4D4D;
 }
-body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);padding-bottom:70px;}
-header{background:var(--secondary);padding:15px;text-align:center;}
+body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);}
+header{background:var(--secondary);padding:15px;text-align:center;position:relative;}
 header h1{margin:0;color:var(--primary);}
-.container{padding:20px;max-width:800px;margin:auto;}
+#maintenanceToggle{position:absolute;top:15px;right:15px;background:var(--primary);color:var(--bg);border:none;padding:5px 10px;border-radius:6px;cursor:pointer;}
+.container{padding:20px;max-width:800px;margin:0 auto;}
 .search-bar{display:flex;gap:10px;margin-bottom:15px;}
-.search-bar input{flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:var(--text);}
-.search-bar button{background:var(--primary);color:var(--bg);border:none;padding:10px 15px;border-radius:6px;cursor:pointer;}
-.search-bar button:hover{opacity:0.8;}
+.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:none;background:#333;color:#fff;}
+.search-bar button{background:var(--primary);border:none;color:var(--bg);border-radius:6px;padding:10px 15px;cursor:pointer;}
+.search-bar button:hover{background:#D199FF;}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button{background:#333;color:var(--muted);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active{background:var(--primary);color:var(--bg);}
-.user-item{background:var(--secondary);padding:15px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
-.user-item.valid{border-left:5px solid var(--valid);}
-.user-item.expired{border-left:5px solid var(--danger);}
-.user-info strong{display:block;}
-.user-info span{display:block;color:var(--muted);}
-.user-actions{display:flex;align-items:center;gap:5px;}
-.user-actions i.fa-edit{color:#ccc;}
-.user-actions button.del i.fa-trash{color:var(--danger);}
-.status-tag{padding:4px 8px;border-radius:4px;font-weight:700;margin-right:10px;}
-.status-tag.valid{background:var(--valid);color:#000;}
-.status-tag.expired{background:var(--danger);color:#fff;}
-.add-user-btn{position:fixed;bottom:70px;right:20px;background:var(--primary);color:#000;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;box-shadow:var(--glow);}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:1000;}
+.user-item{background:var(--secondary);padding:15px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;}
+.user-item.expired{background:#331f1f;}
+.user-item.valid{border-left:5px solid var(--primary);}
+.user-info strong{display:block;font-size:1.1rem;}
+.user-info span{font-size:0.9rem;color:var(--text-secondary);}
+.user-actions{display:flex;gap:5px;align-items:center;}
+.user-actions .status-tag{padding:4px 8px;border-radius:4px;font-weight:700;}
+.user-actions .status-tag.valid{background:var(--primary);color:var(--bg);}
+.user-actions .status-tag.expired{background:var(--danger);color:#fff;}
+.user-actions button{background:none;border:none;color:var(--text-secondary);font-size:1.1rem;cursor:pointer;}
+.user-actions button:hover{color:var(--text);}
+.add-user-btn{position:fixed;bottom:70px;right:20px;background:var(--primary);color:var(--bg);width:56px;height:56px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;cursor:pointer;}
+#maintenanceMessage{margin:30px;text-align:center;font-size:1.2rem;color:var(--danger);}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:2000;overflow:auto;}
 .modal-content{background:var(--secondary);padding:30px;border-radius:12px;width:90%;max-width:450px;}
-.modal-content h2{margin-top:0;color:var(--primary);}
-.modal-content input, .modal-content textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:var(--text);margin-bottom:10px;}
-.modal-content button{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
-.btn-primary{background:var(--primary);color:#000;}
-.btn-secondary{background:#444;color:#fff;}
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity 0.3s;z-index:2000;}
-#toast.show{opacity:1;}
-.date-shortcuts{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;}
-.date-shortcuts button{background:#333;color:var(--muted);border:none;padding:8px 10px;border-radius:6px;cursor:pointer;}
-.date-shortcuts button:hover{background:#444;}
+.modal h2{margin-top:0;color:var(--primary);}
+.modal button{padding:10px 15px;border:none;border-radius:6px;font-weight:700;cursor:pointer;}
+.modal .btn-secondary{background:#444;color:#fff;margin-right:10px;}
+.modal .btn-primary{background:var(--primary);color:var(--bg);}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity 0.3s;z-index:4000;}
+.toast.show{opacity:1;}
 </style>
 </head>
 <body>
-<header><h1>CloudPlay Admin Panel</h1></header>
+<header>
+<h1>CloudPlay Admin Panel</h1>
+<button id="maintenanceToggle">Maintenance</button>
+</header>
 <div class="container">
+<div id="maintenanceMessage"></div>
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="Search Build/Device ID...">
-<button onclick="render()"><i class="fa fa-search"></i></button>
+<button onclick="render()"><i class="fas fa-search"></i></button>
 </div>
 <div class="filter-bar">
 <button class="active" data-f="all" onclick="setFilter(this)">All <span id="cAll"></span></button>
@@ -68,52 +68,67 @@ header h1{margin:0;color:var(--primary);}
 </div>
 <div id="list"></div>
 </div>
-<div class="add-user-btn" onclick="openModal()"><i class="fa fa-plus"></i></div>
-
+<div class="add-user-btn" onclick="openModal()"><i class="fas fa-plus"></i></div>
 <div id="userModal" class="modal">
 <div class="modal-content">
 <h2 id="userModalTitle">Add ID</h2>
+<div class="form-group">
 <label>Build/Device ID</label>
-<input type="text" id="buildIdInput" placeholder="Build/Device ID">
+<input type="text" id="buildIdInput">
+</div>
+<div class="form-group">
 <label>Username</label>
-<input type="text" id="usernameInput" placeholder="Username">
+<input type="text" id="usernameInput">
+</div>
+<div class="form-group">
 <label>Expiry Date</label>
-<div class="date-shortcuts">
-<button onclick="setExpiryShortcut(1)">+1 Hari</button>
-<button onclick="setExpiryShortcut(7)">+7 Hari</button>
-<button onclick="setExpiryShortcut(30)">+30 Hari</button>
-<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+<input type="date" id="expiryDateInput">
+<div style="margin-top:5px;">
+<button onclick="setExpiryShortcut(1)">+1 Day</button>
+<button onclick="setExpiryShortcut(7)">+7 Days</button>
+<button onclick="setExpiryShortcut(30)">+30 Days</button>
 <button onclick="setPermanent()">Permanent</button>
 </div>
-<input type="date" id="expiryDateInput">
-<div style="text-align:right;">
+</div>
+<div style="display:flex;justify-content:flex-end;margin-top:20px;">
 <button class="btn-secondary" onclick="closeModal()">Cancel</button>
 <button class="btn-primary" id="saveUserBtn">Save</button>
 </div>
 </div>
 </div>
-
-<div id="toast"></div>
-
+<div id="maintenanceModal" class="modal">
+<div class="modal-content">
+<h2>Maintenance Mode</h2>
+<div class="form-group">
+<label>Message</label>
+<input type="text" id="maintenanceInput">
+</div>
+<div style="display:flex;justify-content:flex-end;margin-top:20px;">
+<button class="btn-secondary" onclick="closeMaintenanceModal()">Cancel</button>
+<button class="btn-primary" onclick="saveMaintenance()">Save</button>
+</div>
+</div>
+</div>
+<div id="toast" class="toast"></div>
 <script>
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const DB=FIREBASE_ROOT+"/keys.json";
 let data={},filter="all",editKey=null;
 const $=i=>document.getElementById(i);
-const toast=t=>{$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2000);}
+const toast=t=>{$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>{$('toast').classList.remove('show');},2000);}
 const isExpired=d=>d!=="9999-12-31" && new Date(d)<new Date(new Date().toDateString());
-
 async function load(){try{data=await (await fetch(DB)).json()||{};}catch(e){data={};}render();}
 load();
-
 function setFilter(b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.f;render();}
-
 function render(){
 const l=$('list');l.innerHTML="";let all=0,v=0,e=0;
+const maintenance=data["MAINTENANCE"];
+if(maintenance && maintenance.active){$('maintenanceMessage').textContent=maintenance.message||"Under Maintenance";return;}else{$('maintenanceMessage').textContent="";}
 Object.keys(data).forEach(k=>{
 if(k==="MAINTENANCE")return;
-const d=data[k];const exp=isExpired(d.date);all++;exp?e++:v++;
+const d=data[k];
+const exp=isExpired(d.date);
+all++;exp?e++:v++;
 if(filter==="valid"&&exp)return;if(filter==="expired"&&!exp)return;
 if(!$('searchInput').value||k.toLowerCase().includes($('searchInput').value.toLowerCase())||(d.username||"").toLowerCase().includes($('searchInput').value.toLowerCase())){
 const div=document.createElement('div');div.className=`user-item ${exp?"expired":"valid"}`;
@@ -132,21 +147,36 @@ div.innerHTML=`
 <button class="del" onclick="del('${k}')"><i class="fa fa-trash"></i></button>
 </div>
 </div>`;
-l.appendChild(div);
-}});
-$('cAll').textContent=`(${all})`;
-$('cValid').textContent=`(${v})`;
-$('cExpired').textContent=`(${e})`;
-}
-
-function openModal(){editKey=null;$('userModalTitle').textContent="Add ID";$('buildIdInput').value="";$('usernameInput').value="";$('expiryDateInput').value="";$('userModal').style.display="flex";}
+l.appendChild(div);}});$('cAll').textContent=`(${all})`;$('cValid').textContent=`(${v})`;$('cExpired').textContent=`(${e})`;}
+function openModal(){editKey=null;$('userModalTitle').textContent="Add ID";$('buildIdInput').value="";$('buildIdInput').disabled=false;$('usernameInput').value="";$('expiryDateInput').value="";$('userModal').style.display="flex";}
 function closeModal(){$('userModal').style.display="none";}
 function edit(k){editKey=k;const d=data[k];$('userModalTitle').textContent="Edit ID";$('buildIdInput').value=k;$('buildIdInput').disabled=true;$('usernameInput').value=d.username||"";$('expiryDateInput').value=d.date;$('userModal').style.display="flex";}
 function setExpiryShortcut(days){let dt=new Date();dt.setDate(dt.getDate()+days);$('expiryDateInput').value=dt.toISOString().split('T')[0];}
 function setPermanent(){$('expiryDateInput').value="9999-12-31";}
-async function save(){if(!$('buildIdInput').value||!$('expiryDateInput').value)return;const key=editKey||$('buildIdInput').value;data[key]={username:$('usernameInput').value,date:$('expiryDateInput').value};await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});$('buildIdInput').disabled=false;closeModal();toast("Saved");render();}
+async function save(){
+if(!$('buildIdInput').value||!$('expiryDateInput').value)return;
+const key=editKey||$('buildIdInput').value;
+data[key]={username:$('usernameInput').value,date:$('expiryDateInput').value};
+await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+$('buildIdInput').disabled=false;closeModal();toast("Saved");render();}
 $('saveUserBtn').onclick=save;
-async function del(k){if(!confirm("Delete ID?"))return;delete data[k];await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});toast("Deleted");render();}
+async function del(k){
+if(!confirm("Delete ID?"))return;
+delete data[k];
+await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+toast("Deleted");render();}
+const maintenanceToggle=$('maintenanceToggle');
+maintenanceToggle.onclick=async ()=>{
+const m=data["MAINTENANCE"]||{active:false,message:"Under Maintenance"};
+m.active=!m.active;
+data["MAINTENANCE"]=m;
+await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+toast(m.active?"Maintenance Activated":"Maintenance Deactivated");render();}
+function closeMaintenanceModal(){$('maintenanceModal').style.display="none";}
+async function saveMaintenance(){
+data["MAINTENANCE"]={active:true,message:$('maintenanceInput').value};
+await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+closeMaintenanceModal();toast("Maintenance Activated");render();}
 </script>
 </body>
 </html>
