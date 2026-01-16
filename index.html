@@ -15,201 +15,138 @@
 --muted:#aaa;
 --danger:#ff4d4d;
 --valid:#4caf50;
---glow:0 0 10px rgba(199,125,255,.7);
+--glow:0 0 8px rgba(199,125,255,.7);
 }
-body{margin:0;font-family:Roboto,sans-serif;background:var(--bg);color:var(--text);}
-header{text-align:center;padding:15px;font-size:1.6em;color:var(--primary);font-weight:700;}
-.search-bar{display:flex;justify-content:center;margin-bottom:10px;}
-.search-bar input{width:80%;padding:8px;border-radius:8px 0 0 8px;border:none;outline:none;background:#1e1e1e;color:#fff;}
-.search-bar button{padding:8px 12px;border:none;background:var(--primary);color:#fff;border-radius:0 8px 8px 0;cursor:pointer;}
-.filter-buttons{text-align:center;margin-bottom:15px;}
-.filter-buttons button{padding:6px 12px;margin:0 4px;border:none;border-radius:12px;cursor:pointer;background:#333;color:#fff;}
-.filter-buttons button.active{background:var(--primary);box-shadow:var(--glow);}
-.cards{max-width:500px;margin:0 auto 20px;}
-.user-card{background:#222;padding:15px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border:2px solid var(--primary);margin-bottom:12px;flex-wrap:wrap;}
-.user-info{flex:1 1 60%;}
-.user-info b{display:block;font-size:1.1em;margin-bottom:4px;}
-.user-info span{display:block;color:#aaa;font-size:0.9em;margin-bottom:4px;}
-.status-btns{display:flex;align-items:center;gap:8px;flex:1 1 35%;justify-content:flex-end;}
-.status-btns .valid-label{background:var(--valid);padding:4px 10px;border-radius:6px;color:#fff;font-weight:700;font-size:0.9em;}
-.status-btns .expired-label{background:var(--danger);padding:4px 10px;border-radius:6px;color:#fff;font-weight:700;font-size:0.9em;}
-.status-btns button{border:none;padding:6px 10px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9em;}
-.status-btns .edit-btn{background:#555;color:#ccc;}
-.status-btns .delete-btn{background:var(--danger);color:#fff;}
-#addBtn{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:var(--primary);border:none;color:#fff;font-size:1.5em;padding:15px;border-radius:50%;box-shadow:var(--glow);cursor:pointer;}
-.maintenance{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;color:#fff;}
-.toggle-switch{position:relative;display:inline-block;width:50px;height:24px;}
-.toggle-switch input{opacity:0;width:0;height:0;}
-.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#555;border-radius:24px;transition:.4s;}
-.slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.4s;}
-.toggle-switch input:checked + .slider{background:var(--valid);}
-.toggle-switch input:checked + .slider:before{transform:translateX(26px);}
-.modal{display:none;position:fixed;z-index:10;left:0;top:0;width:100%;height:100%;overflow:auto;background:rgba(0,0,0,0.7);}
-.modal-content{background:#222;margin:10% auto;padding:20px;border-radius:12px;width:90%;max-width:400px;}
+body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);padding-bottom:70px;}
+header{background:var(--secondary);padding:15px;text-align:center;}
+header h1{margin:0;color:var(--primary);}
+.container{padding:20px;max-width:800px;margin:auto;}
+.search-bar{display:flex;gap:10px;margin-bottom:15px;}
+.search-bar input{flex:1;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:var(--text);}
+.search-bar button{background:var(--primary);color:var(--bg);border:none;padding:10px 15px;border-radius:6px;cursor:pointer;}
+.search-bar button:hover{opacity:0.8;}
+.filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
+.filter-bar button{background:#333;color:var(--muted);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.filter-bar button.active{background:var(--primary);color:var(--bg);}
+.user-item{background:var(--secondary);padding:15px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid transparent;}
+.user-item.valid{border-left:5px solid var(--valid);}
+.user-item.expired{border-left:5px solid var(--danger);}
+.user-info strong{display:block;}
+.user-info span{display:block;color:var(--muted);}
+.user-actions{display:flex;align-items:center;gap:5px;}
+.user-actions i.fa-edit{color:#ccc;}
+.user-actions button.del i.fa-trash{color:var(--danger);}
+.status-tag{padding:4px 8px;border-radius:4px;font-weight:700;margin-right:10px;}
+.status-tag.valid{background:var(--valid);color:#000;}
+.status-tag.expired{background:var(--danger);color:#fff;}
+.add-user-btn{position:fixed;bottom:70px;right:20px;background:var(--primary);color:#000;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;box-shadow:var(--glow);}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:1000;}
+.modal-content{background:var(--secondary);padding:30px;border-radius:12px;width:90%;max-width:450px;}
 .modal-content h2{margin-top:0;color:var(--primary);}
-.modal-content label{display:block;margin:8px 0 2px;color:#aaa;}
-.modal-content input{width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:none;background:#333;color:#fff;}
-.date-shortcuts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.date-shortcuts button{flex:1 1 48%;padding:6px;border:none;border-radius:6px;background:#555;color:#fff;cursor:pointer;}
-.modal-actions{text-align:right;}
-.modal-actions button{margin-left:8px;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;}
-.save-btn{background:var(--valid);color:#fff;}
-.cancel-btn{background:#555;color:#ccc;}
+.modal-content input, .modal-content textarea{width:100%;padding:10px;border-radius:6px;border:1px solid #444;background:#333;color:var(--text);margin-bottom:10px;}
+.modal-content button{padding:10px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:700;}
+.btn-primary{background:var(--primary);color:#000;}
+.btn-secondary{background:#444;color:#fff;}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity 0.3s;z-index:2000;}
+#toast.show{opacity:1;}
+.date-shortcuts{display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;}
+.date-shortcuts button{background:#333;color:var(--muted);border:none;padding:8px 10px;border-radius:6px;cursor:pointer;}
+.date-shortcuts button:hover{background:#444;}
 </style>
 </head>
 <body>
-<header>CloudPlay Admin Panel</header>
+<header><h1>CloudPlay Admin Panel</h1></header>
+<div class="container">
 <div class="search-bar">
-<input type="text" id="searchInput" placeholder="Cari Build/Device ID...">
-<button onclick="searchCards()"><i class="fas fa-magnifying-glass"></i></button>
+<input type="text" id="searchInput" placeholder="Search Build/Device ID...">
+<button onclick="render()"><i class="fa fa-search"></i></button>
 </div>
-<div class="filter-buttons">
-<button class="active" onclick="filterCards('all', this)">Semua (<span id="count-all">0</span>)</button>
-<button onclick="filterCards('valid', this)">Valid (<span id="count-valid">0</span>)</button>
-<button onclick="filterCards('expired', this)">Expired (<span id="count-expired">0</span>)</button>
+<div class="filter-bar">
+<button class="active" data-f="all" onclick="setFilter(this)">All <span id="cAll"></span></button>
+<button data-f="valid" onclick="setFilter(this)">Valid <span id="cValid"></span></button>
+<button data-f="expired" onclick="setFilter(this)">Expired <span id="cExpired"></span></button>
 </div>
-<div class="cards" id="cardsContainer">
-<div class="user-card" data-status="valid">
-<div class="user-info">
-<b>Wt62562</b>
-<span>User: @Sannz</span>
-<span>Expire: 2027-04-30</span>
+<div id="list"></div>
 </div>
-<div class="status-btns">
-<div class="valid-label">VALID</div>
-<button class="edit-btn" onclick="openModal(this)"><i class="fas fa-pen"></i></button>
-<button class="delete-btn"><i class="fas fa-trash"></i></button>
-</div>
-</div>
-</div>
-<div class="maintenance">
-<span>Sistem Mati :(</span>
-<label class="toggle-switch">
-<input type="checkbox" id="maintenanceToggle">
-<span class="slider"></span>
-</label>
-</div>
-<button id="addBtn" onclick="openModal()">+</button>
+<div class="add-user-btn" onclick="openModal()"><i class="fa fa-plus"></i></div>
 
-<div class="modal" id="modal">
+<div id="userModal" class="modal">
 <div class="modal-content">
-<h2>Tambah / Edit ID</h2>
+<h2 id="userModalTitle">Add ID</h2>
 <label>Build/Device ID</label>
-<input type="text" id="modalId">
-<label>User</label>
-<input type="text" id="modalUser">
-<label>Expire</label>
-<input type="date" id="modalExpire">
+<input type="text" id="buildIdInput" placeholder="Build/Device ID">
+<label>Username</label>
+<input type="text" id="usernameInput" placeholder="Username">
+<label>Expiry Date</label>
 <div class="date-shortcuts">
 <button onclick="setExpiryShortcut(1)">+1 Hari</button>
 <button onclick="setExpiryShortcut(7)">+7 Hari</button>
 <button onclick="setExpiryShortcut(30)">+30 Hari</button>
 <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
 <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-<button onclick="setExpiryShortcut('permanent')">Permanent</button>
+<button onclick="setPermanent()">Permanent</button>
 </div>
-<div class="modal-actions">
-<button class="cancel-btn" onclick="closeModal()">Batal</button>
-<button class="save-btn" onclick="saveCard()">Simpan</button>
+<input type="date" id="expiryDateInput">
+<div style="text-align:right;">
+<button class="btn-secondary" onclick="closeModal()">Cancel</button>
+<button class="btn-primary" id="saveUserBtn">Save</button>
 </div>
 </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
-let editCard=null;
-function updateCounters(){
-const cards=document.querySelectorAll('.user-card');
-let all=0, valid=0, expired=0;
-cards.forEach(card=>{
-all++;
-if(card.dataset.status==='valid') valid++;
-else if(card.dataset.status==='expired') expired++;
-});
-document.getElementById('count-all').innerText=all;
-document.getElementById('count-valid').innerText=valid;
-document.getElementById('count-expired').innerText=expired;
-}
-updateCounters();
+const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
+const DB=FIREBASE_ROOT+"/keys.json";
+let data={},filter="all",editKey=null;
+const $=i=>document.getElementById(i);
+const toast=t=>{$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2000);}
+const isExpired=d=>d!=="9999-12-31" && new Date(d)<new Date(new Date().toDateString());
 
-function filterCards(status, btn){
-const buttons=document.querySelectorAll('.filter-buttons button');
-buttons.forEach(b=>b.classList.remove('active'));
-btn.classList.add('active');
-const cards=document.querySelectorAll('.user-card');
-cards.forEach(card=>{
-if(status==='all') card.style.display='flex';
-else card.style.display=(card.getAttribute('data-status')===status)?'flex':'none';
-});
-}
+async function load(){try{data=await (await fetch(DB)).json()||{};}catch(e){data={};}render();}
+load();
 
-function searchCards(){
-const input=document.getElementById('searchInput').value.toLowerCase();
-const cards=document.querySelectorAll('.user-card');
-cards.forEach(card=>{
-const text=card.querySelector('b').innerText.toLowerCase()+' '+card.querySelectorAll('span')[0].innerText.toLowerCase();
-card.style.display=text.includes(input)?'flex':'none';
-});
-updateCounters();
-}
+function setFilter(b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.f;render();}
 
-function openModal(btn=null){
-editCard=btn?btn.closest('.user-card'):null;
-document.getElementById('modal').style.display='block';
-if(editCard){
-document.getElementById('modalId').value=editCard.querySelector('b').innerText;
-document.getElementById('modalUser').value=editCard.querySelectorAll('span')[0].innerText.replace('User: ','');
-let expireText=editCard.querySelectorAll('span')[1].innerText.replace('Expire: ','');
-document.getElementById('modalExpire').value=(expireText==='Permanent')?'':expireText;
-}else{
-document.getElementById('modalId').value='';
-document.getElementById('modalUser').value='';
-document.getElementById('modalExpire').value='';
-}
+function render(){
+const l=$('list');l.innerHTML="";let all=0,v=0,e=0;
+Object.keys(data).forEach(k=>{
+if(k==="MAINTENANCE")return;
+const d=data[k];const exp=isExpired(d.date);all++;exp?e++:v++;
+if(filter==="valid"&&exp)return;if(filter==="expired"&&!exp)return;
+if(!$('searchInput').value||k.toLowerCase().includes($('searchInput').value.toLowerCase())||(d.username||"").toLowerCase().includes($('searchInput').value.toLowerCase())){
+const div=document.createElement('div');div.className=`user-item ${exp?"expired":"valid"}`;
+const expText=d.date==="9999-12-31"?"Permanent":d.date;
+const statusClass=exp?"expired":"valid";
+div.innerHTML=`
+<div class="user-info">
+<strong>${k}</strong>
+<span>User: ${d.username||'-'}</span>
+<span>Expire: ${expText}</span>
+</div>
+<div class="user-actions ${statusClass}">
+<span class="status-tag ${statusClass}">${exp?"EXPIRED":"VALID"}</span>
+<div class="actions">
+<button onclick="edit('${k}')"><i class="fa fa-edit"></i></button>
+<button class="del" onclick="del('${k}')"><i class="fa fa-trash"></i></button>
+</div>
+</div>`;
+l.appendChild(div);
+}});
+$('cAll').textContent=`(${all})`;
+$('cValid').textContent=`(${v})`;
+$('cExpired').textContent=`(${e})`;
 }
 
-function closeModal(){document.getElementById('modal').style.display='none';}
-
-function setExpiryShortcut(days){
-const dateInput=document.getElementById('modalExpire');
-if(days==='permanent'){dateInput.value='';dateInput.dataset.permanent='true';}
-else{
-const d=new Date();
-d.setDate(d.getDate()+days);
-let mm=('0'+(d.getMonth()+1)).slice(-2);
-let dd=('0'+d.getDate()).slice(-2);
-dateInput.value=`${d.getFullYear()}-${mm}-${dd}`;
-dateInput.dataset.permanent='';
-}
-}
-
-function saveCard(){
-const id=document.getElementById('modalId').value.trim();
-const user=document.getElementById('modalUser').value.trim();
-const expire=document.getElementById('modalExpire').dataset.permanent?'Permanent':document.getElementById('modalExpire').value;
-if(!id||!user) return alert('Isi semua field!');
-if(editCard){
-editCard.querySelector('b').innerText=id;
-editCard.querySelectorAll('span')[0].innerText='User: '+user;
-editCard.querySelectorAll('span')[1].innerText='Expire: '+expire;
-}else{
-const container=document.getElementById('cardsContainer');
-const div=document.createElement('div');
-div.className='user-card';
-div.dataset.status='valid';
-div.innerHTML=`<div class="user-info"><b>${id}</b><span>User: ${user}</span><span>Expire: ${expire}</span></div>
-<div class="status-btns"><div class="valid-label">VALID</div><button class="edit-btn" onclick="openModal(this)"><i class="fas fa-pen"></i></button>
-<button class="delete-btn" onclick="deleteCard(this)"><i class="fas fa-trash"></i></button></div>`;
-container.appendChild(div);
-}
-updateCounters();
-closeModal();
-}
-
-function deleteCard(btn){
-if(!confirm('Hapus ID ini?')) return;
-btn.closest('.user-card').remove();
-updateCounters();
-}
+function openModal(){editKey=null;$('userModalTitle').textContent="Add ID";$('buildIdInput').value="";$('usernameInput').value="";$('expiryDateInput').value="";$('userModal').style.display="flex";}
+function closeModal(){$('userModal').style.display="none";}
+function edit(k){editKey=k;const d=data[k];$('userModalTitle').textContent="Edit ID";$('buildIdInput').value=k;$('buildIdInput').disabled=true;$('usernameInput').value=d.username||"";$('expiryDateInput').value=d.date;$('userModal').style.display="flex";}
+function setExpiryShortcut(days){let dt=new Date();dt.setDate(dt.getDate()+days);$('expiryDateInput').value=dt.toISOString().split('T')[0];}
+function setPermanent(){$('expiryDateInput').value="9999-12-31";}
+async function save(){if(!$('buildIdInput').value||!$('expiryDateInput').value)return;const key=editKey||$('buildIdInput').value;data[key]={username:$('usernameInput').value,date:$('expiryDateInput').value};await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});$('buildIdInput').disabled=false;closeModal();toast("Saved");render();}
+$('saveUserBtn').onclick=save;
+async function del(k){if(!confirm("Delete ID?"))return;delete data[k];await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});toast("Deleted");render();}
 </script>
 </body>
 </html>
