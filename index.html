@@ -27,17 +27,16 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
 .filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;transition:0.3s;}
 .filter-bar button.active{background-color:var(--primary-color);color:var(--background-color);box-shadow:var(--soft-glow);}
-.user-item{background-color:var(--secondary-color);padding:20px;margin-bottom:10px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid transparent;transition:0.2s;flex-direction:column;}
-.user-item.valid{border-left-color:var(--primary-color);}
+.user-item{background-color:var(--secondary-color);padding:20px;margin-bottom:10px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;border-left:6px solid var(--primary-color);transition:0.2s;}
 .user-item.valid:hover{box-shadow:0 0 10px var(--primary-color);}
 .user-item.expired{background-color:#331f1f;border-left-color:var(--danger-color);}
-.user-item-info{flex-grow:1;width:100%;}
+.user-item-info{flex-grow:1;display:flex;align-items:center;gap:15px;}
 .user-item-text{flex-grow:1;}
-.user-item-text strong{display:block;font-size:1.2rem;color:var(--text-color);margin-bottom:5px;}
-.user-item-text span{display:block;font-size:1rem;color:var(--text-secondary);margin-bottom:3px;}
-.user-status-tag{background-color:#32CD32;color:#000;padding:6px 12px;border-radius:6px;font-size:0.85rem;font-weight:700;flex-shrink:0;margin-top:5px;display:inline-block;}
+.user-item-text strong{display:block;font-size:1.2rem;color:var(--text-color);}
+.user-item-text span{color:var(--text-secondary);font-size:1rem;display:block;margin-top:3px;}
+.user-status-tag{background-color:var(--primary-color);color:#000;padding:6px 12px;border-radius:6px;font-size:0.85rem;font-weight:700;flex-shrink:0;}
 .user-item.expired .user-status-tag{background-color:var(--danger-color);color:var(--text-color);}
-.user-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-top:5px;}
+.user-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
 .action-btn{background:none;border:none;color:var(--text-secondary);font-size:1.2rem;cursor:pointer;padding:8px;border-radius:50%;transition:0.2s;}
 .action-btn:hover{color:var(--text-color);}
 .delete-btn{color:var(--danger-color);}
@@ -68,8 +67,8 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <div id="usersTab">
 <h2>Build/Device IDs</h2>
 <div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="searchIDs()">
-<button onclick="searchIDs()"><i class="fas fa-search"></i></button>
+<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+<button onclick="render()"><i class="fas fa-search"></i></button>
 </div>
 <div class="filter-bar" id="filterBar">
 <button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
@@ -159,8 +158,12 @@ function render(){
   list.innerHTML=''; 
   const q=$('searchInput').value.toLowerCase(); 
   const f=document.querySelector('.filter-bar button.active').dataset.filter; 
-  Object.keys(data).forEach(id=>{
-    if(id==="MAINTENANCE") return; 
+  // Urut berdasarkan tanggal terbaru
+  const ids=Object.keys(data).filter(id=>id!=="MAINTENANCE").sort((a,b)=>{
+    const da=new Date(data[a].date||0), db=new Date(data[b].date||0);
+    return db-da;
+  });
+  ids.forEach(id=>{
     const d=data[id]; 
     const expired=isExpired(d.date); 
     if(f==="valid" && expired) return; 
@@ -168,16 +171,7 @@ function render(){
     if(q && !id.toLowerCase().includes(q) && !(d.username||'').toLowerCase().includes(q)) return; 
     const item=document.createElement('div'); 
     item.className='user-item '+(expired?'expired':'valid'); 
-    item.innerHTML=`<div class="user-item-info">
-<strong>${id}</strong>
-<span>User : ${d.username||'-'}</span>
-<span>Expired : ${d.date||'-'}</span>
-<div class="user-status-tag">${expired?'EXPIRED':'VALID'}</div>
-</div>
-<div class="user-actions">
-<button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button>
-<button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button>
-</div>`;
+    item.innerHTML=`<div class="user-item-info"><div class="user-item-text"><strong>${id}</strong><span>User : ${d.username||'-'}</span><span>Expires : ${d.date||'-'}</span></div><div class="user-status-tag">${expired?'EXPIRED':'VALID'}</div></div><div class="user-actions"><button class="action-btn" onclick="edit('${id}')"><i class="fas fa-edit"></i></button><button class="action-btn delete-btn" onclick="del('${id}')"><i class="fas fa-trash"></i></button></div>`; 
     list.appendChild(item); 
   }); 
   updateCounts();
@@ -196,7 +190,6 @@ function setFilter(f,btn){
   render();
 }
 
-function searchIDs(){render();}
 function showTab(tab){$('usersTab').style.display=tab==='users'?'block':'none';$('settingsTab').style.display=tab==='settings'?'block':'none';}
 function openModal(){ editId=null; $('buildIdInput').value=''; $('usernameInput').value=''; $('expiryDateInput').value=''; $('userModal').style.display='flex'; }
 function closeModal(){ $('userModal').style.display='none'; }
