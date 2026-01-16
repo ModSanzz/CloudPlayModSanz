@@ -8,45 +8,44 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
-  --primary:#C77DFF;
+  --primary:#4CAF50; 
+  --danger:#FF4D4D;
   --secondary:#282828;
   --bg:#121212;
   --text:#fff;
   --text-secondary:#B3B3B3;
-  --danger:#FF4D4D;
 }
 body{margin:0;font-family:Roboto;background:var(--bg);color:var(--text);}
 header{background:var(--secondary);padding:15px;text-align:center;position:relative;}
-header h1{margin:0;color:var(--primary);}
-#maintenanceToggle{position:absolute;top:15px;right:15px;background:var(--primary);color:var(--bg);border:none;padding:5px 10px;border-radius:6px;cursor:pointer;}
-.container{padding:20px;max-width:800px;margin:0 auto;}
-.search-bar{display:flex;gap:10px;margin-bottom:15px;}
+header h1{margin:0;color:#C77DFF;font-size:1.3rem;}
+#maintenanceToggle{position:absolute;top:15px;right:15px;background:#C77DFF;color:#fff;border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:0.8rem;}
+.container{padding:15px;max-width:600px;margin:0 auto;}
+.search-bar{display:flex;gap:10px;margin-bottom:10px;}
 .search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:none;background:#333;color:#fff;}
-.search-bar button{background:var(--primary);border:none;color:var(--bg);border-radius:6px;padding:10px 15px;cursor:pointer;}
-.search-bar button:hover{background:#D199FF;}
-.filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;}
-.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
-.filter-bar button.active{background:var(--primary);color:var(--bg);}
-.user-item{background:var(--secondary);padding:15px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;}
-.user-item.expired{background:#331f1f;}
+.search-bar button{background:#C77DFF;border:none;color:#fff;border-radius:6px;padding:10px 15px;cursor:pointer;}
+.filter-bar{display:flex;gap:10px;margin-bottom:10px;overflow-x:auto;}
+.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:6px 12px;border-radius:20px;cursor:pointer;flex-shrink:0;font-size:0.9rem;}
+.filter-bar button.active{background:#C77DFF;color:#fff;}
+.user-item{background:var(--secondary);padding:12px;margin-bottom:8px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;}
 .user-item.valid{border-left:5px solid var(--primary);}
-.user-info strong{display:block;font-size:1.1rem;}
-.user-info span{font-size:0.9rem;color:var(--text-secondary);}
+.user-item.expired{border-left:5px solid var(--danger);}
+.user-info strong{display:block;font-size:1rem;}
+.user-info span{font-size:0.85rem;color:var(--text-secondary);}
 .user-actions{display:flex;gap:5px;align-items:center;}
-.user-actions .status-tag{padding:4px 8px;border-radius:4px;font-weight:700;}
-.user-actions .status-tag.valid{background:var(--primary);color:var(--bg);}
+.user-actions .status-tag{padding:3px 8px;border-radius:4px;font-weight:700;font-size:0.8rem;}
+.user-actions .status-tag.valid{background:var(--primary);color:#fff;}
 .user-actions .status-tag.expired{background:var(--danger);color:#fff;}
-.user-actions button{background:none;border:none;color:var(--text-secondary);font-size:1.1rem;cursor:pointer;}
-.user-actions button:hover{color:var(--text);}
-.add-user-btn{position:fixed;bottom:70px;right:20px;background:var(--primary);color:var(--bg);width:56px;height:56px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;cursor:pointer;}
-#maintenanceMessage{margin:30px;text-align:center;font-size:1.2rem;color:var(--danger);}
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:2000;overflow:auto;}
-.modal-content{background:var(--secondary);padding:30px;border-radius:12px;width:90%;max-width:450px;}
-.modal h2{margin-top:0;color:var(--primary);}
+.user-actions button{background:none;border:none;color:var(--text-secondary);font-size:1rem;cursor:pointer;}
+.user-actions button:hover{color:#fff;}
+.add-user-btn{position:fixed;bottom:70px;right:20px;background:#C77DFF;color:#fff;width:50px;height:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:1.5rem;cursor:pointer;z-index:100;}
+#maintenanceMessage{margin:20px 0;text-align:center;font-size:1rem;color:#FF4D4D;}
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:2000;overflow:auto;}
+.modal-content{background:var(--secondary);padding:25px;border-radius:12px;width:90%;max-width:400px;}
+.modal h2{margin-top:0;color:#C77DFF;}
 .modal button{padding:10px 15px;border:none;border-radius:6px;font-weight:700;cursor:pointer;}
 .modal .btn-secondary{background:#444;color:#fff;margin-right:10px;}
-.modal .btn-primary{background:var(--primary);color:var(--bg);}
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity 0.3s;z-index:4000;}
+.modal .btn-primary{background:#C77DFF;color:#fff;}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity 0.3s;z-index:4000;}
 .toast.show{opacity:1;}
 </style>
 </head>
@@ -69,47 +68,28 @@ header h1{margin:0;color:var(--primary);}
 <div id="list"></div>
 </div>
 <div class="add-user-btn" onclick="openModal()"><i class="fas fa-plus"></i></div>
+
 <div id="userModal" class="modal">
 <div class="modal-content">
 <h2 id="userModalTitle">Add ID</h2>
-<div class="form-group">
-<label>Build/Device ID</label>
-<input type="text" id="buildIdInput">
-</div>
-<div class="form-group">
-<label>Username</label>
-<input type="text" id="usernameInput">
-</div>
-<div class="form-group">
-<label>Expiry Date</label>
-<input type="date" id="expiryDateInput">
+<label>Build/Device ID</label><input type="text" id="buildIdInput">
+<label>Username</label><input type="text" id="usernameInput">
+<label>Expiry Date</label><input type="date" id="expiryDateInput">
 <div style="margin-top:5px;">
 <button onclick="setExpiryShortcut(1)">+1 Day</button>
 <button onclick="setExpiryShortcut(7)">+7 Days</button>
 <button onclick="setExpiryShortcut(30)">+30 Days</button>
 <button onclick="setPermanent()">Permanent</button>
 </div>
-</div>
-<div style="display:flex;justify-content:flex-end;margin-top:20px;">
+<div style="display:flex;justify-content:flex-end;margin-top:15px;">
 <button class="btn-secondary" onclick="closeModal()">Cancel</button>
 <button class="btn-primary" id="saveUserBtn">Save</button>
 </div>
 </div>
 </div>
-<div id="maintenanceModal" class="modal">
-<div class="modal-content">
-<h2>Maintenance Mode</h2>
-<div class="form-group">
-<label>Message</label>
-<input type="text" id="maintenanceInput">
-</div>
-<div style="display:flex;justify-content:flex-end;margin-top:20px;">
-<button class="btn-secondary" onclick="closeMaintenanceModal()">Cancel</button>
-<button class="btn-primary" onclick="saveMaintenance()">Save</button>
-</div>
-</div>
-</div>
+
 <div id="toast" class="toast"></div>
+
 <script>
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const DB=FIREBASE_ROOT+"/keys.json";
@@ -119,11 +99,13 @@ const toast=t=>{$('toast').textContent=t;$('toast').classList.add('show');setTim
 const isExpired=d=>d!=="9999-12-31" && new Date(d)<new Date(new Date().toDateString());
 async function load(){try{data=await (await fetch(DB)).json()||{};}catch(e){data={};}render();}
 load();
+
 function setFilter(b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.f;render();}
+
 function render(){
 const l=$('list');l.innerHTML="";let all=0,v=0,e=0;
 const maintenance=data["MAINTENANCE"];
-if(maintenance && maintenance.active){$('maintenanceMessage').textContent=maintenance.message||"Under Maintenance";return;}else{$('maintenanceMessage').textContent="";}
+if(maintenance?.active){$('maintenanceMessage').textContent=maintenance.message||"Under Maintenance";return;}else{$('maintenanceMessage').textContent="";}
 Object.keys(data).forEach(k=>{
 if(k==="MAINTENANCE")return;
 const d=data[k];
@@ -134,20 +116,15 @@ if(!$('searchInput').value||k.toLowerCase().includes($('searchInput').value.toLo
 const div=document.createElement('div');div.className=`user-item ${exp?"expired":"valid"}`;
 const expText=d.date==="9999-12-31"?"Permanent":d.date;
 const statusClass=exp?"expired":"valid";
-div.innerHTML=`
-<div class="user-info">
-<strong>${k}</strong>
-<span>User: ${d.username||'-'}</span>
-<span>Expire: ${expText}</span>
-</div>
-<div class="user-actions ${statusClass}">
-<span class="status-tag ${statusClass}">${exp?"EXPIRED":"VALID"}</span>
-<div class="actions">
-<button onclick="edit('${k}')"><i class="fa fa-edit"></i></button>
-<button class="del" onclick="del('${k}')"><i class="fa fa-trash"></i></button>
-</div>
-</div>`;
-l.appendChild(div);}});$('cAll').textContent=`(${all})`;$('cValid').textContent=`(${v})`;$('cExpired').textContent=`(${e})`;}
+div.innerHTML=`<div class="user-info"><strong>${k}</strong><span>User: ${d.username||'-'}</span><span>Expire: ${expText}</span></div>
+<div class="user-actions ${statusClass}"><span class="status-tag ${statusClass}">${exp?"EXPIRED":"VALID"}</span>
+<div class="actions"><button onclick="edit('${k}')"><i class="fa fa-edit"></i></button><button onclick="del('${k}')"><i class="fa fa-trash"></i></button></div></div>`;
+l.appendChild(div);}});
+$('cAll').textContent=`(${all})`;
+$('cValid').textContent=`(${v})`;
+$('cExpired').textContent=`(${e})`;
+}
+
 function openModal(){editKey=null;$('userModalTitle').textContent="Add ID";$('buildIdInput').value="";$('buildIdInput').disabled=false;$('usernameInput').value="";$('expiryDateInput').value="";$('userModal').style.display="flex";}
 function closeModal(){$('userModal').style.display="none";}
 function edit(k){editKey=k;const d=data[k];$('userModalTitle').textContent="Edit ID";$('buildIdInput').value=k;$('buildIdInput').disabled=true;$('usernameInput').value=d.username||"";$('expiryDateInput').value=d.date;$('userModal').style.display="flex";}
@@ -165,6 +142,7 @@ if(!confirm("Delete ID?"))return;
 delete data[k];
 await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
 toast("Deleted");render();}
+
 const maintenanceToggle=$('maintenanceToggle');
 maintenanceToggle.onclick=async ()=>{
 const m=data["MAINTENANCE"]||{active:false,message:"Under Maintenance"};
@@ -172,11 +150,6 @@ m.active=!m.active;
 data["MAINTENANCE"]=m;
 await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
 toast(m.active?"Maintenance Activated":"Maintenance Deactivated");render();}
-function closeMaintenanceModal(){$('maintenanceModal').style.display="none";}
-async function saveMaintenance(){
-data["MAINTENANCE"]={active:true,message:$('maintenanceInput').value};
-await fetch(DB,{method:"PUT",headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-closeMaintenanceModal();toast("Maintenance Activated");render();}
 </script>
 </body>
 </html>
