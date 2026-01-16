@@ -30,20 +30,6 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .search-bar button{background-color:var(--primary-color);color:var(--background-color);border:none;border-radius:6px;padding:10px 15px;cursor:pointer;transition:0.3s;}
 .search-bar button:hover{box-shadow:var(--soft-glow);}
 
-.bulk-buttons{display:flex;gap:10px;margin-bottom:15px;}
-.bulk-btn{
-  background:black;
-  color:#C77DFF;
-  border:1px solid #C77DFF;
-  padding:10px 15px;
-  border-radius:8px;
-  font-weight:700;
-  cursor:pointer;
-  text-shadow:0 0 8px #C77DFF;
-  box-shadow:0 0 10px rgba(199,125,255,.8);
-}
-.bulk-btn:hover{box-shadow:0 0 15px #C77DFF;}
-
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
 .filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;transition:0.3s;}
 .filter-bar button.active{background-color:var(--primary-color);color:var(--background-color);box-shadow:var(--soft-glow);}
@@ -125,11 +111,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 .date-shortcuts{display:flex;gap:5px;margin:10px 0;flex-wrap:wrap;}
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 
-.bulk-list{max-height:300px;overflow-y:auto;margin:10px 0;}
-.bulk-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #444;}
-.bulk-actions{display:flex;justify-content:center;gap:15px;margin-top:15px;}
-
-/* ======== PERBAIKAN ADD NEW ID ======== */
 .admin-buttons{display:flex;gap:10px;margin:10px 0;}
 .admin-btn{
   background:black;
@@ -138,7 +119,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
   padding:10px;
   border-radius:8px;
   font-weight:700;
-  cursor:pointer;
 }
 
 .btn-save, .btn-cancel{
@@ -148,7 +128,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
   padding:10px 15px;
   border-radius:6px;
   font-weight:700;
-  cursor:pointer;
 }
 </style>
 </head>
@@ -159,11 +138,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <div class="container">
 <div id="usersTab">
 <h2>Build/Device IDs</h2>
-
-<div class="bulk-buttons">
-<button class="bulk-btn" onclick="openBulk('expired')">EXPIRED</button>
-<button class="bulk-btn" onclick="openBulk('permanent')">PERMANENT</button>
-</div>
 
 <div class="search-bar">
 <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="searchIDs()">
@@ -202,11 +176,11 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <div class="modal-content">
 <h2>Add New ID</h2>
 
-<label>Build/Device ID</label>
 <input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
+<p style="color:#b3b3b3;">Build/Device ID</p>
 
-<label>Username</label>
 <input type="text" id="usernameInput" placeholder="username">
+<p style="color:#b3b3b3;">Username</p>
 
 <p style="color:#C77DFF;">Fitur Khusus Admin</p>
 <div class="admin-buttons">
@@ -214,7 +188,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <button class="admin-btn" onclick="setPermanent()">PERMANENT</button>
 </div>
 
-<label>Expiry Date (UTC)</label>
+<p style="color:#b3b3b3;">Expiry Date (UTC)</p>
 
 <div class="date-shortcuts">
 <button onclick="setExpiryShortcut(1)">+1 Hari</button>
@@ -233,24 +207,10 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 </div>
 </div>
 
-<div id="bulkModal" class="modal">
-<div class="modal-content">
-<h2 id="bulkTitle"></h2>
-<div class="bulk-list" id="bulkList"></div>
-<div class="bulk-actions" id="bulkActions"></div>
-<div style="text-align:right;margin-top:15px;">
-<button class="btn-secondary" onclick="closeBulk()">Close</button>
-</div>
-</div>
-</div>
-
-<div id="loading">Updating...</div>
-<div id="toast" class="toast"></div>
-
 <script>
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL=FIREBASE_ROOT+"/keys.json";
-let data={}, bulkMode="";
+let data={};
 
 const $=id=>document.getElementById(id);
 
@@ -331,13 +291,13 @@ function setFilter(f,btn){
 }
 
 function searchIDs(){render();}
+
 function showTab(tab){
   $('usersTab').style.display=tab==='users'?'block':'none';
   $('settingsTab').style.display=tab==='settings'?'block':'none';
 }
 
 function openModal(){
-  editId=null;
   $('buildIdInput').value='';
   $('usernameInput').value='';
   const today=new Date().toISOString().split('T')[0];
@@ -362,14 +322,6 @@ function setExpired(){
 
 function setPermanent(){
   $('expiryDateInput').value="9999-01-12";
-}
-
-function edit(id){
-  editId=id;
-  $('buildIdInput').value=id;
-  $('usernameInput').value=data[id].username||'';
-  $('expiryDateInput').value=data[id].date||'';
-  $('userModal').style.display='flex';
 }
 
 async function saveID(){
@@ -410,72 +362,6 @@ async function saveMaintenance(){
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({MAINTENANCE:{status,msg}})
   });
-}
-
-function openBulk(mode){
-  bulkMode=mode;
-  $('bulkTitle').textContent = mode==="expired" ? "Pilih ID yang mau diubah" : "Pilih ID untuk PERMANENT";
-  const list=$('bulkList');
-  list.innerHTML="";
-
-  Object.keys(data).sort().forEach(id=>{
-    if(id==="MAINTENANCE") return;
-    const div=document.createElement('div');
-    div.className='bulk-item';
-    div.innerHTML=`<input type="checkbox" class="bulkCheck" value="${id}"> ${id}`;
-    list.appendChild(div);
-  });
-
-  const actions=$('bulkActions');
-  actions.innerHTML="";
-
-  if(mode==="expired"){
-    actions.innerHTML=`
-      <button class="btn-primary" onclick="applyBulk('on')">ON</button>
-      <button class="btn-secondary" onclick="applyBulk('off')">OFF</button>
-    `;
-  } else {
-    actions.innerHTML=`
-      <button class="btn-primary" onclick="applyBulk('permanent')">Jadikan PERMANENT</button>
-    `;
-  }
-
-  $('bulkModal').style.display='flex';
-}
-
-function closeBulk(){
-  $('bulkModal').style.display='none';
-}
-
-async function applyBulk(action){
-  const checked=[...document.querySelectorAll('.bulkCheck:checked')].map(c=>c.value);
-  if(checked.length===0){ alert("Pilih minimal 1 ID"); return; }
-
-  let updates={};
-
-  const today=new Date().toISOString().split('T')[0];
-  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
-
-  checked.forEach(id=>{
-    if(action==="on"){
-      updates[id]={...data[id],permanent:false,date:today};
-    }
-    if(action==="off"){
-      updates[id]={...data[id],permanent:false,date:yesterday};
-    }
-    if(action==="permanent"){
-      updates[id]={...data[id],permanent:true,date:"9999-01-12"};
-    }
-  });
-
-  await fetch(KEYS_URL,{
-    method:"PATCH",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(updates)
-  });
-
-  closeBulk();
-  load();
 }
 
 $('addUserBtn').onclick=openModal;
