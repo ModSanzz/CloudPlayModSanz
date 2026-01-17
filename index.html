@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{
-  --primary-color:#C77DFF; /* Ungu Neon DPMods */
+  --primary-color:#C77DFF; /* DPMods Neon Purple */
   --secondary-color:#1E1E1E;
   --background-color:#121212;
   --text-color:#FFFFFF;
@@ -35,30 +35,22 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 /* USER ITEMS */
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;border-left:6px solid var(--primary-color);gap:10px;}
-.user-item.valid:hover{box-shadow:0 0 10px var(--valid-color);}
-.user-item.expired{background-color:#331f1f;}
-.user-item.limit{border-left:6px solid gold;}
-.user-item-text{flex-grow:1;line-height:1.3;}
-.user-item-text strong{display:block;font-size:1.1rem;}
-.user-item-text span{color:var(--text-secondary);font-size:.95rem;}
-.user-status-tag{display:inline-block;padding:4px 10px;font-size:.8rem;font-weight:700;border-radius:6px;}
 .user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
+.user-item-text{flex-grow:1;line-height:1.3;}
+.user-item-text strong{display:block;font-size:1.1rem;}
+.user-item-text span{color:var(--text-secondary);font-size:.95rem;}
 
-/* ACTION BUTTONS */
+/* ACTION BUTTONS DPMods */
 .action-buttons{display:flex;align-items:center;gap:6px;}
-.dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
-.dp-btn.edit{
-  width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;
-  transition:.2s;
-}
-.dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;}
-.dp-btn.edit:hover svg{fill:var(--primary-color);}
-.dp-btn.edit:hover{background:rgba(199,125,255,.15);transform:scale(1.08);}
-.dp-btn.delete{color:var(--danger-color);}
-.dp-btn.delete:hover{background:rgba(255,77,77,.15);}
-.dp-btn:hover{transform:scale(1.1);}
+.dp-btn{display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;}
+.dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;transition:.2s;}
+.dp-btn.edit i{font-size:18px;color:#b3b3b3;}
+.dp-btn.edit:hover i{color:var(--primary-color);}
+.dp-btn.edit:hover{background:rgba(199,125,255,0.15);transform:scale(1.08);}
+.dp-btn.delete{width:40px;height:40px;border-radius:14px;background:rgba(255,0,0,0.05);display:flex;align-items:center;justify-content:center;color:var(--danger-color);}
+.dp-btn.delete:hover{background:rgba(255,77,77,.15);transform:scale(1.08);}
 
 /* NAVIGATION */
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
@@ -75,18 +67,18 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 .btn-save,.btn-cancel{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 
-/* STATUS TAB */
+/* STATUS TAB DPMods */
 #statusTab{display:none;flex-direction:column;gap:15px;}
-.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:10px;background:var(--status-bg);cursor:pointer;transition:.2s;}
+.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:12px;background:var(--status-bg);cursor:pointer;transition:.2s;}
 .status-box span{font-weight:700;}
-.status-value{padding:4px 10px;border-radius:6px;}
+.status-box-value{padding:6px 12px;border-radius:14px;min-width:80px;text-align:center;}
+.status-global .status-box-value{background:#fff;color:#000;}
+.status-maintenance .status-box-value{background:var(--primary-color);color:#000;}
+.status-buildid .status-box-value{background:#555;color:#fff;}
+.status-system .status-box-value.active{background:var(--primary-color);color:#000;}
+.status-system .status-box-value.inactive{background:#555;color:#fff;}
+.status-message .status-box-value{background:#222;color:#fff;white-space:pre-wrap;flex:1;margin-left:10px;}
 .status-box:hover{opacity:.9;}
-.status-box.global .status-value{background:#fff;color:#000;}
-.status-box.maintenance .status-value{background:var(--primary-color);color:#000;}
-.status-box.buildid .status-value{background:#888;color:#fff;}
-.status-box.system .status-value.active{background:var(--primary-color);color:#000;}
-.status-box.system .status-value.inactive{background:#555;color:#fff;}
-.status-box.message .status-value{background:#222;color:#fff;white-space:pre-wrap;}
 </style>
 </head>
 <body>
@@ -113,25 +105,25 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
   <!-- STATUS TAB -->
   <div id="statusTab">
     <h2>Global Status</h2>
-    <div class="status-box global" onclick="toggleStatus('global')">
+    <div class="status-box status-global" onclick="toggleStatus('global')">
       <span>Global Status</span>
-      <div class="status-value">Putih</div>
+      <div class="status-box-value">Putih</div>
     </div>
-    <div class="status-box maintenance" onclick="toggleStatus('maintenance')">
+    <div class="status-box status-maintenance" onclick="toggleStatus('maintenance')">
       <span>Maintenance Configuration</span>
-      <div class="status-value">Neon</div>
+      <div class="status-box-value">Neon</div>
     </div>
-    <div class="status-box buildid">
+    <div class="status-box status-buildid">
       <span>Maintenance Build ID</span>
-      <div class="status-value">[MAINTENANCE]</div>
+      <div class="status-box-value">[MAINTENANCE]</div>
     </div>
-    <div class="status-box system" onclick="toggleSystem()">
+    <div class="status-box status-system" onclick="toggleSystem()">
       <span>System is Active</span>
-      <div class="status-value inactive">OFF</div>
+      <div class="status-box-value inactive">OFF</div>
     </div>
-    <div class="status-box message">
+    <div class="status-box status-message">
       <span>Maintenance Message</span>
-      <div class="status-value">[e.g., The server is currently undergoing scheduled maintenance.]</div>
+      <div class="status-box-value">[e.g., The server is currently undergoing scheduled maintenance.]</div>
     </div>
     <button class="btn-save" style="margin-top:10px;" onclick="saveStatus()">Save Status</button>
   </div>
@@ -147,7 +139,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 <!-- MODAL -->
 <div id="userModal" class="modal">
   <div class="modal-content">
-    <h2>Add/Edit ID</h2>
+    <h2>Add New ID</h2>
     <input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
     <p style="color:#b3b3b3;">Build/Device ID</p>
     <input type="text" id="usernameInput" placeholder="username">
@@ -193,14 +185,7 @@ function render(){
     if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;
     const i=document.createElement('div');
     i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
-    i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div>
-    <div class="action-buttons">
-      <div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div>
-      <button class="dp-btn edit" onclick="editID('${id}')">
-        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L18 9l-3.75-3.75L3 17.25zM21.41 6.34l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-      </button>
-      <button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button>
-    </div>`;
+    i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><i class="fa-solid fa-pencil"></i></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;
     userList.appendChild(i);
   });
   updateCounts();
@@ -225,24 +210,17 @@ load();
 
 /* STATUS INTERACTIONS */
 function toggleSystem(){
-  const el = document.querySelector('.status-box.system .status-value');
+  const el = document.querySelector('.status-box.status-system .status-box-value');
   el.classList.toggle('active');
   el.classList.toggle('inactive');
   el.textContent = el.classList.contains('active')?'ON':'OFF';
 }
 function toggleStatus(key){
-  const el = document.querySelector(`.status-box.${key} .status-value`);
-  if(key==="maintenance"){
-    el.textContent = (el.textContent==="Neon")?"Putih":"Neon";
-  } else if(key==="global"){
-    el.textContent = (el.textContent==="Putih")?"Neon":"Putih";
-  }
-  alert(`Status toggle untuk: ${key} (buat versi simpan, bisa PATCH ke Firebase)`);
+  alert("Status toggle untuk: "+key+" (Implement PATCH ke Firebase jika perlu)");
 }
 function saveStatus(){
-  alert("Save status berhasil! (Implement PATCH ke Firebase sesuai kebutuhan)");
+  alert("Save status berhasil! (Implement PATCH ke Firebase jika perlu)");
 }
 </script>
-
 </body>
 </html>
