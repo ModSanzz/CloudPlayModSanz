@@ -16,6 +16,7 @@
   --text-secondary:#b3b3b3;
   --danger-color:#ff4d4d;
   --valid-color:#00ff94;
+  --limit-color:#ffd700;
   --soft-glow:0 0 10px rgba(169,127,255,.8),0 0 20px rgba(169,127,255,.4);
 }
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
@@ -31,11 +32,11 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;border-left:6px solid var(--primary-color);gap:10px;}
 .user-item.valid{border-left-color:var(--valid-color);}
 .user-item.expired{border-left-color:var(--danger-color);}
-.user-item.limit{border-left-color:var(--primary-color);}
+.user-item.limit{border-left-color:var(--limit-color);}
 .user-status-tag{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:700;}
 .user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
-.user-item.limit .user-status-tag{background:#fff;color:#000;}
+.user-item.limit .user-status-tag{background:var(--limit-color);color:#000;}
 .action-buttons{display:flex;align-items:center;gap:6px;}
 .dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
 .dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);}
@@ -180,7 +181,8 @@ function render(){
   Object.keys(data).sort().forEach(id=>{
     if(id==="MAINTENANCE") return;
     const d=data[id];
-    const ex=isExpired(id);
+    let ex = isExpired(id);
+    if(d.limit) ex = false; // LIMIT tidak pernah expired
     a++;
     if(d.limit) l++;
     else if(ex) e++;
