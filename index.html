@@ -139,7 +139,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 </div>
 
 <script>
-/* ===== FIXED LOGIC ONLY ===== */
+/* ===== SCRIPT ASLI KAMU (UTUH) ===== */
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL=FIREBASE_ROOT+"/keys.json";
 let data={};
@@ -226,18 +226,12 @@ function render(){
 }
 
 function switchTab(t){
-  const ids=document.getElementById('tab-ids');
-  const st=document.getElementById('tab-status');
   if(t==='users'){
     usersTab.style.display='block';
     statusTab.style.display='none';
-    ids.classList.add('active');
-    st.classList.remove('active');
   }else{
     usersTab.style.display='none';
     statusTab.style.display='flex';
-    ids.classList.remove('active');
-    st.classList.add('active');
   }
 }
 
