@@ -8,18 +8,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{
-  --primary-color:#C77DFF; /* DPMods Neon Purple */
-  --secondary-color:#1E1E1E;
-  --background-color:#121212;
-  --text-color:#FFFFFF;
-  --text-secondary:#B3B3B3;
-  --danger-color:#FF4D4D;
-  --valid-color:#00FF94;
-  --soft-glow:0 0 10px rgba(199,125,255,.8),0 0 20px rgba(199,125,255,.4);
-  --status-bg:#1E1E1E;
+--primary-color:#C77DFF; /* Neon DPMods */
+--secondary-color:#1E1E1E;
+--background-color:#121212;
+--text-color:#FFFFFF;
+--text-secondary:#B3B3B3;
+--danger-color:#FF4D4D;
+--valid-color:#00FF94;
+--soft-glow:0 0 10px rgba(199,125,255,0.7),0 0 20px rgba(199,125,255,0.3);
+--status-bg:#1E1E1E;
+--status-active:#C77DFF;
+--status-inactive:#555;
 }
 
-/* GLOBAL */
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
 header{background-color:var(--secondary-color);padding:15px 20px;text-align:center;}
 header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
@@ -35,22 +36,30 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 /* USER ITEMS */
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;border-left:6px solid var(--primary-color);gap:10px;}
-.user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
-.user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
-.user-item.limit .user-status-tag{background:#fff;color:#000;}
+.user-item.valid:hover{box-shadow:0 0 10px var(--valid-color);}
+.user-item.expired{background-color:#331f1f;}
+.user-item.limit{border-left:6px solid gold;}
 .user-item-text{flex-grow:1;line-height:1.3;}
 .user-item-text strong{display:block;font-size:1.1rem;}
 .user-item-text span{color:var(--text-secondary);font-size:.95rem;}
+.user-status-tag{display:inline-block;padding:4px 10px;font-size:.8rem;font-weight:700;border-radius:6px;}
+.user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
+.user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
+.user-item.limit .user-status-tag{background:#fff;color:#000;}
 
-/* ACTION BUTTONS DPMods */
+/* ACTION BUTTONS */
 .action-buttons{display:flex;align-items:center;gap:6px;}
-.dp-btn{display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;}
-.dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;transition:.2s;}
-.dp-btn.edit i{font-size:18px;color:#b3b3b3;}
-.dp-btn.edit:hover i{color:var(--primary-color);}
-.dp-btn.edit:hover{background:rgba(199,125,255,0.15);transform:scale(1.08);}
-.dp-btn.delete{width:40px;height:40px;border-radius:14px;background:rgba(255,0,0,0.05);display:flex;align-items:center;justify-content:center;color:var(--danger-color);}
-.dp-btn.delete:hover{background:rgba(255,77,77,.15);transform:scale(1.08);}
+.dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
+.dp-btn.edit{
+  width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;
+  transition:.2s;
+}
+.dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;}
+.dp-btn.edit:hover svg{fill:var(--primary-color);}
+.dp-btn.edit:hover{background:rgba(199,125,255,.15);transform:scale(1.08);}
+.dp-btn.delete{color:var(--danger-color);}
+.dp-btn.delete:hover{background:rgba(255,77,77,.15);}
+.dp-btn:hover{transform:scale(1.1);}
 
 /* NAVIGATION */
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
@@ -67,102 +76,114 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 .btn-save,.btn-cancel{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 
-/* STATUS TAB DPMods */
+/* STATUS TAB */
 #statusTab{display:none;flex-direction:column;gap:15px;}
-.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:12px;background:var(--status-bg);cursor:pointer;transition:.2s;}
+.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:10px;background:var(--status-bg);cursor:pointer;transition:.2s;}
 .status-box span{font-weight:700;}
-.status-box-value{padding:6px 12px;border-radius:14px;min-width:80px;text-align:center;}
-.status-global .status-box-value{background:#fff;color:#000;}
-.status-maintenance .status-box-value{background:var(--primary-color);color:#000;}
-.status-buildid .status-box-value{background:#555;color:#fff;}
-.status-system .status-box-value.active{background:var(--primary-color);color:#000;}
-.status-system .status-box-value.inactive{background:#555;color:#fff;}
-.status-message .status-box-value{background:#222;color:#fff;white-space:pre-wrap;flex:1;margin-left:10px;}
+.status-value{padding:4px 10px;border-radius:6px;}
 .status-box:hover{opacity:.9;}
+.status-box.global .status-value{background:#fff;color:#000;}
+.status-box.maintenance .status-value{background:var(--primary-color);color:#000;}
+.status-box.buildid .status-value{background:#888;color:#fff;}
+.status-box.system .status-value.active{background:var(--primary-color);color:#000;}
+.status-box.system .status-value.inactive{background:#555;color:#fff;}
+.status-box.message .status-value{background:#222;color:#fff;white-space:pre-wrap;}
+
+/* TOGGLE DPMods */
+.toggle-switch{position:relative;display:inline-block;width:50px;height:28px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#555;transition:.4s;border-radius:28px;box-shadow:0 0 5px rgba(199,125,255,0.5);}
+.toggle-switch input:checked + .slider{background:#C77DFF;}
 </style>
 </head>
 <body>
 
 <header><h1>CloudPlay Admin Panel</h1></header>
-
 <div class="container">
-  <!-- USERS TAB -->
-  <div id="usersTab">
-    <h2>Build/Device IDs</h2>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
-      <button onclick="render()"><i class="fas fa-search"></i></button>
-    </div>
-    <div class="filter-bar">
-      <button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
-      <button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
-      <button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
-      <button data-filter="limit" onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
-    </div>
-    <div id="userList"></div>
-  </div>
 
-  <!-- STATUS TAB -->
-  <div id="statusTab">
-    <h2>Global Status</h2>
-    <div class="status-box status-global" onclick="toggleStatus('global')">
-      <span>Global Status</span>
-      <div class="status-box-value">Putih</div>
-    </div>
-    <div class="status-box status-maintenance" onclick="toggleStatus('maintenance')">
-      <span>Maintenance Configuration</span>
-      <div class="status-box-value">Neon</div>
-    </div>
-    <div class="status-box status-buildid">
-      <span>Maintenance Build ID</span>
-      <div class="status-box-value">[MAINTENANCE]</div>
-    </div>
-    <div class="status-box status-system" onclick="toggleSystem()">
-      <span>System is Active</span>
-      <div class="status-box-value inactive">OFF</div>
-    </div>
-    <div class="status-box status-message">
-      <span>Maintenance Message</span>
-      <div class="status-box-value">[e.g., The server is currently undergoing scheduled maintenance.]</div>
-    </div>
-    <button class="btn-save" style="margin-top:10px;" onclick="saveStatus()">Save Status</button>
-  </div>
+<!-- USERS TAB -->
+<div id="usersTab">
+<h2>Build/Device IDs</h2>
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+<button onclick="render()"><i class="fas fa-search"></i></button>
+</div>
+<div class="filter-bar">
+<button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
+<button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
+<button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
+<button data-filter="limit" onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
+</div>
+<div id="userList"></div>
+</div>
+
+<!-- STATUS TAB -->
+<div id="statusTab">
+<h2>Global Status</h2>
+
+<div class="section-group" style="background-color: var(--secondary-color); padding: 20px; border-radius: 12px; box-shadow:0 0 10px rgba(199,125,255,0.3);">
+<h3 style="margin-top:0;color:var(--primary-color);">Maintenance Configuration</h3>
+
+<div class="form-group" style="margin-bottom:15px;">
+<label for="maintenanceID" style="display:block;margin-bottom:5px;">Maintenance Build ID</label>
+<input type="text" id="maintenanceID" value="MAINTENANCE" readonly style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#222;color:#fff;">
+</div>
+
+<div class="toggle-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;">
+<label for="maintenanceEnabled" id="maintenanceStatusLabel">System is Inactive :(</label>
+<label class="toggle-switch">
+<input type="checkbox" id="maintenanceEnabled" onchange="updateToggleLabel()">
+<span class="slider"></span>
+</label>
+</div>
+
+<div class="form-group" style="margin-bottom:10px;">
+<label for="maintenanceMessage" style="display:block;margin-bottom:5px;">Maintenance Message</label>
+<textarea id="maintenanceMessage" rows="2" placeholder="e.g., The server is currently undergoing scheduled maintenance." style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#222;color:#fff;resize:none;"></textarea>
+</div>
+</div>
+
+<div style="display:flex;justify-content:flex-end;margin-top:20px;">
+<button class="btn-primary" id="saveStatusBtn" style="background:var(--primary-color);color:#000;padding:10px 20px;border:none;border-radius:10px;font-weight:700;box-shadow:0 0 10px rgba(199,125,255,0.6);cursor:pointer;">Save Status</button>
+</div>
+</div>
+
 </div>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-item active" id="tab-ids" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
-  <div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
-  <div class="nav-item" id="tab-status" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
+<div class="nav-item active" id="tab-ids" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
+<div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
+<div class="nav-item" id="tab-status" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
 </nav>
 
 <!-- MODAL -->
 <div id="userModal" class="modal">
-  <div class="modal-content">
-    <h2>Add New ID</h2>
-    <input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
-    <p style="color:#b3b3b3;">Build/Device ID</p>
-    <input type="text" id="usernameInput" placeholder="username">
-    <p style="color:#b3b3b3;">Username</p>
-    <p style="color:var(--primary-color);">Fitur Khusus Admin</p>
-    <div class="admin-buttons">
-      <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-      <button class="admin-btn" onclick="setLimit()">LIMIT</button>
-    </div>
-    <p style="color:#b3b3b3;">Expiry Date (UTC)</p>
-    <div class="date-shortcuts">
-      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
-      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
-      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
-      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-    </div>
-    <input type="date" id="expiryDateInput">
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
-      <button class="btn-cancel" onclick="closeModal()">BATAL</button>
-      <button class="btn-save" onclick="saveID()">SIMPAN</button>
-    </div>
-  </div>
+<div class="modal-content">
+<h2>Add New ID</h2>
+<input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
+<p style="color:#b3b3b3;">Build/Device ID</p>
+<input type="text" id="usernameInput" placeholder="username">
+<p style="color:#b3b3b3;">Username</p>
+<p style="color:var(--primary-color);">Fitur Khusus Admin</p>
+<div class="admin-buttons">
+<button class="admin-btn" onclick="setExpired()">EXPIRED</button>
+<button class="admin-btn" onclick="setLimit()">LIMIT</button>
+</div>
+<p style="color:#b3b3b3;">Expiry Date (UTC)</p>
+<div class="date-shortcuts">
+<button onclick="setExpiryShortcut(1)">+1 Hari</button>
+<button onclick="setExpiryShortcut(7)">+7 Hari</button>
+<button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+</div>
+<input type="date" id="expiryDateInput">
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+<button class="btn-cancel" onclick="closeModal()">BATAL</button>
+<button class="btn-save" onclick="saveID()">SIMPAN</button>
+</div>
+</div>
 </div>
 
 <script>
@@ -175,27 +196,28 @@ async function load(){const r=await fetch(KEYS_URL);data=await r.json()||{};rend
 function isExpired(id){if(data[id]&&data[id].limit)return false;const d=data[id]?.date;if(!d)return true;return new Date(d)<new Date();}
 function updateCounts(){let t=0,v=0,e=0,l=0;Object.keys(data).forEach(id=>{if(id==="MAINTENANCE")return;t++;if(data[id]?.limit)l++;else if(isExpired(id))e++;else v++;});countAll.textContent=`(${t})`;countValid.textContent=`(${v})`;countExpired.textContent=`(${e})`;countLimit.textContent=`(${l})`;}
 function render(){
-  userList.innerHTML='';
-  const q=searchInput.value.toLowerCase();
-  const f=document.querySelector('.filter-bar button.active').dataset.filter;
-  Object.keys(data).sort().forEach(id=>{
-    if(id==="MAINTENANCE")return;
-    const d=data[id];
-    const ex=isExpired(id);
-    if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;
-    const i=document.createElement('div');
-    i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
-    i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><i class="fa-solid fa-pencil"></i></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;
-    userList.appendChild(i);
-  });
-  updateCounts();
+userList.innerHTML='';
+const q=searchInput.value.toLowerCase();
+const f=document.querySelector('.filter-bar button.active').dataset.filter;
+Object.keys(data).sort().forEach(id=>{
+if(id==="MAINTENANCE")return;
+const d=data[id];
+const ex=isExpired(id);
+if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;
+const i=document.createElement('div');
+i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
+i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><svg viewBox="0 0 24 24"><path d="M2 17.25V21h3.75L17.81 8.94l-3.75-3.75L2 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;
+userList.appendChild(i);
+});
+updateCounts();
 }
+
 function setFilter(f,b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();}
 function switchTab(t){
-  document.getElementById('tab-ids').classList.remove('active');
-  document.getElementById('tab-status').classList.remove('active');
-  if(t==='users'){document.getElementById('tab-ids').classList.add('active');usersTab.style.display='block';statusTab.style.display='none';}
-  if(t==='status'){document.getElementById('tab-status').classList.add('active');usersTab.style.display='none';statusTab.style.display='flex';}
+document.getElementById('tab-ids').classList.remove('active');
+document.getElementById('tab-status').classList.remove('active');
+if(t==='users'){document.getElementById('tab-ids').classList.add('active');usersTab.style.display='block';statusTab.style.display='flex';}
+if(t==='status'){document.getElementById('tab-status').classList.add('active');usersTab.style.display='none';statusTab.style.display='flex';}
 }
 function openModal(){buildIdInput.value='';usernameInput.value='';expiryDateInput.value=new Date().toISOString().split('T')[0];userModal.style.display='flex';}
 function closeModal(){userModal.style.display='none';}
@@ -209,18 +231,11 @@ addUserBtn.onclick=openModal;
 load();
 
 /* STATUS INTERACTIONS */
-function toggleSystem(){
-  const el = document.querySelector('.status-box.status-system .status-box-value');
-  el.classList.toggle('active');
-  el.classList.toggle('inactive');
-  el.textContent = el.classList.contains('active')?'ON':'OFF';
-}
-function toggleStatus(key){
-  alert("Status toggle untuk: "+key+" (Implement PATCH ke Firebase jika perlu)");
-}
-function saveStatus(){
-  alert("Save status berhasil! (Implement PATCH ke Firebase jika perlu)");
-}
-</script>
-</body>
-</html>
+const maintenanceEnabled = document.getElementById('maintenanceEnabled');
+const maintenanceStatusLabel = document.getElementById('maintenanceStatusLabel');
+
+function updateToggleLabel(){
+  const slider = document.querySelector('.toggle-switch .slider');
+  if(maintenanceEnabled.checked){
+    maintenanceStatusLabel.textContent = "System is Active :)";
+    maintenanceStatusLabel.style.color = "#00
