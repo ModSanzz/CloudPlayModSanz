@@ -19,20 +19,20 @@
 }
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
 header{background-color:var(--secondary-color);padding:15px 20px;text-align:center;}
-header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
+header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;text-shadow:0 0 8px #a97fff;}
 .container{padding:20px;max-width:800px;margin:0 auto;}
 .search-bar{display:flex;gap:10px;margin-bottom:10px;}
-.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:var(--text-color);}
+.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;}
 .search-bar button{background-color:var(--primary-color);color:#000;border:none;border-radius:6px;padding:10px 15px;cursor:pointer;}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
-.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
+.filter-bar button{background:#333;color:#b3b3b3;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active{background-color:var(--primary-color);color:#000;box-shadow:var(--soft-glow);}
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden;}
-.user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--primary-color);box-shadow:0 0 10px rgba(169,127,255,.6);}
+.user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:#a97fff;box-shadow:0 0 10px rgba(169,127,255,.6);}
 .user-item.expired::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--danger-color);}
 .user-item.limit::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:yellow;}
 .user-status-tag{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:700;position:relative;z-index:1;}
-.user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
+.user-item.valid .user-status-tag{background:#00ff94;color:#000;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
 .action-buttons{display:flex;align-items:center;gap:6px;position:relative;z-index:1;}
@@ -54,6 +54,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 .admin-buttons button{padding:8px 15px;border-radius:8px;font-weight:700;color:#000;background:#a97fff;cursor:pointer;}
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 .form-group{margin-bottom:15px;display:flex;flex-direction:column;gap:5px;}
+input[type="text"], input[type="date"]{background:#333;color:#fff;border:1px solid #555;padding:8px 10px;border-radius:5px;}
 .btn-save,.btn-cancel,.btn-primary,.btn-secondary{padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 .btn-primary{background:var(--primary-color);color:#000;border:none;box-shadow:0 0 10px rgba(169,127,255,.6);}
 .btn-secondary{background:#555;color:#fff;border:none;}
@@ -118,45 +119,45 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 </nav>
 
 <div id="userModal" class="modal">
-    <div class="modal-content">
-        <h2 id="userModalTitle">Add New ID</h2>
+  <div class="modal-content">
+    <h2 id="userModalTitle" style="color:#a97fff;text-shadow:0 0 8px #a97fff;">Add New ID</h2>
 
-        <div class="form-group">
-            <label for="buildIdInput">Build/Device ID</label>
-            <input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007" required>
-        </div>
-
-        <div class="form-group">
-            <label for="usernameInput">Username</label>
-            <input type="text" id="usernameInput" placeholder="Username" required>
-        </div>
-
-        <div class="form-group">
-            <label>Fitur Khusus Admin</label>
-            <div class="admin-buttons">
-                <button onclick="setExpired()">EXPIRED</button>
-                <button onclick="setLimit()">LIMIT</button>
-            </div>
-        </div>
-
-        <label>Expiry Date (UTC)</label>
-        <div class="date-shortcuts">
-            <button onclick="setExpiryShortcut(1)">+1 Hari</button>
-            <button onclick="setExpiryShortcut(7)">+7 Hari</button>
-            <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
-            <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-            <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-        </div>
-
-        <div class="form-group">
-            <input type="date" id="expiryDateInput" required>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 20px; gap:10px;">
-            <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn-primary" id="saveUserBtn">Save ID</button>
-        </div>
+    <div class="form-group">
+      <label for="buildIdInput">Build/Device ID</label>
+      <input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007" required>
     </div>
+
+    <div class="form-group">
+      <label for="usernameInput">Username</label>
+      <input type="text" id="usernameInput" placeholder="Username" required>
+    </div>
+
+    <div class="form-group">
+      <label>Fitur Khusus Admin</label>
+      <div class="admin-buttons">
+        <button onclick="setExpired()">EXPIRED</button>
+        <button onclick="setLimit()">LIMIT</button>
+      </div>
+    </div>
+
+    <label>Expiry Date (UTC)</label>
+    <div class="date-shortcuts">
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+    </div>
+
+    <div class="form-group">
+      <input type="date" id="expiryDateInput" required>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px; gap:10px;">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="saveUserBtn" onclick="saveID()">Save ID</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -216,7 +217,7 @@ function render(){
       </div>`;
     userList.appendChild(div);
   });
-  countAll.textContent=`(${a})`;
+  countAll.textContent=`(${Object.keys(data).length-1})`;
   countValid.textContent=`(${v})`;
   countExpired.textContent=`(${e})`;
   countLimit.textContent=`(${l})`;
@@ -270,4 +271,4 @@ async function deleteID(id){
 load();
 </script>
 </body>
-</html
+</html>
