@@ -88,17 +88,40 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .dp-btn.delete{
   color:var(--danger-color);
-  border-color:var(--glow-red);
+  border-color:var(--danger-color);
   box-shadow:var(--glow-red);
 }
 
 .dp-btn:hover{transform:scale(1.15);}
 
-nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
+nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:60px;
+  background-color:var(--secondary-color);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+}
 
-.nav-item{text-decoration:none;color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:0.9rem;padding:5px 10px;}
-.nav-item i{font-size:1.5rem;}
-.nav-item.active{color:var(--primary-color);text-shadow:var(--soft-glow);}
+.nav-item{
+  text-decoration:none;
+  color:var(--text-secondary);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-size:0.9rem;
+  padding:5px 10px;
+  transition: all 0.2s;
+}
+.nav-item.active{
+  color:var(--primary-color);
+  text-shadow:var(--soft-glow);
+  transform:scale(1.05);
+}
 
 .add-user-btn{
   background-color:var(--primary-color);
@@ -147,15 +170,20 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 </div>
 
 <nav>
-<div class="nav-item active"><i class="fas fa-key"></i><span>IDs</span></div>
+<div class="nav-item active" id="navIDs" onclick="showTab('users')">
+  <i class="fas fa-key" style="font-size:1.3rem;"></i>
+  <span style="font-weight:700;font-size:0.85rem;">IDs</span>
+</div>
 <div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
-<div class="nav-item"><i class="fas fa-bell"></i><span>Status</span></div>
+<div class="nav-item" id="navStatus" onclick="showTab('settings')">
+  <i class="fas fa-bell" style="font-size:1.3rem;"></i>
+  <span style="font-weight:700;font-size:0.85rem;">Status</span>
+</div>
 </nav>
 
 <div id="userModal" class="modal">
 <div class="modal-content">
 <h2>Add New ID</h2>
-
 <input type="text" id="buildIdInput" placeholder="UP1A.231005.007" style="background:#2a2a2a;color:white;border:1px solid #444;">
 <p style="color:#b3b3b3;">Build/Device ID</p>
 
@@ -239,7 +267,6 @@ function render(){
 
     const item=document.createElement('div');
     item.className='user-item '+(d.limit?'limit':(expired?'expired':'valid'));
-
     item.innerHTML=`
     <div class="user-item-text">
       <strong>${id}</strong>
@@ -248,8 +275,8 @@ function render(){
     </div>
     <div class="action-buttons">
       <div class="user-status-tag">${d.limit?'LIMIT':(expired?'EXPIRED':'VALID')}</div>
-      <button class="dp-btn edit" onclick="editID('${id}')"><i class="fas fa-pen"></i></button>
-      <button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fas fa-trash"></i></button>
+      <button class="dp-btn edit" onclick="editID('${id}')"><i class="fa-solid fa-pen-to-square"></i></button>
+      <button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash-can"></i></button>
     </div>
     `;
     list.appendChild(item);
@@ -265,6 +292,9 @@ function setFilter(f,btn){
 
 function showTab(tab){
   $('usersTab').style.display=tab==='users'?'block':'none';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(tab==='users') $('navIDs').classList.add('active');
+  else if(tab==='settings') $('navStatus').classList.add('active');
 }
 
 function openModal(){
