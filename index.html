@@ -5,21 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CloudPlay Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 <style>
-:root {
-  --primary-color: #C77DFF;
-  --secondary-color: #282828;
-  --background-color: #121212;
-  --text-color: #FFFFFF;
-  --text-secondary: #B3B3B3;
-  --danger-color: #FF4D4D;
-  --valid-color: #4CAF50;
-  --soft-glow: 0 0 8px rgba(199,125,255,.7),0 0 15px rgba(199,125,255,.3);
+:root{
+  --primary-color:#C77DFF;
+  --secondary-color:#282828;
+  --background-color:#121212;
+  --text-color:#FFFFFF;
+  --text-secondary:#B3B3B3;
+  --danger-color:#FF4D4D;
+  --valid-color:#4CAF50;
+  --soft-glow:0 0 8px rgba(199,125,255,.7),0 0 15px rgba(199,125,255,.3);
 }
 
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
-
 header{background-color:var(--secondary-color);padding:15px 20px;text-align:center;}
 header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
@@ -64,8 +64,17 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.limit .user-status-tag{background-color:white;color:black;}
 
 .action-buttons{display:flex;align-items:center;gap:6px;}
-.action-buttons button{padding:6px 10px;border-radius:6px;border:none;cursor:pointer;font-size:0.85rem;}
-.action-buttons .edit-btn{background:#999;color:#fff;}
+.action-buttons button{
+  width:36px;height:36px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1rem;
+}
+.action-buttons .edit-btn{background:#3a3a3a;color:#fff;}
 .action-buttons .delete-btn{background:#FF4D4D;color:#fff;}
 
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
@@ -91,7 +100,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 
-.btn-save, .btn-cancel{background:#C77DFF;color:black;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
+.btn-save,.btn-cancel{background:#C77DFF;color:black;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -184,9 +193,9 @@ function updateCounts(){
   Object.keys(data).forEach(id=>{
     if(id==="MAINTENANCE") return;
     total++;
-    if(data[id]?.limit){ limit++; }
-    else if(isExpired(id)){ expired++; }
-    else { valid++; }
+    if(data[id]?.limit) limit++;
+    else if(isExpired(id)) expired++;
+    else valid++;
   });
   $('countAll').textContent=`(${total})`;
   $('countValid').textContent=`(${valid})`;
@@ -220,8 +229,12 @@ function render(){
     </div>
     <div class="action-buttons">
       <div class="user-status-tag">${d.limit?'LIMIT':(expired?'EXPIRED':'VALID')}</div>
-      <button class="edit-btn" onclick="editID('${id}')"><i class="fas fa-pencil-alt"></i></button>
-      <button class="delete-btn" onclick="deleteID('${id}')"><i class="fas fa-trash"></i></button>
+      <button class="edit-btn" onclick="editID('${id}')">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </button>
+      <button class="delete-btn" onclick="deleteID('${id}')">
+        <i class="fa-solid fa-trash-can"></i>
+      </button>
     </div>
     `;
     list.appendChild(item);
@@ -269,7 +282,7 @@ async function saveID(){
   const username=$('usernameInput').value.trim();
   const date=$('expiryDateInput').value;
   if(!id||!username||!date){ alert("Isi semua!"); return; }
-  const limit = (date==="9999-01-12");
+  const limit=(date==="9999-01-12");
   await fetch(KEYS_URL,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
