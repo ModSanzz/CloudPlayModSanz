@@ -8,28 +8,34 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root{
---primary-color:#C77DFF;
---secondary-color:#282828;
---background-color:#121212;
---text-color:#FFFFFF;
---text-secondary:#B3B3B3;
---danger-color:#FF4D4D;
---valid-color:#4CAF50;
---soft-glow:0 0 8px rgba(199,125,255,.7),0 0 15px rgba(199,125,255,.3);
---status-bg:#fff;
---status-active:#C77DFF;
---status-inactive:#aaa;
+  --primary-color:#4CFFB5; /* Neon DPMods */
+  --secondary-color:#1E1E1E;
+  --background-color:#121212;
+  --text-color:#FFFFFF;
+  --text-secondary:#B3B3B3;
+  --danger-color:#FF4D4D;
+  --valid-color:#00FF94;
+  --soft-glow:0 0 10px rgba(76,255,181,.8),0 0 20px rgba(76,255,181,.4);
+  --status-bg:#1E1E1E;
+  --status-active:#4CFFB5;
+  --status-inactive:#555;
 }
+
+/* GLOBAL */
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
 header{background-color:var(--secondary-color);padding:15px 20px;text-align:center;}
 header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .container{padding:20px;max-width:800px;margin:0 auto;}
+
+/* SEARCH & FILTER */
 .search-bar{display:flex;gap:10px;margin-bottom:10px;}
-.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#2a2a2a;color:var(--text-color);}
+.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:var(--text-color);}
 .search-bar button{background-color:var(--primary-color);color:#000;border:none;border-radius:6px;padding:10px 15px;cursor:pointer;}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
 .filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;}
 .filter-bar button.active{background-color:var(--primary-color);color:#000;box-shadow:var(--soft-glow);}
+
+/* USER ITEMS */
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;border-left:6px solid var(--primary-color);gap:10px;}
 .user-item.valid:hover{box-shadow:0 0 10px var(--valid-color);}
 .user-item.expired{background-color:#331f1f;}
@@ -41,50 +47,48 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
+
+/* ACTION BUTTONS */
 .action-buttons{display:flex;align-items:center;gap:6px;}
 .dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
 .dp-btn.edit{
-  width:40px;
-  height:40px;
-  border-radius:20px;
-  background:rgba(255,255,255,0.05);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+  width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;
   transition:.2s;
-}
-.dp-btn.edit:hover{
-  background:rgba(199,125,255,.25);
-  transform:scale(1.08);
 }
 .dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;}
 .dp-btn.edit:hover svg{fill:var(--primary-color);}
+.dp-btn.edit:hover{background:rgba(76,255,181,.15);transform:scale(1.08);}
 .dp-btn.delete{color:var(--danger-color);}
 .dp-btn.delete:hover{background:rgba(255,77,77,.15);}
 .dp-btn:hover{transform:scale(1.1);}
+
+/* NAVIGATION */
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
 .nav-item{color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:.8rem;gap:3px;cursor:pointer;}
 .nav-item i{font-size:1.3rem;}
 .nav-item.active{color:var(--primary-color);text-shadow:var(--soft-glow);}
 .add-user-btn{background:var(--primary-color);color:#000;width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;box-shadow:0 4px 6px rgba(0,0,0,.3),var(--soft-glow);cursor:pointer;transform:translateY(-15px);}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;justify-content:center;align-items:center;z-index:2000;}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000;}
 .modal-content{background:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;}
 .admin-buttons{display:flex;gap:10px;margin:10px 0;}
-.admin-btn{background:#000;color:#C77DFF;border:1px solid #C77DFF;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;}
+.admin-btn{background:#000;color:var(--primary-color);border:1px solid var(--primary-color);padding:10px;border-radius:8px;font-weight:700;cursor:pointer;}
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
-.btn-save,.btn-cancel{background:#C77DFF;color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
+.btn-save,.btn-cancel{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 
 /* STATUS TAB */
 #statusTab{display:none;flex-direction:column;gap:15px;}
-.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:10px;background:#222;}
+.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:10px;background:var(--status-bg);cursor:pointer;transition:.2s;}
 .status-box span{font-weight:700;}
-.status-box .status-value{padding:4px 10px;border-radius:6px;}
-.status-box.global{background:#fff;color:#000;}
-.status-box.maintenance{background:#C77DFF;color:#000;}
-.status-box.buildid{background:#888;color:#fff;}
-.status-box.system{background:#C77DFF;color:#000;}
-.status-box.message{background:#2a2a2a;color:#fff;white-space:pre-wrap;}
+.status-value{padding:4px 10px;border-radius:6px;}
+.status-box:hover{opacity:.9;}
+.status-box.global .status-value{background:#fff;color:#000;}
+.status-box.maintenance .status-value{background:var(--primary-color);color:#000;}
+.status-box.buildid .status-value{background:#888;color:#fff;}
+.status-box.system .status-value.active{background:var(--primary-color);color:#000;}
+.status-box.system .status-value.inactive{background:#555;color:#fff;}
+.status-box.message .status-value{background:#222;color:#fff;white-space:pre-wrap;}
 </style>
 </head>
 <body>
@@ -92,64 +96,83 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 <header><h1>CloudPlay Admin Panel</h1></header>
 
 <div class="container">
-<div id="usersTab">
-<h2>Build/Device IDs</h2>
-<div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
-<button onclick="render()"><i class="fas fa-search"></i></button>
-</div>
-<div class="filter-bar">
-<button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
-<button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
-<button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
-<button data-filter="limit" onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
-</div>
-<div id="userList"></div>
+  <!-- USERS TAB -->
+  <div id="usersTab">
+    <h2>Build/Device IDs</h2>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+      <button onclick="render()"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="filter-bar">
+      <button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
+      <button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
+      <button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
+      <button data-filter="limit" onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
+    </div>
+    <div id="userList"></div>
+  </div>
+
+  <!-- STATUS TAB -->
+  <div id="statusTab">
+    <h2>Global Status</h2>
+    <div class="status-box global" onclick="toggleStatus('global')">
+      <span>Global Status</span>
+      <div class="status-value">Putih</div>
+    </div>
+    <div class="status-box maintenance" onclick="toggleStatus('maintenance')">
+      <span>Maintenance Configuration</span>
+      <div class="status-value">Neon</div>
+    </div>
+    <div class="status-box buildid">
+      <span>Maintenance Build ID</span>
+      <div class="status-value">[MAINTENANCE]</div>
+    </div>
+    <div class="status-box system" onclick="toggleSystem()">
+      <span>System is Active</span>
+      <div class="status-value inactive">OFF</div>
+    </div>
+    <div class="status-box message">
+      <span>Maintenance Message</span>
+      <div class="status-value">[e.g., The server is currently undergoing scheduled maintenance.]</div>
+    </div>
+    <button class="btn-save" style="margin-top:10px;" onclick="saveStatus()">Save Status</button>
+  </div>
 </div>
 
-<div id="statusTab">
-<h2>Global Status</h2>
-<div class="status-box global"><span>Global Status</span><div class="status-value">Putih</div></div>
-<div class="status-box maintenance"><span>Maintenance Configuration</span><div class="status-value">Ungu Neon</div></div>
-<div class="status-box buildid"><span>Maintenance Build ID</span><div class="status-value">[MAINTENANCE]</div></div>
-<div class="status-box system"><span>System is Active</span><div class="status-value">O</div></div>
-<div class="status-box message"><span>Maintenance Message</span><div class="status-value">[e.g., The server is currently undergoing scheduled maintenance.]</div></div>
-</div>
-
-</div>
-
+<!-- NAV -->
 <nav>
-<div class="nav-item active" id="tab-ids" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
-<div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
-<div class="nav-item" id="tab-status" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
+  <div class="nav-item active" id="tab-ids" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
+  <div class="add-user-btn" id="addUserBtn"><i class="fas fa-plus"></i></div>
+  <div class="nav-item" id="tab-status" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
 </nav>
 
+<!-- MODAL -->
 <div id="userModal" class="modal">
-<div class="modal-content">
-<h2>Add New ID</h2>
-<input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
-<p style="color:#b3b3b3;">Build/Device ID</p>
-<input type="text" id="usernameInput" placeholder="username">
-<p style="color:#b3b3b3;">Username</p>
-<p style="color:#C77DFF;">Fitur Khusus Admin</p>
-<div class="admin-buttons">
-<button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-<button class="admin-btn" onclick="setLimit()">LIMIT</button>
-</div>
-<p style="color:#b3b3b3;">Expiry Date (UTC)</p>
-<div class="date-shortcuts">
-<button onclick="setExpiryShortcut(1)">+1 Hari</button>
-<button onclick="setExpiryShortcut(7)">+7 Hari</button>
-<button onclick="setExpiryShortcut(30)">+1 Bulan</button>
-<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-</div>
-<input type="date" id="expiryDateInput">
-<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
-<button class="btn-cancel" onclick="closeModal()">BATAL</button>
-<button class="btn-save" onclick="saveID()">SIMPAN</button>
-</div>
-</div>
+  <div class="modal-content">
+    <h2>Add New ID</h2>
+    <input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
+    <p style="color:#b3b3b3;">Build/Device ID</p>
+    <input type="text" id="usernameInput" placeholder="username">
+    <p style="color:#b3b3b3;">Username</p>
+    <p style="color:var(--primary-color);">Fitur Khusus Admin</p>
+    <div class="admin-buttons">
+      <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
+      <button class="admin-btn" onclick="setLimit()">LIMIT</button>
+    </div>
+    <p style="color:#b3b3b3;">Expiry Date (UTC)</p>
+    <div class="date-shortcuts">
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+    </div>
+    <input type="date" id="expiryDateInput">
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+      <button class="btn-cancel" onclick="closeModal()">BATAL</button>
+      <button class="btn-save" onclick="saveID()">SIMPAN</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -161,13 +184,28 @@ const $=id=>document.getElementById(id);
 async function load(){const r=await fetch(KEYS_URL);data=await r.json()||{};render();}
 function isExpired(id){if(data[id]&&data[id].limit)return false;const d=data[id]?.date;if(!d)return true;return new Date(d)<new Date();}
 function updateCounts(){let t=0,v=0,e=0,l=0;Object.keys(data).forEach(id=>{if(id==="MAINTENANCE")return;t++;if(data[id]?.limit)l++;else if(isExpired(id))e++;else v++;});countAll.textContent=`(${t})`;countValid.textContent=`(${v})`;countExpired.textContent=`(${e})`;countLimit.textContent=`(${l})`;}
-function render(){userList.innerHTML='';const q=searchInput.value.toLowerCase();const f=document.querySelector('.filter-bar button.active').dataset.filter;Object.keys(data).sort().forEach(id=>{if(id==="MAINTENANCE")return;const d=data[id];const ex=isExpired(id);if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;const i=document.createElement('div');i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><svg viewBox="0 0 24 24"><path d="M2 17.25V21h3.75L17.81 8.94l-3.75-3.75L2 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;userList.appendChild(i);});updateCounts();}
+function render(){
+  userList.innerHTML='';
+  const q=searchInput.value.toLowerCase();
+  const f=document.querySelector('.filter-bar button.active').dataset.filter;
+  Object.keys(data).sort().forEach(id=>{
+    if(id==="MAINTENANCE")return;
+    const d=data[id];
+    const ex=isExpired(id);
+    if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;
+    const i=document.createElement('div');
+    i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
+    i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><svg viewBox="0 0 24 24"><path d="M2 17.25V21h3.75L17.81 8.94l-3.75-3.75L2 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;
+    userList.appendChild(i);
+  });
+  updateCounts();
+}
 function setFilter(f,b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();}
 function switchTab(t){
-document.getElementById('tab-ids').classList.remove('active');
-document.getElementById('tab-status').classList.remove('active');
-if(t==='users'){document.getElementById('tab-ids').classList.add('active');usersTab.style.display='block';statusTab.style.display='none';}
-if(t==='status'){document.getElementById('tab-status').classList.add('active');usersTab.style.display='none';statusTab.style.display='flex';}
+  document.getElementById('tab-ids').classList.remove('active');
+  document.getElementById('tab-status').classList.remove('active');
+  if(t==='users'){document.getElementById('tab-ids').classList.add('active');usersTab.style.display='block';statusTab.style.display='none';}
+  if(t==='status'){document.getElementById('tab-status').classList.add('active');usersTab.style.display='none';statusTab.style.display='flex';}
 }
 function openModal(){buildIdInput.value='';usernameInput.value='';expiryDateInput.value=new Date().toISOString().split('T')[0];userModal.style.display='flex';}
 function closeModal(){userModal.style.display='none';}
@@ -179,6 +217,20 @@ function editID(id){buildIdInput.value=id;usernameInput.value=data[id]?.username
 async function deleteID(id){if(!confirm(`Hapus ID ${id}?`))return;await fetch(`${FIREBASE_ROOT}/keys/${id}.json`,{method:"DELETE"});load();}
 addUserBtn.onclick=openModal;
 load();
+
+/* STATUS INTERACTIONS */
+function toggleSystem(){
+  const el = document.querySelector('.status-box.system .status-value');
+  el.classList.toggle('active');
+  el.classList.toggle('inactive');
+  el.textContent = el.classList.contains('active')?'ON':'OFF';
+}
+function toggleStatus(key){
+  alert("Status toggle untuk: "+key+" (buat versi simpan, bisa patch ke Firebase)");
+}
+function saveStatus(){
+  alert("Save status berhasil! (Implement PATCH ke Firebase sesuai kebutuhan)");
+}
 </script>
 
 </body>
