@@ -16,6 +16,9 @@
 --danger-color:#FF4D4D;
 --valid-color:#4CAF50;
 --soft-glow:0 0 8px rgba(199,125,255,.7),0 0 15px rgba(199,125,255,.3);
+--status-bg:#fff;
+--status-active:#C77DFF;
+--status-inactive:#aaa;
 }
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
 header{background-color:var(--secondary-color);padding:15px 20px;text-align:center;}
@@ -40,7 +43,18 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
 .action-buttons{display:flex;align-items:center;gap:6px;}
 .dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
-.dp-btn.edit:hover{color:var(--primary-color);background:rgba(199,125,255,.15);}
+.dp-btn.edit{
+  width:40px;
+  height:40px;
+  border-radius:20px;
+  background:rgba(255,255,255,0.05);
+  color:#b3b3b3;
+}
+.dp-btn.edit:hover{
+  background:rgba(199,125,255,.25);
+  color:var(--primary-color);
+  transform:scale(1.08);
+}
 .dp-btn.delete{color:var(--danger-color);}
 .dp-btn.delete:hover{background:rgba(255,77,77,.15);}
 .dp-btn:hover{transform:scale(1.1);}
@@ -56,18 +70,16 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 .btn-save,.btn-cancel{background:#C77DFF;color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 
-.dp-btn.edit{
-  width:40px;
-  height:40px;
-  border-radius:14px;
-  background:rgba(255,255,255,0.05);
-  color:#b3b3b3;
-}
-.dp-btn.edit:hover{
-  background:rgba(199,125,255,.25);
-  color:var(--primary-color);
-  transform:scale(1.08);
-}
+/* STATUS TAB */
+#statusTab{display:none;flex-direction:column;gap:15px;}
+.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:10px;background:#222;}
+.status-box span{font-weight:700;}
+.status-box .status-value{padding:4px 10px;border-radius:6px;}
+.status-box.global{background:#fff;color:#000;}
+.status-box.maintenance{background:#C77DFF;color:#000;}
+.status-box.buildid{background:#888;color:#fff;}
+.status-box.system{background:#C77DFF;color:#000;}
+.status-box.message{background:#2a2a2a;color:#fff;white-space:pre-wrap;}
 </style>
 </head>
 <body>
@@ -89,6 +101,17 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 </div>
 <div id="userList"></div>
 </div>
+
+<div id="statusTab">
+<h2>Global Status</h2>
+<div class="status-box global"><span>Global Status</span><div class="status-value">Putih</div></div>
+<div class="status-box maintenance"><span>Maintenance Configuration</span><div class="status-value">Ungu Neon</div></div>
+<div class="status-box buildid"><span>Maintenance Build ID</span><div class="status-value">[MAINTENANCE]</div></div>
+<div class="status-box system"><span>System is Active</span><div class="status-value">O</div></div>
+<div class="status-box message"><span>Maintenance Message</span><div class="status-value">[e.g., The server is currently undergoing
+scheduled maintenance.]</div></div>
+</div>
+
 </div>
 
 <nav>
@@ -139,8 +162,8 @@ function setFilter(f,b){document.querySelectorAll('.filter-bar button').forEach(
 function switchTab(t){
 document.getElementById('tab-ids').classList.remove('active');
 document.getElementById('tab-status').classList.remove('active');
-if(t==='users')document.getElementById('tab-ids').classList.add('active');
-if(t==='status')document.getElementById('tab-status').classList.add('active');
+if(t==='users'){document.getElementById('tab-ids').classList.add('active');usersTab.style.display='block';statusTab.style.display='none';}
+if(t==='status'){document.getElementById('tab-status').classList.add('active');usersTab.style.display='none';statusTab.style.display='flex';}
 }
 function openModal(){buildIdInput.value='';usernameInput.value='';expiryDateInput.value=new Date().toISOString().split('T')[0];userModal.style.display='flex';}
 function closeModal(){userModal.style.display='none';}
