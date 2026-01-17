@@ -76,19 +76,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 .btn-save,.btn-cancel{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 
-/* STATUS TAB */
-#statusTab{display:none;flex-direction:column;gap:15px;}
-.status-box{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;border-radius:10px;background:var(--status-bg);cursor:pointer;transition:.2s;}
-.status-box span{font-weight:700;}
-.status-value{padding:4px 10px;border-radius:6px;}
-.status-box:hover{opacity:.9;}
-.status-box.global .status-value{background:#fff;color:#000;}
-.status-box.maintenance .status-value{background:var(--primary-color);color:#000;}
-.status-box.buildid .status-value{background:#888;color:#fff;}
-.status-box.system .status-value.active{background:var(--primary-color);color:#000;}
-.status-box.system .status-value.inactive{background:#555;color:#fff;}
-.status-box.message .status-value{background:#222;color:#fff;white-space:pre-wrap;}
-
 /* TOGGLE DPMods */
 .toggle-switch{position:relative;display:inline-block;width:50px;height:28px;}
 .toggle-switch input{opacity:0;width:0;height:0;}
@@ -238,4 +225,22 @@ function updateToggleLabel(){
   const slider = document.querySelector('.toggle-switch .slider');
   if(maintenanceEnabled.checked){
     maintenanceStatusLabel.textContent = "System is Active :)";
-    maintenanceStatusLabel.style.color = "#00
+    maintenanceStatusLabel.style.color = "#00FF94";
+    slider.style.background = "#C77DFF";
+  }else{
+    maintenanceStatusLabel.textContent = "System is Inactive :(";
+    maintenanceStatusLabel.style.color = "#FF4D4D";
+    slider.style.background = "#555";
+  }
+}
+
+document.getElementById('saveStatusBtn').onclick = ()=>{
+  const status = maintenanceEnabled.checked ? "ON" : "OFF";
+  const buildID = document.getElementById('maintenanceID').value;
+  const message = document.getElementById('maintenanceMessage').value;
+  alert(`Save Status!\nSystem: ${status}\nBuild ID: ${buildID}\nMessage: ${message}`);
+  // disini bisa PATCH ke Firebase sesuai kebutuhan
+}
+</script>
+</body>
+</html>
