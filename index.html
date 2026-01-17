@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CloudPlay Admin Panel</title>
+<title>DPMods Build ID Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
@@ -15,8 +15,10 @@
   --text-secondary:#b3b3b3;
   --danger-color:#ff4d4d;
   --valid-color:#00ff94;
+  --limit-color:yellow;
   --soft-glow:0 0 10px rgba(169,127,255,.8),0 0 20px rgba(169,127,255,.4);
 }
+
 body{margin:0;padding:0;font-family:'Roboto',sans-serif;background-color:var(--background-color);color:var(--text-color);padding-bottom:70px;}
 header{background-color:var(--secondary-color);padding:15px 20px;text-align:center;}
 header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
@@ -30,14 +32,14 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden;}
 .user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--primary-color);box-shadow:0 0 10px rgba(169,127,255,.6);}
 .user-item.expired::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--danger-color);}
-.user-item.limit::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:yellow;}
+.user-item.limit::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--limit-color);}
 .user-status-tag{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:700;position:relative;z-index:1;}
 .user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
 .action-buttons{display:flex;align-items:center;gap:6px;position:relative;z-index:1;}
 .dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
-.dp-btn.edit{width:40px;height:40px;border-radius:12px;background: rgba(255,255,255,0.05);}
+.dp-btn.edit{width:40px;height:40px;border-radius:12px;background: rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;}
 .dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;transition:.2s;}
 .dp-btn.edit:hover svg{fill: var(--primary-color);}
 .dp-btn.edit:hover{background: rgba(169,127,255,0.15);transform: scale(1.08);}
@@ -70,7 +72,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 </style>
 </head>
 <body>
-<header><h1>CloudPlay Admin Panel</h1></header>
+<header><h1>DPMods Build ID Admin Panel</h1></header>
 <div class="container">
   <div id="usersTab">
     <h2>Build / Device IDs</h2>
@@ -86,16 +88,17 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
     </div>
     <div id="userList"></div>
   </div>
+
   <div id="statusTab">
     <h2>Global Status</h2>
     <div class="status-container">
       <h3>Maintenance Configuration</h3>
       <label>Maintenance Build ID</label>
-      <input type="text" value="MAINTENANCE" readonly>
+      <input type="text" id="maintenanceID" value="MAINTENANCE" readonly>
       <div class="toggle-row">
         <label id="maintenanceStatusLabel">System is Inactive :(</label>
         <label class="toggle-switch">
-          <input type="checkbox" id="maintenanceEnabled">
+          <input type="checkbox" id="maintenanceEnabled" onchange="updateToggleLabel()">
           <span class="slider"></span>
         </label>
       </div>
@@ -209,6 +212,9 @@ function render(){
 function switchTab(t){
   usersTab.style.display=t==='users'?'block':'none';
   statusTab.style.display=t==='status'?'flex':'none';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(t==='users') document.querySelector('.nav-item:first-child').classList.add('active');
+  if(t==='status') document.querySelector('.nav-item:last-child').classList.add('active');
 }
 
 function openModal(){
@@ -252,6 +258,11 @@ async function deleteID(id){
   if(!confirm("Hapus ID "+id+" ?")) return;
   await fetch(`${FIREBASE_ROOT}/keys/${id}.json`,{method:"DELETE"});
   load();
+}
+
+function updateToggleLabel(){
+  const el=document.getElementById('maintenanceStatusLabel');
+  el.textContent=document.getElementById('maintenanceEnabled').checked?"System is Active :)":"System is Inactive :(";
 }
 
 load();
