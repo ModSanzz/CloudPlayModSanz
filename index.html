@@ -6,7 +6,6 @@
 <title>CloudPlay Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
 <style>
 :root{
   --primary-color:#a97fff;
@@ -26,7 +25,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:var(--text-color);}
 .search-bar button{background-color:var(--primary-color);color:#000;border:none;border-radius:6px;padding:10px 15px;cursor:pointer;}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
-.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
+.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;transition:.2s;}
 .filter-bar button.active{background-color:var(--primary-color);color:#000;box-shadow:var(--soft-glow);}
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden;}
 .user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--primary-color);box-shadow:0 0 10px rgba(169,127,255,.6);}
@@ -38,14 +37,14 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
 .action-buttons{display:flex;align-items:center;gap:6px;position:relative;z-index:1;}
 .dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
-.dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);}
+.dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;}
 .dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;}
 .dp-btn.edit:hover svg{fill:var(--primary-color);}
 .dp-btn.edit:hover{background:rgba(169,127,255,.15);transform:scale(1.08);}
 .dp-btn.delete{color:var(--danger-color);}
 .dp-btn.delete:hover{background:rgba(255,77,77,.15);}
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
-.nav-item{color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:.8rem;gap:3px;cursor:pointer;}
+.nav-item{color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:.8rem;gap:3px;cursor:pointer;transition:.2s;}
 .nav-item i{font-size:1.3rem;}
 .nav-item.active{color:var(--primary-color);text-shadow:var(--soft-glow);}
 .add-user-btn{background:var(--primary-color);color:#000;width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;box-shadow:0 4px 6px rgba(0,0,0,.3),var(--soft-glow);cursor:pointer;transform:translateY(-15px);}
@@ -72,73 +71,72 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 </head>
 <body>
 <header><h1>CloudPlay Admin Panel</h1></header>
-
 <div class="container">
-  <div id="usersTab">
-    <h2>Build / Device IDs</h2>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
-      <button onclick="render()"><i class="fas fa-search"></i></button>
-    </div>
-    <div class="filter-bar">
-      <button class="active" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
-      <button onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
-      <button onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
-      <button onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
-    </div>
-    <div id="userList"></div>
-  </div>
+<div id="usersTab">
+<h2>Build / Device IDs</h2>
+<div class="search-bar">
+<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+<button onclick="render()"><i class="fas fa-search"></i></button>
+</div>
+<div class="filter-bar">
+<button class="active" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
+<button onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
+<button onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
+<button onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
+</div>
+<div id="userList"></div>
+</div>
 
-  <div id="statusTab">
-    <h2>Global Status</h2>
-    <div class="status-container">
-      <h3>Maintenance Configuration</h3>
-      <label>Maintenance Build ID</label>
-      <input type="text" value="MAINTENANCE" readonly>
-      <div class="toggle-row">
-        <label id="maintenanceStatusLabel">System is Inactive :(</label>
-        <label class="toggle-switch">
-          <input type="checkbox" id="maintenanceEnabled">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <label>Maintenance Message</label>
-      <textarea id="maintenanceMessage" rows="2"></textarea>
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:15px;">
-      <button class="btn-primary" id="saveStatusBtn">Save Status</button>
-    </div>
-  </div>
+<div id="statusTab">
+<h2>Global Status</h2>
+<div class="status-container">
+<h3>Maintenance Configuration</h3>
+<label>Maintenance Build ID</label>
+<input type="text" value="MAINTENANCE" readonly>
+<div class="toggle-row">
+<label id="maintenanceStatusLabel">System is Inactive :(</label>
+<label class="toggle-switch">
+<input type="checkbox" id="maintenanceEnabled">
+<span class="slider"></span>
+</label>
+</div>
+<label>Maintenance Message</label>
+<textarea id="maintenanceMessage" rows="2"></textarea>
+</div>
+<div style="display:flex;justify-content:flex-end;margin-top:15px;">
+<button class="btn-primary" id="saveStatusBtn">Save Status</button>
+</div>
+</div>
 </div>
 
 <nav>
-  <div class="nav-item active" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
-  <div class="add-user-btn" onclick="openModal()"><i class="fas fa-plus"></i></div>
-  <div class="nav-item" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
+<div class="nav-item active" onclick="switchTab('users',this)"><i class="fas fa-key"></i><span>IDs</span></div>
+<div class="add-user-btn" onclick="openModal()"><i class="fas fa-plus"></i></div>
+<div class="nav-item" onclick="switchTab('status',this)"><i class="fas fa-bell"></i><span>Status</span></div>
 </nav>
 
 <div id="userModal" class="modal">
-  <div class="modal-content">
-    <h2>Add / Edit ID</h2>
-    <input type="text" id="buildIdInput" placeholder="Build ID">
-    <input type="text" id="usernameInput" placeholder="Username">
-    <div class="admin-buttons">
-      <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-      <button class="admin-btn" onclick="setLimit()">LIMIT</button>
-    </div>
-    <div class="date-shortcuts">
-      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
-      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
-      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
-      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-    </div>
-    <input type="date" id="expiryDateInput">
-    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
-      <button class="btn-cancel" onclick="closeModal()">BATAL</button>
-      <button class="btn-save" onclick="saveID()">SIMPAN</button>
-    </div>
-  </div>
+<div class="modal-content">
+<h2>Add / Edit ID</h2>
+<input type="text" id="buildIdInput" placeholder="Build ID">
+<input type="text" id="usernameInput" placeholder="Username">
+<div class="admin-buttons">
+<button class="admin-btn" onclick="setExpired()">EXPIRED</button>
+<button class="admin-btn" onclick="setLimit()">LIMIT</button>
+</div>
+<div class="date-shortcuts">
+<button onclick="setExpiryShortcut(1)">+1 Hari</button>
+<button onclick="setExpiryShortcut(7)">+7 Hari</button>
+<button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+</div>
+<input type="date" id="expiryDateInput">
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+<button class="btn-cancel" onclick="closeModal()">BATAL</button>
+<button class="btn-save" onclick="saveID()">SIMPAN</button>
+</div>
+</div>
 </div>
 
 <script>
@@ -170,6 +168,13 @@ function setFilter(f,el){
   document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   render();
+}
+
+function switchTab(tab,el){
+  usersTab.style.display=tab==='users'?'block':'none';
+  statusTab.style.display=tab==='status'?'flex':'none';
+  document.querySelectorAll('nav .nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
 }
 
 function render(){
@@ -207,11 +212,6 @@ function render(){
   countValid.textContent=`(${v})`;
   countExpired.textContent=`(${e})`;
   countLimit.textContent=`(${l})`;
-}
-
-function switchTab(t){
-  usersTab.style.display=t==='users'?'block':'none';
-  statusTab.style.display=t==='status'?'flex':'none';
 }
 
 function openModal(){
