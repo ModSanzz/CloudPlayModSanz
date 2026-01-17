@@ -31,46 +31,50 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.valid .user-status-tag{background:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
-.user-item-text span{display:block;font-size:.85rem;color:var(--text-secondary);}
-.user-status-tag{padding:4px 8px;border-radius:6px;font-size:.75rem;font-weight:700;}
 .action-buttons{display:flex;align-items:center;gap:6px;}
 .dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
-.dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);}
+.dp-btn.edit{width:40px;height:40px;border-radius:14px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;transition:.2s;}
 .dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;}
 .dp-btn.edit:hover svg{fill:var(--primary-color);}
+.dp-btn.edit:hover{background:rgba(169,127,255,.15);transform:scale(1.08);}
 .dp-btn.delete{color:var(--danger-color);}
+.dp-btn.delete:hover{background:rgba(255,77,77,.15);}
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
-.nav-item{color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:.8rem;cursor:pointer;}
+.nav-item{color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:.8rem;gap:3px;cursor:pointer;}
+.nav-item i{font-size:1.3rem;}
 .nav-item.active{color:var(--primary-color);text-shadow:var(--soft-glow);}
-.add-user-btn{background:var(--primary-color);color:#000;width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;box-shadow:var(--soft-glow);cursor:pointer;transform:translateY(-15px);}
+.add-user-btn{background:var(--primary-color);color:#000;width:60px;height:60px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:2rem;box-shadow:0 4px 6px rgba(0,0,0,.3),var(--soft-glow);cursor:pointer;transform:translateY(-15px);}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000;}
-.modal-content{background:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;display:flex;flex-direction:column;gap:10px;}
+.modal-content{background:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;}
 .admin-buttons{display:flex;gap:10px;margin:10px 0;}
 .admin-btn{background:#000;color:var(--primary-color);border:1px solid var(--primary-color);padding:10px;border-radius:8px;font-weight:700;cursor:pointer;}
-.date-shortcuts{display:flex;flex-wrap:wrap;gap:6px;}
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
 .btn-save,.btn-cancel{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
 #statusTab{display:none;flex-direction:column;gap:15px;}
 .status-container{background:var(--secondary-color);padding:20px;border-radius:10px;}
-.toggle-row{display:flex;justify-content:space-between;align-items:center;}
-.toggle-switch{position:relative;width:50px;height:26px;}
-.toggle-switch input{opacity:0;}
-.slider{position:absolute;inset:0;background:#444;border-radius:26px;}
-.slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+.status-container h3{color:var(--primary-color);margin-top:0;}
+.status-container label{display:block;margin-top:10px;}
+.status-container input, .status-container textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;resize:none;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.toggle-switch{position:relative;display:inline-block;width:50px;height:26px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#444;transition:.4s;border-radius:26px;}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background:white;transition:.4s;border-radius:50%;}
 .toggle-switch input:checked + .slider{background:var(--primary-color);}
 .toggle-switch input:checked + .slider:before{transform:translateX(24px);}
-.btn-primary{background:var(--primary-color);color:#000;padding:10px 15px;border:none;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:var(--soft-glow);}
+.btn-primary{background:var(--primary-color);color:#000;padding:10px 15px;border:none;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 0 10px rgba(169,127,255,.6);}
 </style>
 </head>
+
 <body>
 
 <header><h1>CloudPlay Admin Panel</h1></header>
 
 <div class="container">
   <div id="usersTab">
-    <h2>Build / Device IDs</h2>
+    <h2>Build/Device IDs</h2>
     <div class="search-bar">
-      <input id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+      <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
       <button onclick="render()"><i class="fas fa-search"></i></button>
     </div>
     <div class="filter-bar">
@@ -85,8 +89,9 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
   <div id="statusTab">
     <h2>Global Status</h2>
     <div class="status-container">
+      <h3>Maintenance Configuration</h3>
       <label>Maintenance Build ID</label>
-      <input id="maintenanceID" value="MAINTENANCE" readonly>
+      <input type="text" id="maintenanceID" value="MAINTENANCE" readonly>
       <div class="toggle-row">
         <label id="maintenanceStatusLabel">System is Inactive :(</label>
         <label class="toggle-switch">
@@ -97,7 +102,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
       <label>Maintenance Message</label>
       <textarea id="maintenanceMessage" rows="2"></textarea>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:10px;">
+    <div style="display:flex;justify-content:flex-end;margin-top:15px;">
       <button class="btn-primary" id="saveStatusBtn">Save Status</button>
     </div>
   </div>
@@ -111,22 +116,22 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 
 <div id="userModal" class="modal">
   <div class="modal-content">
-    <h2>Add / Edit ID</h2>
-    <input id="buildIdInput" placeholder="Build ID">
-    <input id="usernameInput" placeholder="Username">
+    <h2>Add/Edit ID</h2>
+    <input type="text" id="buildIdInput" placeholder="UP1A.231005.007">
+    <input type="text" id="usernameInput" placeholder="username">
     <div class="admin-buttons">
       <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
       <button class="admin-btn" onclick="setLimit()">LIMIT</button>
     </div>
     <div class="date-shortcuts">
-      <button onclick="setExpiryShortcut(1)">+1</button>
-      <button onclick="setExpiryShortcut(7)">+7</button>
-      <button onclick="setExpiryShortcut(30)">+30</button>
-      <button onclick="setExpiryShortcut(90)">+90</button>
-      <button onclick="setExpiryShortcut(365)">+365</button>
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
     </div>
     <input type="date" id="expiryDateInput">
-    <div style="display:flex;justify-content:flex-end;gap:10px;">
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
       <button class="btn-cancel" onclick="closeModal()">BATAL</button>
       <button class="btn-save" onclick="saveID()">SIMPAN</button>
     </div>
@@ -134,9 +139,11 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 </div>
 
 <script>
+/* ===== FIXED LOGIC ONLY ===== */
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL=FIREBASE_ROOT+"/keys.json";
-let data={},currentFilter="all";
+let data={};
+const $=i=>document.getElementById(i);
 
 async function load(){
   const r=await fetch(KEYS_URL);
@@ -145,31 +152,43 @@ async function load(){
   render();
 }
 
+function loadMaintenance(){
+  const m=data.MAINTENANCE||{};
+  maintenanceEnabled.checked=!!m.enabled;
+  maintenanceMessage.value=m.message||"";
+  updateToggleLabel();
+}
+
+function updateToggleLabel(){
+  maintenanceStatusLabel.textContent=
+    maintenanceEnabled.checked?"System is Active :)":"System is Inactive :(";
+}
+
 function isExpired(id){
-  if(!data[id]) return true;
-  if(data[id].limit) return false;
-  return new Date(data[id].date)<new Date();
+  if(data[id]?.limit)return false;
+  return new Date(data[id]?.date)<new Date();
 }
 
 function updateCounts(){
   let a=0,v=0,e=0,l=0;
-  for(const id in data){
-    if(id==="MAINTENANCE") continue;
+  Object.keys(data).forEach(id=>{
+    if(id==="MAINTENANCE")return;
     a++;
-    if(data[id].limit) l++;
-    else if(isExpired(id)) e++;
+    if(data[id].limit)l++;
+    else if(isExpired(id))e++;
     else v++;
-  }
+  });
   countAll.textContent=`(${a})`;
   countValid.textContent=`(${v})`;
   countExpired.textContent=`(${e})`;
   countLimit.textContent=`(${l})`;
 }
 
-function setFilter(f,btn){
+let currentFilter="all";
+function setFilter(f,el){
   currentFilter=f;
   document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  el.classList.add('active');
   render();
 }
 
@@ -177,32 +196,49 @@ function render(){
   userList.innerHTML='';
   const q=searchInput.value.toLowerCase();
   Object.keys(data).sort().forEach(id=>{
-    if(id==="MAINTENANCE") return;
+    if(id==="MAINTENANCE")return;
     const d=data[id];
     const ex=isExpired(id);
+
     if(currentFilter==="valid"&&(ex||d.limit))return;
-    if(currentFilter==="expired"&&!ex)return;
+    if(currentFilter==="expired"&&(!ex||d.limit))return;
     if(currentFilter==="limit"&&!d.limit)return;
     if(q&&!id.toLowerCase().includes(q))return;
 
-    const el=document.createElement('div');
-    el.className=`user-item ${d.limit?'limit':(ex?'expired':'valid')}`;
-    el.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>@${d.username||'-'}</span><span>${d.date||'-'}</span></div>
-    <div class="action-buttons">
-      <div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div>
-      <button class="dp-btn edit" onclick="editID('${id}')"><i class="fa fa-pen"></i></button>
-      <button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa fa-trash"></i></button>
-    </div>`;
-    userList.appendChild(el);
+    const div=document.createElement('div');
+    div.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
+    div.innerHTML=`
+      <div class="user-item-text">
+        <strong>${id}</strong>
+        <span>User : @${d.username}</span>
+        <span>Expired : ${d.date}</span>
+      </div>
+      <div class="action-buttons">
+        <div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div>
+        <button class="dp-btn edit" onclick="editID('${id}')">
+          <svg viewBox="0 0 24 24"><path d="M2 17.25V21h3.75L17.81 8.94l-3.75-3.75z"/></svg>
+        </button>
+        <button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button>
+      </div>`;
+    userList.appendChild(div);
   });
   updateCounts();
 }
 
 function switchTab(t){
-  usersTab.style.display=t==='users'?'block':'none';
-  statusTab.style.display=t==='status'?'flex':'none';
-  document.getElementById('tab-ids').classList.toggle('active',t==='users');
-  document.getElementById('tab-status').classList.toggle('active',t==='status');
+  const ids=document.getElementById('tab-ids');
+  const st=document.getElementById('tab-status');
+  if(t==='users'){
+    usersTab.style.display='block';
+    statusTab.style.display='none';
+    ids.classList.add('active');
+    st.classList.remove('active');
+  }else{
+    usersTab.style.display='none';
+    statusTab.style.display='flex';
+    ids.classList.remove('active');
+    st.classList.add('active');
+  }
 }
 
 function openModal(){
@@ -211,9 +247,7 @@ function openModal(){
   expiryDateInput.value=new Date().toISOString().split('T')[0];
   userModal.style.display='flex';
 }
-
 function closeModal(){userModal.style.display='none';}
-
 function setExpiryShortcut(d){
   const x=new Date();x.setDate(x.getDate()+d);
   expiryDateInput.value=x.toISOString().split('T')[0];
@@ -223,44 +257,38 @@ function setLimit(){expiryDateInput.value="9999-01-12";}
 
 async function saveID(){
   const id=buildIdInput.value.trim();
-  if(!id||!usernameInput.value||!expiryDateInput.value)return alert("Lengkapi");
-  await fetch(KEYS_URL,{method:"PATCH",headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({[id]:{username:usernameInput.value,date:expiryDateInput.value,limit:expiryDateInput.value==="9999-01-12"}})});
+  const u=usernameInput.value.trim();
+  const d=expiryDateInput.value;
+  if(!id||!u||!d)return alert("Isi semua");
+  await fetch(KEYS_URL,{method:"PATCH",headers:{'Content-Type':'application/json'},body:JSON.stringify({[id]:{username:u,date:d,limit:d==="9999-01-12"}})});
   closeModal();load();
 }
-
 function editID(id){
   buildIdInput.value=id;
   usernameInput.value=data[id].username;
   expiryDateInput.value=data[id].date;
-  openModal();
+  userModal.style.display='flex';
 }
-
 async function deleteID(id){
-  if(!confirm(`Hapus ${id}?`))return;
+  if(!confirm(`Hapus ID ${id}?`))return;
   await fetch(`${FIREBASE_ROOT}/keys/${id}.json`,{method:"DELETE"});
   load();
 }
 
-function loadMaintenance(){
-  const m=data.MAINTENANCE;
-  if(!m)return;
-  maintenanceEnabled.checked=!!m.enabled;
-  maintenanceMessage.value=m.message||'';
-  updateToggleLabel();
-}
-function updateToggleLabel(){
-  maintenanceStatusLabel.textContent=maintenanceEnabled.checked?"System is Active :)":"System is Inactive :(";
-}
-
 saveStatusBtn.onclick=async()=>{
-  await fetch(`${FIREBASE_ROOT}/keys/MAINTENANCE.json`,{method:"PATCH",headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({enabled:maintenanceEnabled.checked,message:maintenanceMessage.value})});
+  await fetch(`${FIREBASE_ROOT}/keys/MAINTENANCE.json`,{
+    method:"PATCH",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({enabled:maintenanceEnabled.checked,message:maintenanceMessage.value})
+  });
+  alert("Global Status tersimpan!");
+  load();
 };
 
 addUserBtn.onclick=openModal;
 maintenanceEnabled.onchange=updateToggleLabel;
 load();
 </script>
+
 </body>
 </html>
