@@ -15,6 +15,7 @@
   --text-secondary: #B3B3B3;
   --danger-color: #FF4D4D;
   --valid-color: #4CAF50;
+  --input-gray: #2e2e2e;
   --soft-glow: 0 0 8px rgba(199,125,255,.7),0 0 15px rgba(199,125,255,.3);
 }
 
@@ -26,10 +27,8 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .container{padding:20px;max-width:800px;margin:0 auto;}
 
 .search-bar{display:flex;gap:10px;margin-bottom:10px;}
-.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#2a2a2a;color:var(--text-color);}
+.search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:var(--input-gray);color:var(--text-color);}
 .search-bar button{background-color:var(--primary-color);color:var(--background-color);border:none;border-radius:6px;padding:10px 15px;cursor:pointer;}
-
-.bulk-btn{margin-bottom:10px;background:#C77DFF;color:black;border:none;padding:8px 12px;border-radius:6px;font-weight:700;}
 
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
 .filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;}
@@ -49,7 +48,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .user-item.valid:hover{box-shadow:0 0 10px var(--valid-color);}
 .user-item.expired{background-color:#331f1f;}
-.user-item.limit{border-left:6px solid gold;}
+.user-item.permanent{border-left:6px solid gold;}
 
 .user-item-text{flex-grow:1;line-height:1.3;}
 .user-item-text strong{display:block;font-size:1.1rem;color:var(--text-color);}
@@ -65,7 +64,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .user-item.valid .user-status-tag{background-color:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background-color:var(--danger-color);color:#fff;}
-.user-item.limit .user-status-tag{background:white;color:black;}
+.user-item.permanent .user-status-tag{background:white;color:black;}
 
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
 
@@ -87,7 +86,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 
 .admin-buttons{display:flex;gap:10px;margin:10px 0;}
 .admin-btn{
-  background:black;
+  background:#1a1a1a;
   color:#C77DFF;
   border:1px solid #C77DFF;
   padding:10px;
@@ -126,13 +125,11 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <button onclick="searchIDs()"><i class="fas fa-search"></i></button>
 </div>
 
-<button class="bulk-btn" onclick="openBulkExpired()">BULK EXPIRED</button>
-
 <div class="filter-bar">
 <button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
 <button data-filter="valid" onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
 <button data-filter="expired" onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
-<button data-filter="limit" onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
+<button data-filter="permanent" onclick="setFilter('permanent',this)">Permanent <span id="countPermanent"></span></button>
 </div>
 
 <div id="userList"></div>
@@ -149,16 +146,16 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <div class="modal-content">
 <h2>Add New ID</h2>
 
-<input type="text" id="buildIdInput" placeholder="UP1A.231005.007" style="background:#2a2a2a;color:white;border:1px solid #444;">
+<input type="text" id="buildIdInput" placeholder="UP1A.231005.007" style="background:var(--input-gray);color:white;border:1px solid #444;">
 <p style="color:#b3b3b3;">Build/Device ID</p>
 
-<input type="text" id="usernameInput" placeholder="username" style="background:#2a2a2a;color:white;border:1px solid #444;">
+<input type="text" id="usernameInput" placeholder="username" style="background:var(--input-gray);color:white;border:1px solid #444;">
 <p style="color:#b3b3b3;">Username</p>
 
 <p style="color:#C77DFF;">Fitur Khusus Admin</p>
 <div class="admin-buttons">
 <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-<button class="admin-btn" onclick="setLimit()">LIMIT</button>
+<button class="admin-btn" onclick="setPermanent()">PERMANENT</button>
 </div>
 
 <p style="color:#b3b3b3;">Expiry Date (UTC)</p>
@@ -171,12 +168,17 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
 </div>
 
-<input type="date" id="expiryDateInput" style="background:#2a2a2a;color:white;border:1px solid #444;">
+<input type="date" id="expiryDateInput" style="background:var(--input-gray);color:white;border:1px solid #444;">
 
 <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
 <button class="btn-cancel" onclick="closeModal()">BATAL</button>
 <button class="btn-save" onclick="saveID()">SIMPAN</button>
 </div>
+
+<div style="margin-top:15px;text-align:center;">
+<button class="admin-btn" onclick="openBulkExpired()">BULK EXPIRED</button>
+</div>
+
 </div>
 </div>
 
@@ -205,7 +207,7 @@ async function load(){
 }
 
 function isExpired(id){
-  if(data[id] && data[id].limit) return false;
+  if(data[id] && data[id].permanent) return false;
   const date=data[id]?.date;
   if(!date) return true;
   const d=new Date(date); d.setHours(0,0,0,0);
@@ -214,18 +216,18 @@ function isExpired(id){
 }
 
 function updateCounts(){
-  let total=0, valid=0, expired=0, limit=0;
+  let total=0, valid=0, expired=0, permanent=0;
   Object.keys(data).forEach(id=>{
     if(id==="MAINTENANCE") return;
     total++;
-    if(data[id]?.limit){ limit++; }
+    if(data[id]?.permanent){ permanent++; }
     else if(isExpired(id)){ expired++; }
     else { valid++; }
   });
   $('countAll').textContent=`(${total})`;
   $('countValid').textContent=`(${valid})`;
   $('countExpired').textContent=`(${expired})`;
-  $('countLimit').textContent=`(${limit})`;
+  $('countPermanent').textContent=`(${permanent})`;
 }
 
 function render(){
@@ -241,11 +243,11 @@ function render(){
 
     if(f==="valid" && expired) return;
     if(f==="expired" && !expired) return;
-    if(f==="limit" && !d.limit) return;
+    if(f==="permanent" && !d.permanent) return;
     if(q && !id.toLowerCase().includes(q) && !(d.username||'').toLowerCase().includes(q)) return;
 
     const item=document.createElement('div');
-    item.className='user-item '+(d.limit?'limit':(expired?'expired':'valid'));
+    item.className='user-item '+(d.permanent?'permanent':(expired?'expired':'valid'));
 
     item.innerHTML=`
     <div class="user-item-text">
@@ -255,7 +257,7 @@ function render(){
     </div>
     <div>
       <div class="user-status-tag">
-        ${d.limit ? 'LIMIT' : (expired?'EXPIRED':'VALID')}
+        ${d.permanent ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
       </div>
     </div>
     `;
@@ -301,7 +303,7 @@ function setExpired(){
   $('expiryDateInput').value=today;
 }
 
-function setLimit(){
+function setPermanent(){
   $('expiryDateInput').value="9999-01-12";
 }
 
@@ -311,12 +313,12 @@ async function saveID(){
   const date=$('expiryDateInput').value;
   if(!id||!username||!date){ alert("Isi semua!"); return; }
 
-  const limit = (date==="9999-01-12");
+  const permanent = (date==="9999-01-12");
 
   await fetch(KEYS_URL,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({[id]:{username,date,limit}})
+    body:JSON.stringify({[id]:{username,date,permanent}})
   });
 
   closeModal();
@@ -347,9 +349,9 @@ async function applyBulk(mode){
 
     let payload={};
     if(mode==='on'){
-      payload={date:today,limit:false};
+      payload={date:today,permanent:false};
     } else {
-      payload={date:oldDate,limit:false};
+      payload={date:oldDate,permanent:false};
     }
 
     await fetch(KEYS_URL,{
