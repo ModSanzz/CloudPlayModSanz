@@ -29,8 +29,6 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#2a2a2a;color:var(--text-color);}
 .search-bar button{background-color:var(--primary-color);color:var(--background-color);border:none;border-radius:6px;padding:10px 15px;cursor:pointer;}
 
-.bulk-btn{margin-bottom:10px;background:#C77DFF;color:black;border:none;padding:8px 12px;border-radius:6px;font-weight:700;}
-
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
 .filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;}
 .filter-bar button.active{background-color:var(--primary-color);color:var(--background-color);box-shadow:var(--soft-glow);}
@@ -66,6 +64,18 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.valid .user-status-tag{background-color:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background-color:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:white;color:black;}
+
+.user-actions{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.user-actions i{
+  font-size:18px;
+  cursor:pointer;
+  color:var(--primary-color);
+}
 
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
 
@@ -105,12 +115,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
   border-radius:6px;
   font-weight:700;
 }
-
-.bulk-list{max-height:250px;overflow-y:auto;margin:10px 0;}
-.bulk-item{display:flex;align-items:center;gap:10px;margin:6px 0;}
-
-.bulk-actions{display:flex;justify-content:center;gap:20px;margin-top:15px;}
-.bulk-actions button{background:#C77DFF;color:black;border:none;padding:10px 18px;border-radius:6px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -125,8 +129,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="searchIDs()">
 <button onclick="searchIDs()"><i class="fas fa-search"></i></button>
 </div>
-
-<button class="bulk-btn" onclick="openBulkExpired()">BULK EXPIRED</button>
 
 <div class="filter-bar">
 <button class="active" data-filter="all" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
@@ -158,7 +160,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <p style="color:#C77DFF;">Fitur Khusus Admin</p>
 <div class="admin-buttons">
 <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-<button class="admin-btn" onclick="setLimit()">LIMIT</button>
+<button class="admin-btn" onclick="setLimit()">PERMANENT</button>
 </div>
 
 <p style="color:#b3b3b3;">Expiry Date (UTC)</p>
@@ -180,22 +182,10 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 </div>
 </div>
 
-<div id="bulkModal" class="modal">
-<div class="modal-content">
-<h2>Pilih ID yang mau diubah:</h2>
-<div class="bulk-list" id="bulkList"></div>
-<div class="bulk-actions">
-<button onclick="applyBulk('on')">ON</button>
-<button onclick="applyBulk('off')">OFF</button>
-</div>
-</div>
-</div>
-
 <script>
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL=FIREBASE_ROOT+"/keys.json";
 let data={};
-
 const $=id=>document.getElementById(id);
 
 async function load(){
@@ -253,9 +243,11 @@ function render(){
       <span>User : @${d.username||'-'}</span><br>
       <span>Expired : ${d.date||'-'}</span>
     </div>
-    <div>
+    <div class="user-actions">
+      <i class="fas fa-edit" onclick="editID('${id}')"></i>
+      <i class="fas fa-trash" onclick="deleteID('${id}')"></i>
       <div class="user-status-tag">
-        ${d.limit ? 'LIMIT' : (expired?'EXPIRED':'VALID')}
+        ${d.limit ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
       </div>
     </div>
     `;
@@ -287,7 +279,6 @@ function openModal(){
 
 function closeModal(){
   $('userModal').style.display='none';
-  $('bulkModal').style.display='none';
 }
 
 function setExpiryShortcut(days){
@@ -310,7 +301,6 @@ async function saveID(){
   const username=$('usernameInput').value.trim();
   const date=$('expiryDateInput').value;
   if(!id||!username||!date){ alert("Isi semua!"); return; }
-
   const limit = (date==="9999-01-12");
 
   await fetch(KEYS_URL,{
@@ -323,44 +313,22 @@ async function saveID(){
   load();
 }
 
-function openBulkExpired(){
-  const list=$('bulkList');
-  list.innerHTML='';
-  Object.keys(data).forEach(id=>{
-    if(id==="MAINTENANCE") return;
-    const div=document.createElement('div');
-    div.className='bulk-item';
-    div.innerHTML=`<input type="checkbox" value="${id}"> ${id}`;
-    list.appendChild(div);
+async function deleteID(id){
+  if(!confirm("Yakin hapus ID ini?")) return;
+  await fetch(KEYS_URL,{
+    method:"PATCH",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({[id]:null})
   });
-  $('bulkModal').style.display='flex';
+  load();
 }
 
-async function applyBulk(mode){
-  const checks=document.querySelectorAll('#bulkList input:checked');
-  if(checks.length===0){ alert("Pilih minimal 1 ID"); return; }
-
-  for(let c of checks){
-    const id=c.value;
-    const oldDate=data[id]?.date || new Date().toISOString().split('T')[0];
-    const today=new Date().toISOString().split('T')[0];
-
-    let payload={};
-    if(mode==='on'){
-      payload={date:today,limit:false};
-    } else {
-      payload={date:oldDate,limit:false};
-    }
-
-    await fetch(KEYS_URL,{
-      method:"PATCH",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({[id]:{...data[id],...payload}})
-    });
-  }
-
-  closeModal();
-  load();
+function editID(id){
+  const d=data[id];
+  $('buildIdInput').value=id;
+  $('usernameInput').value=d.username||'';
+  $('expiryDateInput').value=d.date||new Date().toISOString().split('T')[0];
+  $('userModal').style.display='flex';
 }
 
 $('addUserBtn').onclick=openModal;
