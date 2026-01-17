@@ -63,19 +63,12 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 
 .user-item.valid .user-status-tag{background-color:var(--valid-color);color:#000;}
 .user-item.expired .user-status-tag{background-color:var(--danger-color);color:#fff;}
-.user-item.limit .user-status-tag{background:white;color:black;}
+.user-item.limit .user-status-tag{background-color:white;color:black;}
 
-.user-actions{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-
-.user-actions i{
-  font-size:18px;
-  cursor:pointer;
-  color:var(--primary-color);
-}
+.action-buttons{display:flex;align-items:center;gap:8px;}
+.action-buttons button{padding:6px 10px;border-radius:6px;border:none;cursor:pointer;font-size:0.85rem;}
+.action-buttons .edit-btn{background:#999;color:#fff;}
+.action-buttons .delete-btn{background:#FF4D4D;color:#fff;}
 
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
 
@@ -96,25 +89,11 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 .modal-content{background-color:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;}
 
 .admin-buttons{display:flex;gap:10px;margin:10px 0;}
-.admin-btn{
-  background:black;
-  color:#C77DFF;
-  border:1px solid #C77DFF;
-  padding:10px;
-  border-radius:8px;
-  font-weight:700;
-}
+.admin-btn{background:black;color:#C77DFF;border:1px solid #C77DFF;padding:10px;border-radius:8px;font-weight:700;}
 
 .date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;}
 
-.btn-save, .btn-cancel{
-  background:#C77DFF;
-  color:black;
-  border:none;
-  padding:10px 15px;
-  border-radius:6px;
-  font-weight:700;
-}
+.btn-save, .btn-cancel{background:#C77DFF;color:black;border:none;padding:10px 15px;border-radius:6px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -126,8 +105,8 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <h2>Build/Device IDs</h2>
 
 <div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="searchIDs()">
-<button onclick="searchIDs()"><i class="fas fa-search"></i></button>
+<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+<button onclick="render()"><i class="fas fa-search"></i></button>
 </div>
 
 <div class="filter-bar">
@@ -150,7 +129,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <div id="userModal" class="modal">
 <div class="modal-content">
 <h2>Add New ID</h2>
-
 <input type="text" id="buildIdInput" placeholder="UP1A.231005.007" style="background:#2a2a2a;color:white;border:1px solid #444;">
 <p style="color:#b3b3b3;">Build/Device ID</p>
 
@@ -160,11 +138,10 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <p style="color:#C77DFF;">Fitur Khusus Admin</p>
 <div class="admin-buttons">
 <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-<button class="admin-btn" onclick="setLimit()">PERMANENT</button>
+<button class="admin-btn" onclick="setLimit()">LIMIT</button>
 </div>
 
 <p style="color:#b3b3b3;">Expiry Date (UTC)</p>
-
 <div class="date-shortcuts">
 <button onclick="setExpiryShortcut(1)">+1 Hari</button>
 <button onclick="setExpiryShortcut(7)">+7 Hari</button>
@@ -172,7 +149,6 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background-color:var(--se
 <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
 <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
 </div>
-
 <input type="date" id="expiryDateInput" style="background:#2a2a2a;color:white;border:1px solid #444;">
 
 <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
@@ -228,7 +204,6 @@ function render(){
     if(id==="MAINTENANCE") return;
     const d=data[id];
     const expired=isExpired(id);
-
     if(f==="valid" && expired) return;
     if(f==="expired" && !expired) return;
     if(f==="limit" && !d.limit) return;
@@ -243,17 +218,14 @@ function render(){
       <span>User : @${d.username||'-'}</span><br>
       <span>Expired : ${d.date||'-'}</span>
     </div>
-    <div class="user-actions">
-      <i class="fas fa-edit" onclick="editID('${id}')"></i>
-      <i class="fas fa-trash" onclick="deleteID('${id}')"></i>
-      <div class="user-status-tag">
-        ${d.limit ? 'PERMANENT' : (expired?'EXPIRED':'VALID')}
-      </div>
+    <div class="action-buttons">
+      <div class="user-status-tag">${d.limit?'LIMIT':(expired?'EXPIRED':'VALID')}</div>
+      <button class="edit-btn"><i class="fas fa-pencil-alt"></i></button>
+      <button class="delete-btn"><i class="fas fa-trash"></i></button>
     </div>
     `;
     list.appendChild(item);
   });
-
   updateCounts();
 }
 
@@ -263,8 +235,6 @@ function setFilter(f,btn){
   render();
 }
 
-function searchIDs(){render();}
-
 function showTab(tab){
   $('usersTab').style.display=tab==='users'?'block':'none';
 }
@@ -272,8 +242,7 @@ function showTab(tab){
 function openModal(){
   $('buildIdInput').value='';
   $('usernameInput').value='';
-  const today=new Date().toISOString().split('T')[0];
-  $('expiryDateInput').value=today;
+  $('expiryDateInput').value=new Date().toISOString().split('T')[0];
   $('userModal').style.display='flex';
 }
 
@@ -288,8 +257,7 @@ function setExpiryShortcut(days){
 }
 
 function setExpired(){
-  const today=new Date().toISOString().split('T')[0];
-  $('expiryDateInput').value=today;
+  $('expiryDateInput').value=new Date().toISOString().split('T')[0];
 }
 
 function setLimit(){
@@ -302,33 +270,13 @@ async function saveID(){
   const date=$('expiryDateInput').value;
   if(!id||!username||!date){ alert("Isi semua!"); return; }
   const limit = (date==="9999-01-12");
-
   await fetch(KEYS_URL,{
     method:"PATCH",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({[id]:{username,date,limit}})
   });
-
   closeModal();
   load();
-}
-
-async function deleteID(id){
-  if(!confirm("Yakin hapus ID ini?")) return;
-  await fetch(KEYS_URL,{
-    method:"PATCH",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({[id]:null})
-  });
-  load();
-}
-
-function editID(id){
-  const d=data[id];
-  $('buildIdInput').value=id;
-  $('usernameInput').value=d.username||'';
-  $('expiryDateInput').value=d.date||new Date().toISOString().split('T')[0];
-  $('userModal').style.display='flex';
 }
 
 $('addUserBtn').onclick=openModal;
