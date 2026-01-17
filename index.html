@@ -39,10 +39,10 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .user-item.expired .user-status-tag{background:var(--danger-color);color:#fff;}
 .user-item.limit .user-status-tag{background:#fff;color:#000;}
 .action-buttons{display:flex;align-items:center;gap:6px;}
-.dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;}
-.dp-btn.edit,.dp-btn.delete{color:#9e9e9e;}
+.dp-btn{width:36px;height:36px;border-radius:50%;background:transparent;border:2px solid transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s;color:#9e9e9e;}
 .dp-btn.edit:hover{color:var(--primary-color);background:rgba(199,125,255,.15);}
-.dp-btn.delete:hover{color:var(--danger-color);background:rgba(255,77,77,.15);}
+.dp-btn.delete{color:var(--danger-color);}
+.dp-btn.delete:hover{background:rgba(255,77,77,.15);}
 .dp-btn:hover{transform:scale(1.1);}
 nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondary-color);display:flex;justify-content:space-around;align-items:center;}
 .nav-item{color:var(--text-secondary);display:flex;flex-direction:column;align-items:center;font-size:.8rem;gap:3px;cursor:pointer;}
@@ -123,7 +123,12 @@ function isExpired(id){if(data[id]&&data[id].limit)return false;const d=data[id]
 function updateCounts(){let t=0,v=0,e=0,l=0;Object.keys(data).forEach(id=>{if(id==="MAINTENANCE")return;t++;if(data[id]?.limit)l++;else if(isExpired(id))e++;else v++;});countAll.textContent=`(${t})`;countValid.textContent=`(${v})`;countExpired.textContent=`(${e})`;countLimit.textContent=`(${l})`;}
 function render(){userList.innerHTML='';const q=searchInput.value.toLowerCase();const f=document.querySelector('.filter-bar button.active').dataset.filter;Object.keys(data).sort().forEach(id=>{if(id==="MAINTENANCE")return;const d=data[id];const ex=isExpired(id);if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;const i=document.createElement('div');i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><i class="fa-solid fa-pen"></i></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;userList.appendChild(i);});updateCounts();}
 function setFilter(f,b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();}
-function switchTab(t){tab-ids.classList.remove('active');tab-status.classList.remove('active');if(t==='users')tab-ids.classList.add('active');if(t==='status')tab-status.classList.add('active');}
+function switchTab(t){
+document.getElementById('tab-ids').classList.remove('active');
+document.getElementById('tab-status').classList.remove('active');
+if(t==='users')document.getElementById('tab-ids').classList.add('active');
+if(t==='status')document.getElementById('tab-status').classList.add('active');
+}
 function openModal(){buildIdInput.value='';usernameInput.value='';expiryDateInput.value=new Date().toISOString().split('T')[0];userModal.style.display='flex';}
 function closeModal(){userModal.style.display='none';}
 function setExpiryShortcut(d){const x=new Date();x.setDate(x.getDate()+d);expiryDateInput.value=x.toISOString().split('T')[0];}
