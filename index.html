@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +28,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active{background-color:var(--primary-color);color:#000;box-shadow:var(--soft-glow);}
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden;}
-.user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:#a97fff;box-shadow:0 0 10px rgba(169,127,255,.6);}
+.user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--primary-color);box-shadow:0 0 10px rgba(169,127,255,.6);}
 .user-item.expired::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--danger-color);}
 .user-item.limit::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:yellow;}
 .user-status-tag{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:700;position:relative;z-index:1;}
@@ -51,11 +51,22 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;justify-content:center;align-items:center;z-index:2000;}
 .modal-content{background:var(--secondary-color);padding:30px;border-radius:12px;width:90%;max-width:450px;}
 .admin-buttons{display:flex;gap:10px;margin:10px 0;}
-.admin-btn{background:#a97fff;color:#000;border:none;padding:10px;border-radius:8px;font-weight:700;cursor:pointer;}
-.date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;margin-right:5px;}
-.btn-save,.btn-cancel,.btn-primary,.btn-secondary{padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;border:none;}
-.btn-primary{background:var(--primary-color);color:#000;}
-.btn-secondary{background:#333;color:#fff;}
+.admin-buttons button{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
+.date-shortcuts button{background:#333;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;}
+.btn-save,.btn-cancel{background:var(--primary-color);color:#000;border:none;padding:10px 15px;border-radius:6px;font-weight:700;cursor:pointer;}
+#statusTab{display:none;flex-direction:column;gap:15px;}
+.status-container{background:var(--secondary-color);padding:20px;border-radius:10px;}
+.status-container h3{color:var(--primary-color);margin-top:0;}
+.status-container label{display:block;margin-top:10px;}
+.status-container input,.status-container textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.toggle-switch{position:relative;display:inline-block;width:50px;height:26px;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#444;transition:.4s;border-radius:26px;}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:3px;bottom:3px;background:white;transition:.4s;border-radius:50%;}
+.toggle-switch input:checked + .slider{background:var(--primary-color);}
+.toggle-switch input:checked + .slider:before{transform:translateX(24px);}
+.btn-primary{background:var(--primary-color);color:#000;padding:10px 15px;border:none;border-radius:8px;font-weight:700;cursor:pointer;box-shadow:0 0 10px rgba(169,127,255,.6);}
 </style>
 </head>
 <body>
@@ -75,52 +86,68 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
     </div>
     <div id="userList"></div>
   </div>
+  <div id="statusTab">
+    <h2>Global Status</h2>
+    <div class="status-container">
+      <h3>Maintenance Configuration</h3>
+      <label>Maintenance Build ID</label>
+      <input type="text" value="MAINTENANCE" readonly>
+      <div class="toggle-row">
+        <label id="maintenanceStatusLabel">System is Inactive :(</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="maintenanceEnabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <label>Maintenance Message</label>
+      <textarea id="maintenanceMessage" rows="2"></textarea>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:15px;">
+      <button class="btn-primary" id="saveStatusBtn">Save Status</button>
+    </div>
+  </div>
 </div>
 
 <nav>
   <div class="nav-item active" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
   <div class="add-user-btn" onclick="openModal()"><i class="fas fa-plus"></i></div>
-  <div class="nav-item"><i class="fas fa-bell"></i><span>Status</span></div>
+  <div class="nav-item" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
 </nav>
 
 <div id="userModal" class="modal">
-    <div class="modal-content">
-        <h2 id="userModalTitle">Add / Edit ID</h2>
-
-        <div class="form-group">
-            <label for="buildIdInput">Build/Device ID</label>
-            <input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007" required>
-        </div>
-
-        <div class="form-group">
-            <label for="usernameInput">Username</label>
-            <input type="text" id="usernameInput" placeholder="Username" required>
-        </div>
-
-        <label>Fitur Khusus Admin</label>
-        <div class="admin-buttons">
-            <button class="admin-btn" onclick="setExpired()">EXPIRED</button>
-            <button class="admin-btn" onclick="setLimit()">LIMIT</button>
-        </div>
-
-        <label>Expiry Date (UTC)</label>
-        <div class="date-shortcuts">
-            <button onclick="setExpiryShortcut(1)">+1 Hari</button>
-            <button onclick="setExpiryShortcut(7)">+7 Hari</button>
-            <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
-            <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-            <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-        </div>
-
-        <div class="form-group">
-            <input type="date" id="expiryDateInput" required>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-            <button class="btn-secondary" onclick="closeModal()">Batal</button>
-            <button class="btn-primary" id="saveUserBtn" onclick="saveID()">Simpan</button>
-        </div>
+  <div class="modal-content">
+    <h2 id="userModalTitle">Add New ID</h2>
+    <div class="form-group">
+      <label for="buildIdInput">Build/Device ID</label>
+      <input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007" required>
     </div>
+    <div class="form-group">
+      <label for="usernameInput">Username</label>
+      <input type="text" id="usernameInput" placeholder="Username">
+    </div>
+    <div class="form-group">
+      <label>Fitur Khusus Admin</label>
+      <div class="admin-buttons">
+        <button onclick="setExpired()">EXPIRED</button>
+        <button onclick="setLimit()">LIMIT</button>
+      </div>
+    </div>
+    <label>Expiry Date (UTC)</label>
+    <div class="date-shortcuts">
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+    </div>
+    <div class="form-group">
+      <input type="date" id="expiryDateInput" required>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" id="saveUserBtn" onclick="saveID()">Save ID</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -185,9 +212,16 @@ function render(){
       </div>`;
     userList.appendChild(div);
   });
+  countAll.textContent=`(${a})`;
+  countValid.textContent=`(${v})`;
+  countExpired.textContent=`(${e})`;
+  countLimit.textContent=`(${l})`;
 }
 
-function switchTab(t){}
+function switchTab(t){
+  usersTab.style.display=t==='users'?'block':'none';
+  statusTab.style.display=t==='status'?'flex':'none';
+}
 
 function openModal(){
   buildIdInput.value='';
