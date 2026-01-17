@@ -48,13 +48,18 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
   height:40px;
   border-radius:20px;
   background:rgba(255,255,255,0.05);
-  color:#b3b3b3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.2s;
 }
 .dp-btn.edit:hover{
   background:rgba(199,125,255,.25);
-  color:var(--primary-color);
   transform:scale(1.08);
 }
+.dp-btn.edit svg{width:18px;height:18px;fill:#b3b3b3;}
+.dp-btn.edit:hover svg{fill:var(--primary-color);}
 .dp-btn.delete{color:var(--danger-color);}
 .dp-btn.delete:hover{background:rgba(255,77,77,.15);}
 .dp-btn:hover{transform:scale(1.1);}
@@ -108,8 +113,7 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 <div class="status-box maintenance"><span>Maintenance Configuration</span><div class="status-value">Ungu Neon</div></div>
 <div class="status-box buildid"><span>Maintenance Build ID</span><div class="status-value">[MAINTENANCE]</div></div>
 <div class="status-box system"><span>System is Active</span><div class="status-value">O</div></div>
-<div class="status-box message"><span>Maintenance Message</span><div class="status-value">[e.g., The server is currently undergoing
-scheduled maintenance.]</div></div>
+<div class="status-box message"><span>Maintenance Message</span><div class="status-value">[e.g., The server is currently undergoing scheduled maintenance.]</div></div>
 </div>
 
 </div>
@@ -157,7 +161,7 @@ const $=id=>document.getElementById(id);
 async function load(){const r=await fetch(KEYS_URL);data=await r.json()||{};render();}
 function isExpired(id){if(data[id]&&data[id].limit)return false;const d=data[id]?.date;if(!d)return true;return new Date(d)<new Date();}
 function updateCounts(){let t=0,v=0,e=0,l=0;Object.keys(data).forEach(id=>{if(id==="MAINTENANCE")return;t++;if(data[id]?.limit)l++;else if(isExpired(id))e++;else v++;});countAll.textContent=`(${t})`;countValid.textContent=`(${v})`;countExpired.textContent=`(${e})`;countLimit.textContent=`(${l})`;}
-function render(){userList.innerHTML='';const q=searchInput.value.toLowerCase();const f=document.querySelector('.filter-bar button.active').dataset.filter;Object.keys(data).sort().forEach(id=>{if(id==="MAINTENANCE")return;const d=data[id];const ex=isExpired(id);if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;const i=document.createElement('div');i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><i class="fa-solid fa-pen"></i></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;userList.appendChild(i);});updateCounts();}
+function render(){userList.innerHTML='';const q=searchInput.value.toLowerCase();const f=document.querySelector('.filter-bar button.active').dataset.filter;Object.keys(data).sort().forEach(id=>{if(id==="MAINTENANCE")return;const d=data[id];const ex=isExpired(id);if(f==="valid"&&ex)return;if(f==="expired"&&!ex)return;if(f==="limit"&&!d.limit)return;if(q&&!id.toLowerCase().includes(q))return;const i=document.createElement('div');i.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));i.innerHTML=`<div class="user-item-text"><strong>${id}</strong><span>User : @${d.username||'-'}</span><br><span>Expired : ${d.date||'-'}</span></div><div class="action-buttons"><div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div><button class="dp-btn edit" onclick="editID('${id}')"><svg viewBox="0 0 24 24"><path d="M2 17.25V21h3.75L17.81 8.94l-3.75-3.75L2 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button><button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fa-solid fa-trash"></i></button></div>`;userList.appendChild(i);});updateCounts();}
 function setFilter(f,b){document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render();}
 function switchTab(t){
 document.getElementById('tab-ids').classList.remove('active');
