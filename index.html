@@ -25,7 +25,7 @@ header h1{color:var(--primary-color);margin:0;font-weight:700;font-size:1.5rem;}
 .search-bar input{flex-grow:1;padding:10px;border-radius:6px;border:1px solid #444;background:#222;color:var(--text-color);}
 .search-bar button{background-color:var(--primary-color);color:#000;border:none;border-radius:6px;padding:10px 15px;cursor:pointer;}
 .filter-bar{display:flex;gap:10px;margin-bottom:15px;overflow-x:auto;padding-bottom:5px;}
-.filter-bar button{background:#333;color:#b3b3b3;border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
+.filter-bar button{background:#333;color:var(--text-secondary);border:none;padding:8px 15px;border-radius:20px;cursor:pointer;flex-shrink:0;}
 .filter-bar button.active{background-color:var(--primary-color);color:#000;box-shadow:var(--soft-glow);}
 .user-item{background-color:var(--secondary-color);padding:12px 15px;margin-bottom:10px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;overflow:hidden;}
 .user-item.valid::before{content:"";position:absolute;top:0;left:0;width:6px;height:100%;background:var(--primary-color);box-shadow:0 0 10px rgba(169,127,255,.6);}
@@ -74,185 +74,178 @@ nav{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--secondar
 <body>
 <header><h1>CloudPlay Admin Panel</h1></header>
 <div class="container">
-<div id="usersTab">
-<h2>Build / Device IDs</h2>
-<div class="search-bar">
-<input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
-<button onclick="render()"><i class="fas fa-search"></i></button>
+  <div id="usersTab">
+    <h2>Build / Device IDs</h2>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search Build/Device ID..." oninput="render()">
+      <button onclick="render()"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="filter-bar">
+      <button class="active" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
+      <button onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
+      <button onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
+      <button onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
+    </div>
+    <div id="userList"></div>
+  </div>
+  <div id="statusTab">
+    <h2>Global Status</h2>
+    <div class="status-container">
+      <h3>Maintenance Configuration</h3>
+      <label>Maintenance Build ID</label>
+      <input type="text" value="MAINTENANCE" readonly>
+      <div class="toggle-row">
+        <label id="maintenanceStatusLabel">System is Inactive :(</label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="maintenanceEnabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <label>Maintenance Message</label>
+      <textarea id="maintenanceMessage" rows="2"></textarea>
+      <div style="display:flex;justify-content:flex-end;margin-top:15px;">
+        <button class="btn-primary" id="saveStatusBtn">Save Status</button>
+      </div>
+    </div>
+  </div>
 </div>
-<div class="filter-bar">
-<button class="active" onclick="setFilter('all',this)">All <span id="countAll"></span></button>
-<button onclick="setFilter('valid',this)">Valid <span id="countValid"></span></button>
-<button onclick="setFilter('expired',this)">Expired <span id="countExpired"></span></button>
-<button onclick="setFilter('limit',this)">Limit <span id="countLimit"></span></button>
-</div>
-<div id="userList"></div>
-</div>
-<div id="statusTab">
-<h2>Global Status</h2>
-<div class="status-container">
-<h3>Maintenance Configuration</h3>
-<label>Maintenance Build ID</label>
-<input type="text" value="MAINTENANCE" readonly>
-<div class="toggle-row">
-<label id="maintenanceStatusLabel">System is Inactive :(</label>
-<label class="toggle-switch">
-<input type="checkbox" id="maintenanceEnabled">
-<span class="slider"></span>
-</label>
-</div>
-<label>Maintenance Message</label>
-<textarea id="maintenanceMessage" rows="2"></textarea>
-<div style="display:flex;justify-content:flex-end;margin-top:15px;">
-<button class="btn-primary" id="saveStatusBtn">Save Status</button>
-</div>
-</div>
-</div>
-</div>
-
+<nav>
+  <div class="nav-item active" onclick="switchTab('users')"><i class="fas fa-key"></i><span>IDs</span></div>
+  <div class="add-user-btn" onclick="openModal()"><i class="fas fa-plus"></i></div>
+  <div class="nav-item" onclick="switchTab('status')"><i class="fas fa-bell"></i><span>Status</span></div>
+</nav>
 <div id="userModal" class="modal">
-<div class="modal-content">
-<h2 id="userModalTitle" style="color:var(--primary-color);">Add New ID</h2>
-<div class="form-group">
-<label for="buildIdInput">Build/Device ID</label>
-<input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007" style="background:#333;color:#fff;" required>
+  <div class="modal-content">
+    <h2 id="userModalTitle" style="color:#a97fff;">Add New ID</h2>
+    <div class="form-group">
+      <label for="buildIdInput">Build/Device ID</label>
+      <input type="text" id="buildIdInput" placeholder="e.g., UP1A.231005.007" style="background:#333;color:#fff;" required>
+    </div>
+    <div class="form-group">
+      <label for="usernameInput">Username</label>
+      <input type="text" id="usernameInput" placeholder="Username" style="background:#333;color:#fff;" required>
+    </div>
+    <div class="form-group">
+      <label>Fitur Khusus Admin</label>
+      <div class="admin-buttons">
+        <button onclick="setExpired()">EXPIRED</button>
+        <button onclick="setLimit()">LIMIT</button>
+      </div>
+    </div>
+    <label>Expiry Date (UTC)</label>
+    <div class="date-shortcuts">
+      <button onclick="setExpiryShortcut(1)">+1 Hari</button>
+      <button onclick="setExpiryShortcut(7)">+7 Hari</button>
+      <button onclick="setExpiryShortcut(30)">+1 Bulan</button>
+      <button onclick="setExpiryShortcut(90)">+3 Bulan</button>
+      <button onclick="setExpiryShortcut(365)">+1 Tahun</button>
+    </div>
+    <div class="form-group">
+      <input type="date" id="expiryDateInput" style="background:#333;color:#fff;" required>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 20px; gap:10px;">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="saveUserBtn">Save ID</button>
+    </div>
+  </div>
 </div>
-<div class="form-group">
-<label for="usernameInput">Username</label>
-<input type="text" id="usernameInput" placeholder="Username" style="background:#333;color:#fff;" required>
-</div>
-<div class="form-group">
-<label>Fitur Khusus Admin</label>
-<div class="admin-buttons">
-<button onclick="setExpired()">EXPIRED</button>
-<button onclick="setLimit()">LIMIT</button>
-</div>
-</div>
-<label>Expiry Date (UTC)</label>
-<div class="date-shortcuts">
-<button onclick="setExpiryShortcut(1)">+1 Hari</button>
-<button onclick="setExpiryShortcut(7)">+7 Hari</button>
-<button onclick="setExpiryShortcut(30)">+1 Bulan</button>
-<button onclick="setExpiryShortcut(90)">+3 Bulan</button>
-<button onclick="setExpiryShortcut(365)">+1 Tahun</button>
-</div>
-<div class="form-group">
-<input type="date" id="expiryDateInput" style="background:#222;color:#fff;" required>
-</div>
-<div style="display:flex;justify-content:flex-end;margin-top:20px;gap:10px;">
-<button class="btn-secondary" onclick="closeModal()">Cancel</button>
-<button class="btn-primary" id="saveUserBtn">Save ID</button>
-</div>
-</div>
-</div>
-
 <script>
 const FIREBASE_ROOT="https://cloudplaypaneladmin-default-rtdb.asia-southeast1.firebasedatabase.app";
 const KEYS_URL=FIREBASE_ROOT+"/keys.json";
 let data={};
 let currentFilter="all";
-
 async function load(){
-const r=await fetch(KEYS_URL);
-data=await r.json()||{};
-render();
+  const r=await fetch(KEYS_URL);
+  data=await r.json()||{};
+  render();
 }
-
 function isExpired(id){
-const d=data[id];
-if(!d) return false;
-if(d.limit===true) return false;
-if(!d.date) return false;
-const today=new Date(); today.setHours(0,0,0,0);
-const exp=new Date(d.date); exp.setHours(0,0,0,0);
-return exp < today;
+  const d=data[id];
+  if(!d) return false;
+  if(d.limit===true) return false;
+  if(!d.date) return false;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const exp=new Date(d.date); exp.setHours(0,0,0,0);
+  return exp < today;
 }
-
 function setFilter(f,el){
-currentFilter=f;
-document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
-el.classList.add('active');
-render();
+  currentFilter=f;
+  document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  render();
 }
-
 function render(){
-userList.innerHTML='';
-let a=0,v=0,e=0,l=0;
-const q=searchInput.value.toLowerCase();
-Object.keys(data).sort().forEach(id=>{
-if(id==="MAINTENANCE") return;
-const d=data[id];
-const ex=isExpired(id);
-a++; if(d.limit) l++; else if(ex) e++; else v++;
-if(currentFilter==="valid"&&(ex||d.limit))return;
-if(currentFilter==="expired"&&(!ex||d.limit))return;
-if(currentFilter==="limit"&&!d.limit)return;
-if(q && !id.toLowerCase().includes(q))return;
-const div=document.createElement('div');
-div.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
-div.innerHTML=`
-<div>
-<strong>${id}</strong><br>
-User: @${d.username || '-'}<br>
-Expired: ${d.date || '-'}
-</div>
-<div class="action-buttons">
-<div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div>
-<button class="dp-btn edit" onclick="editID('${id}')"><i class="fas fa-pen"></i></button>
-<button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fas fa-trash"></i></button>
-</div>`;
-userList.appendChild(div);
-});
-countAll.textContent=`(${a})`;
-countValid.textContent=`(${v})`;
-countExpired.textContent=`(${e})`;
-countLimit.textContent=`(${l})`;
+  userList.innerHTML='';
+  let a=0,v=0,e=0,l=0;
+  const q=searchInput.value.toLowerCase();
+  Object.keys(data).sort().forEach(id=>{
+    if(id==="MAINTENANCE") return;
+    const d=data[id];
+    const ex=isExpired(id);
+    a++; if(d.limit) l++; else if(ex) e++; else v++;
+    if(currentFilter==="valid"&&(ex||d.limit))return;
+    if(currentFilter==="expired"&&(!ex||d.limit))return;
+    if(currentFilter==="limit"&&!d.limit)return;
+    if(q && !id.toLowerCase().includes(q))return;
+    const div=document.createElement('div');
+    div.className='user-item '+(d.limit?'limit':(ex?'expired':'valid'));
+    div.innerHTML=`
+      <div>
+        <strong>${id}</strong><br>
+        User: @${d.username || '-'}<br>
+        Expired: ${d.date || '-'}
+      </div>
+      <div class="action-buttons">
+        <div class="user-status-tag">${d.limit?'LIMIT':(ex?'EXPIRED':'VALID')}</div>
+        <button class="dp-btn edit" onclick="editID('${id}')"><i class="fas fa-pen"></i></button>
+        <button class="dp-btn delete" onclick="deleteID('${id}')"><i class="fas fa-trash"></i></button>
+      </div>`;
+    userList.appendChild(div);
+  });
+  countAll.textContent=`(${a})`;
+  countValid.textContent=`(${v})`;
+  countExpired.textContent=`(${e})`;
+  countLimit.textContent=`(${l})`;
 }
-
 function switchTab(t){
-usersTab.style.display=t==='users'?'block':'none';
-statusTab.style.display=t==='status'?'flex':'none';
+  usersTab.style.display=t==='users'?'block':'none';
+  statusTab.style.display=t==='status'?'flex':'none';
 }
-
 function openModal(){
-buildIdInput.value=''; usernameInput.value=''; expiryDateInput.value=new Date().toISOString().split('T')[0];
-userModal.style.display='flex';
+  buildIdInput.value=''; usernameInput.value=''; expiryDateInput.value=new Date().toISOString().split('T')[0];
+  userModal.style.display='flex';
 }
 function closeModal(){userModal.style.display='none';}
 function setExpiryShortcut(d){
-const x=new Date(); x.setDate(x.getDate()+d);
-expiryDateInput.value=x.toISOString().split('T')[0];
+  const x=new Date(); x.setDate(x.getDate()+d);
+  expiryDateInput.value=x.toISOString().split('T')[0];
 }
 function setExpired(){expiryDateInput.value=new Date().toISOString().split('T')[0];}
 function setLimit(){expiryDateInput.value="9999-01-12";}
-
 async function saveID(){
-const id=buildIdInput.value.trim();
-const u=usernameInput.value.trim();
-const d=expiryDateInput.value;
-if(!id||!u||!d) return alert("Isi semua");
-await fetch(KEYS_URL,{
-method:"PATCH",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({[id]:{username:u,date:d,limit:d==="9999-01-12"}})
-});
-closeModal();
-load();
+  const id=buildIdInput.value.trim();
+  const u=usernameInput.value.trim();
+  const d=expiryDateInput.value;
+  if(!id||!u||!d) return alert("Isi semua");
+  await fetch(KEYS_URL,{
+    method:"PATCH",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({[id]:{username:u,date:d,limit:d==="9999-01-12"}})
+  });
+  closeModal();
+  load();
 }
-
 function editID(id){
-buildIdInput.value=id;
-usernameInput.value=data[id].username;
-expiryDateInput.value=data[id].date;
-openModal();
+  buildIdInput.value=id;
+  usernameInput.value=data[id].username;
+  expiryDateInput.value=data[id].date;
+  openModal();
 }
-
 async function deleteID(id){
-if(!confirm("Hapus ID "+id+" ?")) return;
-await fetch(`${FIREBASE_ROOT}/keys/${id}.json`,{method:"DELETE"});
-load();
+  if(!confirm("Hapus ID "+id+" ?")) return;
+  await fetch(`${FIREBASE_ROOT}/keys/${id}.json`,{method:"DELETE"});
+  load();
 }
-
 load();
 </script>
 </body>
